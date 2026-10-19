@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createPortalBrief, DEFAULT_PORTAL_BRIEF } from '../src/lib/blog/portal-brief.ts';
+import { createPortalBrief, DEFAULT_PORTAL_BRIEF } from '../portal-brief.ts';
 
 test('the client approval preset produces an actionable brief without silently adding payments', () => {
   const brief = createPortalBrief(DEFAULT_PORTAL_BRIEF);

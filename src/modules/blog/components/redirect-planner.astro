@@ -3,7 +3,7 @@ import {
   intendedDestination,
   intendedStatus,
   sampleRedirectRows,
-} from '@/lib/blog/redirect-planner';
+} from '@/modules/blog/utils/redirect-planner';
 ---
 
 <section class="redirect-planner" data-redirect-planner aria-label="Redirect-map planner">
@@ -141,7 +141,7 @@ import {
     validateRedirectRows,
     type RedirectAction,
     type RedirectRow,
-  } from '@/lib/blog/redirect-planner';
+  } from '@/modules/blog/utils/redirect-planner';
 
   document.querySelectorAll<HTMLElement>('[data-redirect-planner]').forEach((planner, instance) => {
     const form = planner.querySelector<HTMLFormElement>('[data-planner-form]')!;

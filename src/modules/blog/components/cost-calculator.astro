@@ -4,7 +4,7 @@ import {
   createCostComparison,
   DEFAULT_COST_OPTIONS,
   formatCost,
-} from '@/lib/blog/cost-calculator';
+} from '@/modules/blog/utils/cost-calculator';
 
 const months = 36;
 const totals = DEFAULT_COST_OPTIONS.map((option) => calculateCosts(option, months));
@@ -219,8 +219,8 @@ const fields = [
     createCostComparison,
     formatCost,
     parseNonnegativeNumber,
-  } from '@/lib/blog/cost-calculator';
-  import type { CostOption } from '@/lib/blog/cost-calculator';
+  } from '@/modules/blog/utils/cost-calculator';
+  import type { CostOption } from '@/modules/blog/utils/cost-calculator';
 
   class CostCalculator extends HTMLElement {
     connectedCallback() {

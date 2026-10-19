@@ -1,5 +1,5 @@
 ---
-import { createPortalBrief, DEFAULT_PORTAL_BRIEF } from '@/lib/blog/portal-brief';
+import { createPortalBrief, DEFAULT_PORTAL_BRIEF } from '@/modules/blog/utils/portal-brief';
 
 const defaultBrief = createPortalBrief(DEFAULT_PORTAL_BRIEF);
 ---
@@ -170,8 +170,8 @@ const defaultBrief = createPortalBrief(DEFAULT_PORTAL_BRIEF);
 </portal-brief-builder>
 
 <script>
-  import { createPortalBrief } from '@/lib/blog/portal-brief';
-  import type { BillingScope, DocumentHandling } from '@/lib/blog/portal-brief';
+  import { createPortalBrief } from '@/modules/blog/utils/portal-brief';
+  import type { BillingScope, DocumentHandling } from '@/modules/blog/utils/portal-brief';
 
   class PortalBriefBuilder extends HTMLElement {
     connectedCallback() {

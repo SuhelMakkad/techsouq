@@ -1,9 +1,9 @@
 ---
 import ArrowIcon from '@/components/arrow-icon.astro';
-import BlogCard from '@/components/blog-card.astro';
+import BlogCard from '@/modules/blog/components/blog-card.astro';
 import SectionLabel from '@/components/section-label.astro';
 
-import { getPosts } from '@/lib/blog';
+import { getPosts } from '@/modules/blog/lib/posts';
 
 const posts = (await getPosts()).slice(0, 3);
 ---

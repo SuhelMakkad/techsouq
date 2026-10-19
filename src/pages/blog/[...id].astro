@@ -1,9 +1,8 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { render } from 'astro:content';
 
-import BlogPost from '@/layouts/blog-post.astro';
-import { getPosts } from '@/lib/blog';
+import { getPosts } from '@/modules/blog/lib/posts';
+import BlogDetailPage from '@/modules/blog/pages/detail/index.astro';
 
 export async function getStaticPaths() {
   const posts = await getPosts();
@@ -16,10 +15,6 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { Content, headings } = await render(post);
-const relatedPosts = (await getPosts()).filter((entry) => entry.id !== post.id).slice(0, 2);
 ---
 
-<BlogPost post={post} headings={headings} relatedPosts={relatedPosts}>
-  <Content />
-</BlogPost>
+<BlogDetailPage post={post} />

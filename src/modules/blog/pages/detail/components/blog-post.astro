@@ -3,13 +3,13 @@ import { Image } from 'astro:assets';
 import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
-import BaseHead from '@/components/base-head.astro';
-import BlogCard from '@/components/blog-card.astro';
-import Footer from '@/components/footer.astro';
+import BaseHead from '@/components/layout/base-head.astro';
+import BlogCard from '@/modules/blog/components/blog-card.astro';
+import Footer from '@/components/layout/footer.astro';
 
 import FormattedDate from '@/components/formatted-date.astro';
-import Header from '@/components/header.astro';
-import { readingMinutes } from '@/lib/blog';
+import Header from '@/components/layout/header.astro';
+import { readingMinutes } from '@/modules/blog/lib/posts';
 
 interface Props {
   post: CollectionEntry<'blog'>;

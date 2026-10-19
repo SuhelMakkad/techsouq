@@ -7,7 +7,7 @@ import {
   DEFAULT_COST_OPTIONS,
   formatCost,
   parseNonnegativeNumber,
-} from '../src/lib/blog/cost-calculator.ts';
+} from '../cost-calculator.ts';
 
 test('a copied comparison includes chosen inputs, totals, and the model limitations', () => {
   const comparison = createCostComparison(DEFAULT_COST_OPTIONS, 36, 'INR');

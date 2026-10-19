@@ -54,7 +54,7 @@
 
 @layer components {
   .page-container {
-    @apply mx-auto w-full max-w-[1360px] px-6 sm:px-10 lg:px-16;
+    @apply mx-auto w-full max-w-340 px-6 sm:px-10 lg:px-16;
   }
 
   .eyebrow {

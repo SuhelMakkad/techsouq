@@ -9,7 +9,7 @@ import {
   sampleRedirectRows,
   validateRedirectRows,
   type RedirectRow,
-} from '../src/lib/blog/redirect-planner.ts';
+} from '../redirect-planner.ts';
 
 const move = (source: string, destination: string): RedirectRow => ({
   source,

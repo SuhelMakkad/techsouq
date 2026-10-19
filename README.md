@@ -21,11 +21,55 @@ pnpm exec astro dev stop
 
 Build the site with `pnpm build`. The static output is written to `dist/`.
 
+## Project structure
+
+The source follows Hostleaf's shared-code and feature-module conventions while keeping Astro's file-based routes and content collections.
+
+```text
+src/
+├── assets/blog/
+├── common/
+│   ├── components/
+│   │   └── layout/
+│   ├── constants/site.ts
+│   └── styles/global.css
+├── content/blog/
+├── content.config.ts
+├── modules/
+│   ├── marketing/pages/landing/
+│   │   ├── index.astro
+│   │   └── components/
+│   └── blog/
+│       ├── components/
+│       ├── lib/posts.ts
+│       ├── utils/
+│       │   └── __test__/
+│       └── pages/
+│           ├── list/index.astro
+│           └── detail/
+│               ├── index.astro
+│               └── components/blog-post.astro
+└── pages/
+    ├── index.astro
+    ├── blog/
+    │   ├── index.astro
+    │   └── [...id].astro
+    └── robots.txt.ts
+```
+
+Shared components such as the brand, arrow icon, formatted date, and section label belong in `src/common/components/`; the document head, header, and footer belong in its `layout/` directory. Site constants and global styles also live under `common/`.
+
+Feature implementations live in `src/modules/`. Keep landing-page sections in the landing page's `components/` directory, reusable blog components in the blog module's `components/` directory, and article layout components beside the detail page. Collection and reading-time helpers belong in `modules/blog/lib/posts.ts`; pure calculation and validation helpers belong in `modules/blog/utils/` with colocated tests under `__test__/`. Add directories only when they contain an implementation.
+
+Keep `src/pages/` thin: route files import module page entrypoints directly, and the dynamic article route owns `getStaticPaths()` and URL parameter mapping. Avoid barrel files. Content collections, cover assets, and public files retain their Astro locations.
+
+Use `@/` for shared imports, such as `@/components/layout/header.astro` and `@/styles/global.css`, and `@/modules/` for feature imports, such as `@/modules/blog/pages/list/index.astro`. These aliases map to `src/common/` and `src/modules/` respectively. Use kebab-case component filenames and PascalCase imported identifiers.
+
 ## Code quality
 
 Run `pnpm lint` to check JavaScript, TypeScript, and Astro files. Use `pnpm lint:fix` to apply available automatic fixes.
 
-Run `pnpm test` for the interactive tools' calculation, brief-generation, and redirect-validation tests. These use Node's built-in test runner and TypeScript stripping; no test framework is required.
+Run `pnpm test` for the interactive tools' calculation, brief-generation, and redirect-validation tests in `src/modules/blog/utils/__test__/`. These use Node's built-in test runner and TypeScript stripping; no test framework is required. Tests import helpers with relative `.ts` paths so they run without resolving Astro's aliases.
 
 Run `pnpm format` to format the project, or `pnpm format:check` to check formatting without changing files. Prettier supports Astro components and sorts Tailwind classes using the site's stylesheet. Markdown prose stays on one source line per paragraph.
 
@@ -37,7 +81,7 @@ The project inquiry is a local preview. Entered details are not delivered or sto
 
 ## Writing blog articles
 
-Add a kebab-case `.mdx` file to `src/content/blog/`. Its filename becomes its stable `/blog/<filename>/` URL. The collection schema is in `src/content.config.ts`; public routes and navigation are generated from the collection. Use `@/` imports for components, and keep each prose paragraph on one source line.
+Add a kebab-case `.mdx` file to `src/content/blog/`. Its filename becomes its stable `/blog/<filename>/` URL. The collection schema is in `src/content.config.ts`; public routes and navigation are generated from the collection. Use `@/modules/blog/components/` imports for blog components and `@/components/` for shared components, and keep each prose paragraph on one source line.
 
 Required frontmatter:
 
@@ -53,7 +97,7 @@ socialImage: /images/blog/article-slug.png
 
 Use the actual publication date. Add `updatedDate` only after a substantive revision. The visible author and structured-data author are Techsouq. Reading time and the linked contents list are derived from the article; related posts appear automatically.
 
-Explain assumptions, label fictional examples, and cite original sources beside factual claims. Add useful graphics and preserve complete explanations without JavaScript. Interactive components live in `src/components/blog/`, with tested calculation and validation helpers in `src/lib/blog/`. Tools run entirely in the browser and do not send or retain reader input after a refresh.
+Explain assumptions, label fictional examples, and cite original sources beside factual claims. Add useful graphics and preserve complete explanations without JavaScript. Interactive components live in `src/modules/blog/components/`, with tested calculation and validation helpers in `src/modules/blog/utils/`. Tools run entirely in the browser and do not send or retain reader input after a refresh.
 
 Original cover SVGs live in `src/assets/blog/`, with matching 1200 × 630 PNG social images in `public/images/blog/`. If you change a cover, regenerate its PNG using the installed Sharp package:
 

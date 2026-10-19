@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 
 import ArrowIcon from '@/components/arrow-icon.astro';
-import { readingMinutes } from '@/lib/blog';
+import { readingMinutes } from '@/modules/blog/lib/posts';
 
 interface Props {
   post: CollectionEntry<'blog'>;

@@ -1,0 +1,48 @@
+---
+import BaseHead from '@/components/layout/base-head.astro';
+import BlogCard from '@/modules/blog/components/blog-card.astro';
+import Footer from '@/components/layout/footer.astro';
+
+import Header from '@/components/layout/header.astro';
+import { getPosts } from '@/modules/blog/lib/posts';
+
+const posts = await getPosts();
+const description =
+  'Practical guides, calculators, and planning tools for founders and business owners building websites, customer portals, and custom software.';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title="Digital product guides & tools | Techsouq Blog" description={description} />
+  </head>
+
+  <body>
+    <Header />
+
+    <main id="main-content" tabindex="-1" class="page-container py-16 sm:py-22">
+      <header class="mb-12 max-w-3xl">
+        <p class="eyebrow text-brand">The Techsouq blog</p>
+        <h1 class="mt-6 text-[clamp(2.5rem,5vw,4.5rem)] font-semibold leading-[1.12] tracking-[-0.055em]">
+          Good decisions
+          <br />
+          start with clarity.
+        </h1>
+
+        <p class="mt-6 max-w-xl text-base leading-8 text-muted">{description}</p>
+        <p class="mt-5 inline-flex items-center gap-2 text-xs font-medium text-muted">
+          <span class="size-1.5 rounded-full bg-brand" aria-hidden="true"></span>
+          Worked examples. Useful tools. Room to think.
+        </p>
+      </header>
+
+      <section aria-label="All articles" class="grid gap-6 lg:grid-cols-3">
+        {posts.map((post) => (
+          <BlogCard post={post} headingLevel="h2" />
+        ))}
+      </section>
+    </main>
+
+    <Footer />
+  </body>
+</html>
