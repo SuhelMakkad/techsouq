@@ -5,6 +5,7 @@ import Brand from '@/components/brand.astro';
 const links = [
   { label: 'Services', href: '/#services' },
   { label: 'Approach', href: '/#approach' },
+  { label: 'Blog', href: '/blog/' },
 ];
 ---
 
@@ -15,7 +16,10 @@ const links = [
   Skip to content
 </a>
 
-<header class="sticky top-0 z-40 border-b border-line/80 bg-white/95 backdrop-blur-md">
+<header
+  data-site-header
+  class="sticky top-0 z-40 border-b border-line/80 bg-white/95 backdrop-blur-md"
+>
   <div class="page-container flex h-21 items-center justify-between gap-5">
     <Brand />
 
@@ -71,6 +75,16 @@ const links = [
     </div>
   </nav>
 </header>
+
+<noscript>
+  <style is:inline>
+    @media (max-width: 47.999rem) {
+      [data-site-header] {
+        position: static;
+      }
+    }
+  </style>
+</noscript>
 
 <script>
   const menuToggle = document.querySelector<HTMLButtonElement>('#menu-toggle');

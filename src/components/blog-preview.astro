@@ -1,0 +1,39 @@
+---
+import ArrowIcon from '@/components/arrow-icon.astro';
+import BlogCard from '@/components/blog-card.astro';
+import SectionLabel from '@/components/section-label.astro';
+
+import { getPosts } from '@/lib/blog';
+
+const posts = (await getPosts()).slice(0, 3);
+---
+
+<section aria-labelledby="guides-title" class="border-b border-line py-20 lg:py-25">
+  <div class="page-container">
+    <SectionLabel number="03" label="A little clarity" />
+
+    <div class="mt-7 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+      <h2 id="guides-title" class="section-heading">
+        Make a more
+        <br />
+        informed next move.
+      </h2>
+      <a
+        href="/blog/"
+        class="inline-flex min-h-11 items-center gap-3 text-xs font-semibold text-brand"
+      >
+        Explore the blog <ArrowIcon class="size-3.5" />
+      </a>
+    </div>
+
+    <p class="mt-6 max-w-xl text-sm leading-7 text-muted">
+      Practical guides and useful tools for the decisions that come before a great build.
+    </p>
+
+    <div class="mt-10 grid gap-6 lg:grid-cols-3">
+      {posts.map((post) => (
+        <BlogCard post={post} />
+      ))}
+    </div>
+  </div>
+</section>

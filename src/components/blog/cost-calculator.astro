@@ -1,0 +1,831 @@
+---
+import {
+  calculateCosts,
+  createCostComparison,
+  DEFAULT_COST_OPTIONS,
+  formatCost,
+} from '@/lib/blog/cost-calculator';
+
+const months = 36;
+const totals = DEFAULT_COST_OPTIONS.map((option) => calculateCosts(option, months));
+const largestTotal = Math.max(...totals.map((total) => total.combined), 1);
+const defaultComparison = createCostComparison(DEFAULT_COST_OPTIONS, months);
+
+const fields = [
+  { key: 'upfront', label: 'Upfront cash', hint: 'Setup, build, and migration' },
+  { key: 'monthly', label: 'Monthly cash', hint: 'Fees, hosting, and support' },
+  { key: 'hours', label: 'Staff hours / month', hint: 'Recurring internal work' },
+  { key: 'hourlyRate', label: 'Loaded hourly rate', hint: 'Pay plus employer overhead' },
+  { key: 'exit', label: 'Exit cash allowance', hint: 'One allowance at the end' },
+] as const;
+---
+
+<cost-calculator class="cost-tool">
+  <div class="tool-heading">
+    <span class="tool-kicker">Try your own numbers</span>
+    <h3>What does each option really cost?</h3>
+    <p>
+      Compare cash separately from the value you assign to staff time. These starting numbers are a
+      fictional example, not vendor quotes.
+    </p>
+  </div>
+
+  <form data-cost-form hidden novalidate>
+    <div class="planning-fields">
+      <label class="field">
+        <span>Planning period</span>
+        <select name="months">
+          <option value="12">12 months</option>
+          <option value="36" selected>
+            36 months
+          </option>
+          <option value="60">60 months</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Currency label</span>
+        <input name="currency" type="text" value="USD" maxlength="12" required />
+        <small>A label only. No exchange-rate conversion.</small>
+      </label>
+    </div>
+
+    <div class="options-grid">
+      {DEFAULT_COST_OPTIONS.map((option, index) => (
+        <fieldset class="option-card">
+          <legend>Option {index + 1}</legend>
+
+          <label class="field option-name-field">
+            <span>Option name</span>
+            <input name={`${index}-name`} type="text" value={option.name} maxlength="80" required />
+          </label>
+
+          <div class="numeric-fields">
+            {fields.map((field) => (
+              <label class="field">
+                <span>{field.label}</span>
+                <input
+                  name={`${index}-${field.key}`}
+                  type="number"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  value={option[field.key]}
+                  required
+                />
+                <small>{field.hint}</small>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ))}
+    </div>
+
+    <div class="form-footer">
+      <p>Results update as you edit. All inputs stay on this page.</p>
+      <button type="reset" class="text-button">
+        Reset example
+      </button>
+    </div>
+
+    <p class="error-message" data-cost-error role="alert" hidden></p>
+  </form>
+
+  <noscript>
+    <p class="no-script">
+      Enable JavaScript to change the inputs. The complete 36-month worked result is below; the
+      formulas also appear in the article.
+    </p>
+  </noscript>
+
+  <div class="results">
+    <div class="result-heading">
+      <h4>
+        Your <span data-period>{months}</span>-month comparison
+      </h4>
+      <span class="estimate-badge">Planning estimate</span>
+    </div>
+
+    <div class="comparison-chart" aria-hidden="true">
+      {DEFAULT_COST_OPTIONS.map((option, index) => (
+        <div class="chart-row">
+          <div class="chart-label">
+            <span data-option-name={index}>{option.name}</span>
+            <strong data-total={index}>{formatCost(totals[index].combined)}</strong>
+          </div>
+
+          <div class="chart-track">
+            <span
+              class="cash-segment"
+              data-cash-bar={index}
+              style={`width: ${(totals[index].cash / largestTotal) * 100}%`}
+            ></span>
+            <span
+              class="capacity-segment"
+              data-capacity-bar={index}
+              style={`width: ${(totals[index].capacity / largestTotal) * 100}%`}
+            ></span>
+          </div>
+        </div>
+      ))}
+
+      <div class="chart-legend">
+        <span>
+          <i class="cash-swatch"></i>Cash outlay
+        </span>
+        <span>
+          <i class="capacity-swatch"></i>Assigned staff-time value
+        </span>
+      </div>
+    </div>
+
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Detailed cost comparison">
+      <table>
+        <caption>Cash and staff time over the selected period</caption>
+        <thead>
+          <tr>
+            <th scope="col">Measure</th>
+            {DEFAULT_COST_OPTIONS.map((option, index) => (
+              <th scope="col" data-option-name={index}>
+                {option.name}
+              </th>
+            ))}
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <th scope="row">Cash outlay</th>
+            {totals.map((total, index) => (
+              <td data-metric={`${index}-cash`}>{formatCost(total.cash)}</td>
+            ))}
+          </tr>
+          <tr>
+            <th scope="row">Staff hours</th>
+            {totals.map((total, index) => (
+              <td data-metric={`${index}-staffHours`}>
+                {total.staffHours.toLocaleString('en-US')} hrs
+              </td>
+            ))}
+          </tr>
+          <tr>
+            <th scope="row">Assigned staff-time value</th>
+            {totals.map((total, index) => (
+              <td data-metric={`${index}-capacity`}>{formatCost(total.capacity)}</td>
+            ))}
+          </tr>
+          <tr class="combined-row">
+            <th scope="row">Cash + staff-time value</th>
+            {totals.map((total, index) => (
+              <td data-metric={`${index}-combined`}>{formatCost(total.combined)}</td>
+            ))}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="result-takeaway" role="status" aria-live="polite" aria-atomic="true">
+      <p data-cash-summary>
+        <strong>Custom portal needs USD 47,600 more cash than SaaS portal.</strong>
+      </p>
+      <p data-capacity-summary>
+        It uses 1,260 fewer staff hours. Its cash + staff-time value is USD 2,800 lower.
+      </p>
+    </div>
+  </div>
+
+  <div class="comparison-actions" data-copy-controls hidden>
+    <button type="button" class="copy-button" data-copy-comparison>
+      Copy comparison
+    </button>
+    <p class="copy-status" data-copy-status role="status"></p>
+
+    <label class="copy-fallback" data-copy-fallback hidden>
+      <span>Select and copy the comparison</span>
+      <textarea data-copy-output rows="12" readonly>{defaultComparison}</textarea>
+    </label>
+  </div>
+
+  <p class="model-note">
+    Released time is capacity, not automatic cash savings. This model keeps recurring costs flat,
+    includes the exit allowance once, and excludes tax, inflation, financing, and any revenue
+    change. Compare with the same currency and horizon.
+  </p>
+</cost-calculator>
+
+<script>
+  import {
+    calculateCosts,
+    createCostComparison,
+    formatCost,
+    parseNonnegativeNumber,
+  } from '@/lib/blog/cost-calculator';
+  import type { CostOption } from '@/lib/blog/cost-calculator';
+
+  class CostCalculator extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready) return;
+
+      const form = this.querySelector<HTMLFormElement>('[data-cost-form]');
+      const error = this.querySelector<HTMLElement>('[data-cost-error]');
+      const copyOutput = this.querySelector<HTMLTextAreaElement>('[data-copy-output]');
+      const copyStatus = this.querySelector<HTMLElement>('[data-copy-status]');
+
+      if (!form || !error || !copyOutput || !copyStatus) return;
+
+      this.dataset.ready = 'true';
+      form.hidden = false;
+
+      const copyControls = this.querySelector<HTMLElement>('[data-copy-controls]');
+
+      if (copyControls) copyControls.hidden = false;
+
+      const input = (name: string) =>
+        form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement;
+
+      const readNumber = (name: string, label: string) => {
+        const field = input(name);
+
+        try {
+          return parseNonnegativeNumber(field.value, label);
+        } catch (cause) {
+          field.setAttribute('aria-invalid', 'true');
+          throw cause;
+        }
+      };
+
+      const readOption = (index: number): CostOption => {
+        const nameField = input(`${index}-name`);
+        const name = nameField.value.trim();
+
+        if (!name || name.length > 80) {
+          nameField.setAttribute('aria-invalid', 'true');
+          throw new Error(`Give option ${index + 1} a name of 1–80 characters.`);
+        }
+
+        return {
+          name,
+          upfront: readNumber(`${index}-upfront`, `Option ${index + 1} upfront cash`),
+          monthly: readNumber(`${index}-monthly`, `Option ${index + 1} monthly cash`),
+          hours: readNumber(`${index}-hours`, `Option ${index + 1} staff hours`),
+          hourlyRate: readNumber(`${index}-hourlyRate`, `Option ${index + 1} hourly rate`),
+          exit: readNumber(`${index}-exit`, `Option ${index + 1} exit cash`),
+        };
+      };
+
+      const setText = (selector: string, text: string) => {
+        this.querySelectorAll<HTMLElement>(selector).forEach((element) => {
+          element.textContent = text;
+        });
+      };
+
+      const update = () => {
+        form
+          .querySelectorAll('[aria-invalid]')
+          .forEach((field) => field.removeAttribute('aria-invalid'));
+
+        try {
+          const months = Number(input('months').value);
+          const currency = input('currency').value.trim();
+
+          try {
+            formatCost(0, currency);
+          } catch (cause) {
+            input('currency').setAttribute('aria-invalid', 'true');
+            throw cause;
+          }
+
+          const options: [CostOption, CostOption] = [readOption(0), readOption(1)];
+          const totals = options.map((option) => calculateCosts(option, months));
+          const largest = Math.max(...totals.map((total) => total.combined), 1);
+
+          setText('[data-period]', String(months));
+
+          options.forEach((option, index) => {
+            setText(`[data-option-name="${index}"]`, option.name);
+            setText(`[data-total="${index}"]`, formatCost(totals[index].combined, currency));
+
+            for (const metric of ['cash', 'capacity', 'combined'] as const) {
+              setText(
+                `[data-metric="${index}-${metric}"]`,
+                formatCost(totals[index][metric], currency),
+              );
+            }
+
+            setText(
+              `[data-metric="${index}-staffHours"]`,
+              `${totals[index].staffHours.toLocaleString('en-US', { maximumFractionDigits: 2 })} hrs`,
+            );
+
+            const cashBar = this.querySelector<HTMLElement>(`[data-cash-bar="${index}"]`);
+            const capacityBar = this.querySelector<HTMLElement>(`[data-capacity-bar="${index}"]`);
+
+            if (cashBar) cashBar.style.width = `${(totals[index].cash / largest) * 100}%`;
+            if (capacityBar)
+              capacityBar.style.width = `${(totals[index].capacity / largest) * 100}%`;
+          });
+
+          const cashDifference = totals[1].cash - totals[0].cash;
+          const hoursDifference = totals[0].staffHours - totals[1].staffHours;
+          const combinedDifference = totals[1].combined - totals[0].combined;
+
+          const cashSummary =
+            cashDifference === 0
+              ? `${options[1].name} and ${options[0].name} need the same cash outlay.`
+              : `${options[1].name} needs ${formatCost(Math.abs(cashDifference), currency)} ${cashDifference > 0 ? 'more' : 'less'} cash than ${options[0].name}.`;
+
+          const hoursSummary =
+            hoursDifference === 0
+              ? 'Both options use the same staff hours.'
+              : `It uses ${Math.abs(hoursDifference).toLocaleString('en-US', { maximumFractionDigits: 2 })} ${hoursDifference > 0 ? 'fewer' : 'more'} staff hours.`;
+
+          const combinedSummary =
+            combinedDifference === 0
+              ? 'Their cash + staff-time values are equal.'
+              : `Its cash + staff-time value is ${formatCost(Math.abs(combinedDifference), currency)} ${combinedDifference > 0 ? 'higher' : 'lower'}.`;
+
+          setText('[data-cash-summary]', cashSummary);
+          setText('[data-capacity-summary]', `${hoursSummary} ${combinedSummary}`);
+
+          copyOutput.value = createCostComparison(options, months, currency);
+          copyStatus.textContent = '';
+
+          error.hidden = true;
+          error.textContent = '';
+        } catch (cause) {
+          error.textContent = `${cause instanceof Error ? cause.message : 'Check your inputs.'} Results show the last valid comparison.`;
+          error.hidden = false;
+        }
+      };
+
+      form.addEventListener('input', update);
+      form.addEventListener('change', update);
+      form.addEventListener('reset', () => queueMicrotask(update));
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        update();
+      });
+
+      this.querySelector('[data-copy-comparison]')?.addEventListener('click', async () => {
+        try {
+          if (!navigator.clipboard) throw new Error('Clipboard unavailable');
+
+          await navigator.clipboard.writeText(copyOutput.value);
+          copyStatus.textContent = error.hidden
+            ? 'Comparison copied with your inputs, formulas, and model limitations.'
+            : 'The last valid comparison was copied. Correct the input error to include new values.';
+        } catch {
+          const fallback = this.querySelector<HTMLElement>('[data-copy-fallback]');
+
+          if (fallback) fallback.hidden = false;
+
+          copyOutput.focus();
+          copyOutput.select();
+          copyOutput.setSelectionRange(0, copyOutput.value.length);
+
+          copyStatus.textContent =
+            'Automatic copy is unavailable. The last valid comparison is selected below; press ⌘C or Ctrl+C to copy.';
+        }
+      });
+    }
+  }
+
+  if (!customElements.get('cost-calculator')) {
+    customElements.define('cost-calculator', CostCalculator);
+  }
+</script>
+
+<style>
+  .cost-tool {
+    display: block;
+    margin: 2.25rem 0;
+    padding: clamp(1.1rem, 3vw, 2rem);
+
+    border: 1px solid #dce4f3;
+    border-radius: 1.25rem;
+    background: #f7f8fb;
+
+    color: #18202f;
+    line-height: 1.5;
+  }
+
+  .cost-tool [hidden] {
+    display: none !important;
+  }
+
+  .cost-tool p,
+  .cost-tool h3,
+  .cost-tool h4 {
+    margin: 0;
+  }
+
+  .tool-kicker {
+    color: #2061ef;
+    font-size: 0.7rem;
+    font-weight: 700;
+
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .tool-heading h3 {
+    margin-top: 0.6rem;
+    font-size: clamp(1.35rem, 3vw, 1.7rem);
+    line-height: 1.25;
+
+    letter-spacing: -0.035em;
+  }
+
+  .tool-heading p {
+    margin-top: 0.85rem;
+    color: #566174;
+    font-size: 0.875rem;
+  }
+
+  .planning-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    margin-top: 1.75rem;
+  }
+
+  .field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+
+    gap: 0.45rem;
+    font-size: 0.75rem;
+    font-weight: 650;
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+    min-width: 0;
+    min-height: 2.8rem;
+
+    border: 1px solid #cbd4e1;
+    border-radius: 0.55rem;
+    background: white;
+
+    padding: 0.6rem 0.7rem;
+    color: #18202f;
+    font: inherit;
+
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .field input[aria-invalid='true'] {
+    border-color: #a33a32;
+  }
+
+  .field small {
+    color: #5e697b;
+    font-size: 0.675rem;
+    font-weight: 400;
+
+    line-height: 1.4;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    margin-top: 1.5rem;
+  }
+
+  .option-card {
+    min-width: 0;
+    margin: 0;
+    border: 1px solid #dce3ee;
+
+    border-radius: 0.85rem;
+    background: #fff;
+    padding: 1rem;
+  }
+
+  .option-card legend {
+    padding: 0 0.4rem;
+    color: #2061ef;
+    font-size: 0.75rem;
+
+    font-weight: 700;
+  }
+
+  .numeric-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 0.8rem;
+
+    margin-top: 1.15rem;
+  }
+
+  .numeric-fields .field:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .form-footer p {
+    color: #5e697b;
+    font-size: 0.725rem;
+  }
+
+  .text-button {
+    flex-shrink: 0;
+    min-height: 2.75rem;
+    border: 0;
+
+    background: transparent;
+    padding: 0.5rem 0;
+    color: #164dd0;
+
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 650;
+
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .cost-tool .error-message,
+  .cost-tool .no-script {
+    margin-top: 1rem;
+    border-left: 3px solid #a33a32;
+    padding: 0.75rem;
+
+    background: #fff4ee;
+    color: #7e302a;
+    font-size: 0.8rem;
+  }
+
+  .results {
+    margin-top: 1.6rem;
+    border-top: 1px solid #dce3ee;
+    padding-top: 1.5rem;
+  }
+
+  .result-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    justify-content: space-between;
+    gap: 0.65rem;
+  }
+
+  .result-heading h4 {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .estimate-badge {
+    border-radius: 999px;
+    background: #e9effc;
+    padding: 0.3rem 0.6rem;
+
+    color: #164dd0;
+    font-size: 0.65rem;
+    font-weight: 650;
+  }
+
+  .comparison-chart {
+    margin-top: 1.25rem;
+  }
+  .chart-row + .chart-row {
+    margin-top: 1rem;
+  }
+
+  .chart-label {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    gap: 0.25rem 1rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.75rem;
+  }
+
+  .chart-label span {
+    overflow-wrap: anywhere;
+  }
+  .chart-label strong {
+    font-weight: 650;
+  }
+
+  .chart-track {
+    display: flex;
+    height: 1rem;
+    overflow: hidden;
+
+    border-radius: 0.25rem;
+    background: #e7ebf3;
+  }
+
+  .cash-segment,
+  .cash-swatch {
+    background: #2061ef;
+  }
+
+  .capacity-segment,
+  .capacity-swatch {
+    background: repeating-linear-gradient(135deg, #aec6ff, #aec6ff 3px, #d7e4ff 3px, #d7e4ff 6px);
+  }
+
+  .chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+
+    margin-top: 0.85rem;
+    color: #566174;
+    font-size: 0.65rem;
+  }
+
+  .chart-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .chart-legend i {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 0.15rem;
+  }
+
+  .table-scroll {
+    margin-top: 1.5rem;
+    overflow-x: auto;
+  }
+
+  .cost-tool table {
+    display: table;
+    width: 100%;
+    margin: 0;
+
+    border-collapse: collapse;
+    font-size: 0.725rem;
+  }
+
+  .cost-tool caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .cost-tool th,
+  .cost-tool td {
+    border-bottom: 1px solid #dce3ee;
+    padding: 0.8rem 0.45rem;
+    text-align: right;
+
+    vertical-align: top;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cost-tool thead th {
+    max-width: 11rem;
+    color: #566174;
+    font-size: 0.675rem;
+
+    overflow-wrap: anywhere;
+  }
+
+  .cost-tool th:first-child {
+    width: 40%;
+    padding-left: 0;
+    text-align: left;
+  }
+
+  .cost-tool tbody th {
+    font-weight: 500;
+  }
+  .cost-tool td:last-child {
+    padding-right: 0;
+  }
+
+  .cost-tool .combined-row th,
+  .cost-tool .combined-row td {
+    border-bottom: 0;
+    font-weight: 750;
+  }
+
+  .result-takeaway {
+    margin-top: 1rem;
+    border-radius: 0.7rem;
+    background: #eaf0ff;
+
+    padding: 1rem;
+    font-size: 0.8rem;
+  }
+
+  .result-takeaway p:first-child {
+    font-weight: 700;
+  }
+
+  .result-takeaway p + p {
+    margin-top: 0.4rem;
+    color: #3c4c66;
+  }
+
+  .cost-tool .model-note {
+    margin-top: 1.2rem;
+    color: #566174;
+    font-size: 0.725rem;
+
+    line-height: 1.65;
+  }
+
+  .comparison-actions {
+    margin-top: 1.25rem;
+  }
+
+  .copy-button {
+    min-height: 2.8rem;
+    border: 1px solid #cbd4e1;
+    border-radius: 0.55rem;
+
+    background: white;
+    padding: 0.7rem 1rem;
+    color: #18202f;
+
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 650;
+  }
+
+  .copy-button:hover {
+    border-color: #2061ef;
+    color: #164dd0;
+  }
+
+  .cost-tool .copy-status {
+    margin-top: 0.6rem;
+    color: #3c4c66;
+    font-size: 0.725rem;
+  }
+
+  .copy-fallback {
+    display: block;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+  }
+
+  .copy-fallback textarea {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+
+    border: 1px solid #cbd4e1;
+    border-radius: 0.7rem;
+    background: white;
+
+    padding: 1rem;
+    font-size: 0.75rem;
+    line-height: 1.7;
+
+    resize: vertical;
+  }
+
+  @media (max-width: 600px) {
+    .field input,
+    .field select,
+    .copy-fallback textarea {
+      font-size: 1rem;
+    }
+
+    .options-grid {
+      grid-template-columns: 1fr;
+    }
+    .planning-fields {
+      gap: 0.75rem;
+    }
+    .form-footer {
+      align-items: flex-start;
+    }
+
+    .cost-tool table {
+      font-size: 0.65rem;
+    }
+    .cost-tool th:first-child {
+      width: 34%;
+    }
+  }
+</style>

@@ -1,0 +1,69 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="1200"
+  height="630"
+  viewBox="0 0 1200 630"
+  fill="none"
+>
+  <title>Build or buy? Compare the whole cost.</title>
+  <desc>
+    A fictional three-year comparison in US dollars. Off-the-shelf costs 29,200 in cash and 57,600
+    in staff capacity. Custom costs 76,800 in cash and 7,200 in staff capacity.
+  </desc>
+  <rect width="1200" height="630" fill="#f7f8fb" />
+  <circle cx="1115" cy="5" r="220" stroke="#e4eaf6" stroke-width="40" />
+  <circle cx="1115" cy="5" r="140" stroke="#e4eaf6" stroke-width="1" />
+
+  <g font-family="Manrope, Arial, sans-serif" fill="#18202f">
+    <g transform="translate(60 45) scale(0.04)" fill="#2061ef">
+      <path
+        d="M 80,356.583592 V 272 C 80,237 100,206 132,190 L 400,56 Q 432,40 464,56 L 570.533747,109.266874 A 12,12 0 0 1 570.533747,130.733126 L 97.366563,367.316718 A 12,12 0 0 1 80,356.583592 Z"
+      />
+      <path
+        d="M 86.633437,436.683282 L 270.633437,344.683282 A 12,12 0 0 1 288,355.416408 L 288,612.583592 A 12,12 0 0 1 270.633437,623.316718 L 132,554 C 100,538 80,507 80,472 L 80,447.416408 A 12,12 0 0 1 86.633437,436.683282 Z"
+      />
+      <path
+        d="M 406.633437,276.683282 L 446.8,256.6 Q 472,244 497.2,257.86 L 668,351.8 C 700,369.4 720,400 720,436 V 568 C 720,600 702,625 672,640 L 456,748 Q 432,760 408,748 L 406.633437,747.316718 A 12,12 0 0 1 400,736.583592 L 400,287.416408 A 12,12 0 0 1 406.633437,276.683282 Z"
+      />
+    </g>
+    <text x="104" y="69" font-size="18" font-weight="700">TECHSOUQ</text>
+    <text x="1136" y="69" font-size="14" letter-spacing="2" text-anchor="end" fill="#536176">
+      BUSINESS SYSTEMS / 01
+    </text>
+
+    <text x="64" y="150" font-size="64" font-weight="750" letter-spacing="-2.5">Build or buy?</text>
+    <text x="66" y="195" font-size="27" fill="#536176">Compare the whole cost.</text>
+
+    <rect x="64" y="235" width="1072" height="308" rx="24" fill="white" stroke="#dfe5ef" />
+    <text x="96" y="280" font-size="14" letter-spacing="1.5" fill="#536176">36-MONTH COST</text>
+    <text x="1100" y="280" font-size="14" letter-spacing="1.5" text-anchor="end" fill="#536176">
+      CASH + STAFF CAPACITY
+    </text>
+
+    <text x="96" y="353" font-size="20" font-weight="650">Off-the-shelf</text>
+    <rect x="300" y="322" width="760" height="48" rx="8" fill="#b7c9ef" />
+    <path d="M308 322H556V370H308Q300 370 300 362V330Q300 322 308 322Z" fill="#2061ef" />
+    <text x="428" y="352" font-size="19" font-weight="700" text-anchor="middle" fill="white">
+      $29.2k
+    </text>
+    <text x="808" y="352" font-size="19" font-weight="700" text-anchor="middle">$57.6k</text>
+    <text x="1060" y="397" font-size="16" text-anchor="end" fill="#536176">$86,800 combined</text>
+
+    <text x="96" y="457" font-size="20" font-weight="650">Custom</text>
+    <rect x="300" y="426" width="735" height="48" rx="8" fill="#b7c9ef" />
+    <path d="M308 426H972V474H308Q300 474 300 466V434Q300 426 308 426Z" fill="#2061ef" />
+    <text x="636" y="456" font-size="19" font-weight="700" text-anchor="middle" fill="white">
+      $76.8k
+    </text>
+    <text x="1003" y="455" font-size="15" font-weight="700" text-anchor="middle">$7.2k</text>
+    <text x="1035" y="501" font-size="16" text-anchor="end" fill="#536176">$84,000 combined</text>
+
+    <text x="64" y="589" font-size="17" fill="#536176">
+      Fictional example · USD · Staff capacity is not cash savings
+    </text>
+    <rect x="795" y="574" width="16" height="16" rx="4" fill="#2061ef" />
+    <text x="821" y="588" font-size="16" fill="#536176">Cash</text>
+    <rect x="903" y="574" width="16" height="16" rx="4" fill="#b7c9ef" />
+    <text x="929" y="588" font-size="16" fill="#536176">Staff capacity</text>
+  </g>
+</svg>

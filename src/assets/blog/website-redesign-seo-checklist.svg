@@ -1,0 +1,82 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="1200"
+  height="630"
+  viewBox="0 0 1200 630"
+  fill="none"
+>
+  <title>A plan for every old URL.</title>
+  <desc>
+    Keep a page at its existing address. Move it with a permanent redirect. Merge it into a relevant
+    replacement. Remove it with a 404 or 410 when there is no replacement.
+  </desc>
+  <rect width="1200" height="630" fill="#f7f8fb" />
+  <circle cx="1115" cy="5" r="220" stroke="#e4eaf6" stroke-width="40" />
+  <circle cx="1115" cy="5" r="140" stroke="#e4eaf6" stroke-width="1" />
+
+  <g font-family="Manrope, Arial, sans-serif" fill="#18202f">
+    <g transform="translate(60 45) scale(0.04)" fill="#2061ef">
+      <path
+        d="M 80,356.583592 V 272 C 80,237 100,206 132,190 L 400,56 Q 432,40 464,56 L 570.533747,109.266874 A 12,12 0 0 1 570.533747,130.733126 L 97.366563,367.316718 A 12,12 0 0 1 80,356.583592 Z"
+      />
+      <path
+        d="M 86.633437,436.683282 L 270.633437,344.683282 A 12,12 0 0 1 288,355.416408 L 288,612.583592 A 12,12 0 0 1 270.633437,623.316718 L 132,554 C 100,538 80,507 80,472 L 80,447.416408 A 12,12 0 0 1 86.633437,436.683282 Z"
+      />
+      <path
+        d="M 406.633437,276.683282 L 446.8,256.6 Q 472,244 497.2,257.86 L 668,351.8 C 700,369.4 720,400 720,436 V 568 C 720,600 702,625 672,640 L 456,748 Q 432,760 408,748 L 406.633437,747.316718 A 12,12 0 0 1 400,736.583592 L 400,287.416408 A 12,12 0 0 1 406.633437,276.683282 Z"
+      />
+    </g>
+    <text x="104" y="69" font-size="18" font-weight="700">TECHSOUQ</text>
+    <text x="1136" y="69" font-size="14" letter-spacing="2" text-anchor="end" fill="#536176">
+      WEBSITES &amp; SEARCH / 03
+    </text>
+
+    <text x="64" y="150" font-size="60" font-weight="750" letter-spacing="-2.5">
+      A plan for every old URL.
+    </text>
+    <text x="66" y="195" font-size="27" fill="#536176">
+      Make the decision before the redesign goes live.
+    </text>
+
+    <rect x="64" y="235" width="1072" height="308" rx="24" fill="white" stroke="#dfe5ef" />
+    <rect x="96" y="324" width="225" height="126" rx="16" fill="#18202f" />
+    <text x="120" y="359" font-size="13" font-weight="700" letter-spacing="1.3" fill="#b7c9ef">
+      START HERE
+    </text>
+    <text x="120" y="399" font-size="25" font-weight="700" fill="white">Existing URL</text>
+    <text x="120" y="428" font-size="16" fill="#d1d9e7">What happens to it?</text>
+
+    <path
+      d="M321 387H376M376 288V492M376 288H430M376 356H430M376 424H430M376 492H430"
+      fill="none"
+      stroke="#a9b8d2"
+      stroke-width="2"
+    />
+    <path
+      d="m422 282 8 6-8 6m0 56 8 6-8 6m0 56 8 6-8 6m0 56 8 6-8 6"
+      fill="none"
+      stroke="#a9b8d2"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <rect x="430" y="263" width="154" height="50" rx="10" fill="#e8efff" />
+    <rect x="430" y="331" width="154" height="50" rx="10" fill="#2061ef" />
+    <rect x="430" y="399" width="154" height="50" rx="10" fill="#e8efff" />
+    <rect x="430" y="467" width="154" height="50" rx="10" fill="#edf0f5" />
+
+    <text x="454" y="295" font-size="21" font-weight="700" fill="#2061ef">Keep</text>
+    <text x="454" y="363" font-size="21" font-weight="700" fill="white">Move</text>
+    <text x="454" y="431" font-size="21" font-weight="700" fill="#2061ef">Merge</text>
+    <text x="454" y="499" font-size="21" font-weight="700">Remove</text>
+
+    <text x="616" y="295" font-size="20">Same address, same purpose</text>
+    <text x="616" y="363" font-size="20">301 / 308 → new location</text>
+    <text x="616" y="431" font-size="20">301 / 308 → relevant combined page</text>
+    <text x="616" y="499" font-size="20">404 / 410 if there is no replacement</text>
+    <text x="64" y="589" font-size="17" fill="#536176">
+      Review the content. Map the URLs. Test the deployed result.
+    </text>
+  </g>
+</svg>

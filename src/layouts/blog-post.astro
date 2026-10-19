@@ -1,61 +1,200 @@
 ---
 import { Image } from 'astro:assets';
+import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
 import BaseHead from '@/components/base-head.astro';
+import BlogCard from '@/components/blog-card.astro';
 import Footer from '@/components/footer.astro';
+
 import FormattedDate from '@/components/formatted-date.astro';
 import Header from '@/components/header.astro';
+import { readingMinutes } from '@/lib/blog';
 
-type Props = CollectionEntry<'blog'>['data'];
+interface Props {
+  post: CollectionEntry<'blog'>;
+  headings: MarkdownHeading[];
+  relatedPosts: CollectionEntry<'blog'>[];
+}
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { post, headings, relatedPosts } = Astro.props;
+const { title, description, pubDate, updatedDate, category, heroImage, heroImageAlt, socialImage } =
+  post.data;
+const contents = headings.filter((heading) => heading.depth === 2);
+
+const canonical = Astro.site ? new URL(`/blog/${post.id}/`, Astro.site).href : undefined;
+const home = Astro.site?.href;
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BlogPosting',
+      headline: title,
+      description,
+
+      datePublished: pubDate.toISOString(),
+      ...(updatedDate ? { dateModified: updatedDate.toISOString() } : {}),
+      articleSection: category,
+
+      author: { '@type': 'Organization', name: 'Techsouq', ...(home ? { url: home } : {}) },
+      publisher: { '@type': 'Organization', name: 'Techsouq', ...(home ? { url: home } : {}) },
+      inLanguage: 'en',
+
+      ...(canonical ? { url: canonical, mainEntityOfPage: canonical } : {}),
+      ...(Astro.site ? { image: new URL(socialImage, Astro.site).href } : {}),
+    },
+    ...(Astro.site
+      ? [
+          {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: home },
+              {
+                '@type': 'ListItem',
+                position: 2,
+                name: 'Blog',
+                item: new URL('/blog/', Astro.site).href,
+              },
+              { '@type': 'ListItem', position: 3, name: title, item: canonical },
+            ],
+          },
+        ]
+      : []),
+  ],
+};
+
+const structuredData = JSON.stringify(schema).replace(/</g, '\\u003c');
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={title} description={description} />
+    <BaseHead
+      title={`${title} | Techsouq`}
+      description={description}
+      type="article"
+      image={socialImage}
+      imageAlt={heroImageAlt}
+      publishedTime={pubDate}
+      modifiedTime={updatedDate}
+    />
+    <script type="application/ld+json" set:html={structuredData} />
   </head>
-  <body class="bg-canvas text-ink">
+
+  <body>
     <Header />
 
-    <main id="main-content" tabindex="-1" class="px-6 pb-24 pt-16 outline-none md:px-10 md:pt-24">
-      <article>
-        <section class="mx-auto max-w-3xl">
-          <header class="mb-10 border-b border-line pb-10">
-            <a href="/" class="mb-8 inline-flex text-sm font-medium text-brand hover:underline">
-              Back to Techsouq
-            </a>
+    <main id="main-content" tabindex="-1" class="outline-none">
+      <article class="page-container pt-10 pb-16 sm:pt-14 sm:pb-22">
+        <header class="mx-auto max-w-[980px]">
+          <nav aria-label="Breadcrumb" class="mb-10 text-xs text-muted">
+            <ol class="flex flex-wrap items-center gap-2.5">
+              <li>
+                <a href="/" class="hover:text-brand">
+                  Home
+                </a>
+              </li>
+              <li aria-hidden="true">/</li>
+              <li>
+                <a href="/blog/" class="hover:text-brand">
+                  Blog
+                </a>
+              </li>
+              <li aria-hidden="true">/</li>
+              <li aria-current="page" class="max-w-full truncate text-ink">
+                {title}
+              </li>
+            </ol>
+          </nav>
 
-            <div class="mb-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
-              <FormattedDate date={pubDate} />
-              {updatedDate && (
-                <span>
-                  Updated <FormattedDate date={updatedDate} />
-                </span>
-              )}
+          <p class="eyebrow text-brand">{category}</p>
+          <h1 class="mt-5 max-w-[940px] text-[clamp(2.15rem,4.2vw,3.7rem)] leading-[1.15] font-semibold tracking-[-0.045em]">
+            {title}
+          </h1>
+          <p class="mt-6 max-w-3xl text-base leading-8 text-muted sm:text-lg">{description}</p>
+
+          <div class="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted">
+            <span class="font-semibold text-ink">
+              By{' '}
+              <a href="/" class="hover:text-brand">
+                Techsouq
+              </a>
+            </span>
+            <FormattedDate date={pubDate} />
+            <span>{readingMinutes(post.body)} min read</span>
+            {updatedDate && (
+              <span>
+                Updated <FormattedDate date={updatedDate} />
+              </span>
+            )}
+          </div>
+
+          <Image
+            src={heroImage}
+            alt={heroImageAlt}
+            width={1200}
+            height={630}
+            loading="eager"
+            fetchpriority="high"
+            class="mt-10 mb-12 h-auto w-full rounded-xl border border-line sm:mb-16"
+          />
+        </header>
+
+        <div class="mx-auto grid max-w-[1100px] gap-10 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-14">
+          <aside class="min-w-0">
+            <nav aria-label="Table of contents" class="contents-nav">
+              <details class="rounded-lg border border-line p-5 lg:border-0 lg:p-0" open>
+                <summary class="cursor-pointer text-xs font-bold tracking-[0.1em] uppercase">
+                  In this guide
+                </summary>
+                <ol class="mt-5 space-y-3 border-l border-line pl-4 text-xs leading-6">
+                  {contents.map(({ slug, text }) => (
+                    <li>
+                      <a
+                        href={`#${slug}`}
+                        class="block text-muted transition-colors hover:text-brand"
+                      >
+                        {text}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </details>
+            </nav>
+          </aside>
+
+          <div class="min-w-0">
+            <div class="article-body">
+              <slot />
             </div>
 
-            <h1 class="text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">{title}</h1>
-            <p class="mt-6 text-lg leading-relaxed text-muted">{description}</p>
-          </header>
-
-          {heroImage && (
-            <Image
-              src={heroImage}
-              width={1536}
-              height={864}
-              alt=""
-              class="mb-12 h-auto w-full rounded-2xl"
-            />
-          )}
-
-          <div class="article-body">
-            <slot />
+            <div class="mt-12 border-t border-line pt-6 text-sm leading-7 text-muted">
+              <p class="font-semibold text-ink">Thoughtful decisions. Thoughtful builds.</p>
+              <p class="mt-2">
+                Techsouq brings design and engineering together for websites, web applications, and
+                custom software.{' '}
+                <a href="/#services" class="text-brand underline underline-offset-4">
+                  Explore our services
+                </a>
+                .
+              </p>
+            </div>
           </div>
-        </section>
+        </div>
       </article>
+
+      <section aria-labelledby="related-title" class="border-t border-line bg-canvas py-16">
+        <div class="page-container max-w-[1100px]">
+          <h2 id="related-title" class="text-2xl font-semibold tracking-tight">
+            Keep thinking it through.
+          </h2>
+          <div class="mt-8 grid gap-6 md:grid-cols-2">
+            {relatedPosts.map((related) => (
+              <BlogCard post={related} />
+            ))}
+          </div>
+        </div>
+      </section>
     </main>
 
     <Footer />
@@ -63,92 +202,110 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 </html>
 
 <style>
-  .article-body {
-    font-size: 1.0625rem;
-    line-height: 1.85;
-    overflow-wrap: break-word;
+  @media (min-width: 64rem) {
+    .contents-nav {
+      position: sticky;
+      top: 7rem;
+      max-height: calc(100vh - 9rem);
+      overflow-y: auto;
+    }
   }
 
-  .article-body :global(p),
-  .article-body :global(ul),
-  .article-body :global(ol) {
+  .article-body {
+    color: var(--color-ink);
+    font-size: 1rem;
+    line-height: 1.9;
+    overflow-wrap: anywhere;
+  }
+
+  .article-body > :global(:first-child) {
+    margin-top: 0;
+  }
+
+  .article-body > :global(p),
+  .article-body > :global(ul),
+  .article-body > :global(ol) {
     margin-block: 1.5rem;
   }
 
-  .article-body :global(h2),
-  .article-body :global(h3),
-  .article-body :global(h4) {
-    margin-top: 2.5rem;
+  .article-body > :global(h2),
+  .article-body > :global(h3),
+  .article-body > :global(h4) {
+    margin-top: 3rem;
     margin-bottom: 1rem;
-    font-weight: 600;
+    font-weight: 650;
 
-    line-height: 1.3;
+    line-height: 1.35;
     letter-spacing: -0.025em;
+    text-wrap: pretty;
   }
 
-  .article-body :global(h2) {
-    font-size: 1.75rem;
+  .article-body > :global(h2) {
+    font-size: clamp(1.5rem, 3vw, 1.85rem);
   }
 
-  .article-body :global(h3) {
-    font-size: 1.375rem;
+  .article-body > :global(h3) {
+    font-size: 1.25rem;
   }
 
-  .article-body :global(h4) {
-    font-size: 1.125rem;
+  .article-body > :global(h4) {
+    font-size: 1.1rem;
   }
 
-  .article-body :global(a) {
-    color: var(--color-brand);
+  .article-body :global(p a),
+  .article-body :global(li a),
+  .article-body :global(td a) {
+    color: var(--color-brand-dark);
     text-decoration: underline;
     text-underline-offset: 0.2em;
   }
 
-  .article-body :global(ul) {
+  .article-body > :global(ul) {
     padding-left: 1.5rem;
     list-style: disc;
   }
 
-  .article-body :global(ol) {
+  .article-body > :global(ol) {
     padding-left: 1.5rem;
     list-style: decimal;
   }
 
-  .article-body :global(li + li) {
-    margin-top: 0.5rem;
+  .article-body > :global(ul li + li),
+  .article-body > :global(ol li + li) {
+    margin-top: 0.65rem;
   }
 
-  .article-body :global(blockquote) {
+  .article-body > :global(blockquote) {
     margin-block: 2rem;
     border-left: 3px solid var(--color-brand);
-    padding-left: 1.5rem;
+    padding: 1rem 1.5rem;
 
-    color: var(--color-muted);
+    border-radius: 0 0.5rem 0.5rem 0;
+    background: var(--color-canvas);
   }
 
-  .article-body :global(code) {
+  .article-body :global(p code),
+  .article-body :global(li code),
+  .article-body :global(td code) {
     border-radius: 0.25rem;
-    background: var(--color-line);
+    background: var(--color-canvas);
     padding: 0.15em 0.35em;
 
-    font-size: 0.875em;
+    font-size: 0.85em;
   }
 
-  .article-body :global(pre) {
+  .article-body > :global(pre) {
     margin-block: 2rem;
     overflow-x: auto;
     border-radius: 0.75rem;
 
     padding: 1.25rem;
+    font-size: 0.85em;
     line-height: 1.65;
   }
 
-  .article-body :global(pre code) {
-    background: transparent;
-    padding: 0;
-  }
-
-  .article-body :global(img) {
+  .article-body > :global(p img),
+  .article-body > :global(figure img) {
     margin-block: 2rem;
     max-width: 100%;
     height: auto;
@@ -156,22 +313,37 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
     border-radius: 0.75rem;
   }
 
-  .article-body :global(table) {
+  .article-body > :global(table) {
     display: block;
+    width: 100%;
     margin-block: 2rem;
+
     overflow-x: auto;
-
     border-collapse: collapse;
+    font-size: 0.875rem;
   }
 
-  .article-body :global(th),
-  .article-body :global(td) {
+  .article-body > :global(table th),
+  .article-body > :global(table td) {
+    min-width: 8rem;
     border-bottom: 1px solid var(--color-line);
-    padding: 0.75rem 1rem;
+    padding: 0.9rem 1rem;
+
     text-align: left;
+    vertical-align: top;
+    line-height: 1.7;
   }
 
-  .article-body :global(hr) {
+  .article-body > :global(table th) {
+    background: var(--color-canvas);
+    font-weight: 650;
+  }
+
+  .article-body > :global(table [align='right']) {
+    text-align: right;
+  }
+
+  .article-body > :global(hr) {
     margin-block: 2.5rem;
     border-color: var(--color-line);
   }

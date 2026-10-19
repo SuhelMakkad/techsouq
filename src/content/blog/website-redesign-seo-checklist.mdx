@@ -1,0 +1,138 @@
+---
+title: 'Website Redesign SEO Checklist: Plan Every Old URL'
+description: 'Protect useful pages during a redesign with a worked URL map, an interactive redirect planner, launch checks, and a practical monitoring routine.'
+pubDate: 2026-10-19
+category: 'Websites & search'
+heroImage: '../../assets/blog/website-redesign-seo-checklist.svg'
+heroImageAlt: 'Four decisions for an old website URL: keep it, move it with a permanent redirect, merge into a relevant page, or remove it with a real 404 or 410.'
+socialImage: '/images/blog/website-redesign-seo-checklist.png'
+---
+
+import RedirectPlanner from '@/components/blog/redirect-planner.astro';
+
+A redesign can look finished while old links lead to missing pages, a staging setting prevents indexing, or a renamed service disappears from the navigation. These problems are easier to prevent when every existing URL has a deliberate destination.
+
+The most useful SEO deliverable before a redesign is a URL decision map. It records what stays, what moves, what merges, and what is intentionally removed. This guide walks through an example, gives you a planner, and turns the map into launch acceptance checks.
+
+No checklist can guarantee unchanged rankings. The aim is to preserve access to useful content, make changes understandable to search engines, and detect mistakes quickly.
+
+## First, identify what is actually changing
+
+A visual redesign does not automatically require new URLs. If the same page still serves the same purpose, keeping its address avoids introducing a migration task just to make the address look tidier.
+
+Separate the decisions about design, content, platform, URL structure, and domain. If the business is changing several of them, write down why they must happen together. Google recommends changing one major element at a time where practical, so the effects are easier to manage. See its [site-move guidance](https://developers.google.com/search/docs/crawling-indexing/site-move-with-url-changes).
+
+For a small services website, a useful project boundary might be: new design and CMS, same domain, existing service URLs retained except for two agreed consolidations. That is specific enough for the content owner and developer to work from.
+
+Also distinguish a domain move from a same-domain redesign. They share many checks, but a domain move adds ownership, domain configuration, and migration tasks. Do not apply domain-change procedures simply because the homepage looks different.
+
+## Make an inventory that includes the forgotten pages
+
+Begin with the current site's crawl and sitemap, then combine those with landing-page data, known backlinks, and a CMS export. The menu alone is not an inventory: an older campaign, downloadable guide, or unlinked service page may still receive visitors.
+
+Ask the marketing owner to identify pages that generate useful enquiries, not just pages with the most sessions. Record at least the current URL, page purpose, proposed action, destination, priority, owner, and verification status. Keep URLs exactly as they are used, including meaningful query strings and capitalization.
+
+Save a pre-launch baseline. Google Search Console's [Performance report](https://support.google.com/webmasters/answer/7576553) provides search clicks, impressions, click-through rate, and position. Export the important landing pages and queries for a representative period, and note seasonal campaigns or unusual traffic. Keep enquiry or sales data alongside it so a change in traffic can be interpreted in business terms.
+
+The inventory should answer a practical question: if someone follows a link saved six months ago, what will they see after launch?
+
+## A worked map for a services website
+
+Consider a fictional studio redesigning its site. It is keeping its services overview, renaming a web-design page, combining two related offerings, and retiring an old workshop page.
+
+| Existing URL | Decision | Destination or response | Reason |
+| --- | --- | --- | --- |
+| `/services` | Keep | `/services` returns 200 | Same purpose and content location |
+| `/web-design` | Move | Permanent redirect to `/website-design` | The service remains; its address changes |
+| `/website-audits` | Merge | Permanent redirect to `/website-strategy` | Relevant content is incorporated into one offering |
+| `/conversion-review` | Merge | Permanent redirect to `/website-strategy` | The combined page still answers the old need |
+| `/events/2024-workshop` | Remove | A real 404 or 410 response | No useful replacement or archive is needed |
+
+The merge is a content decision first. The new strategy page must actually explain the audit and conversion-review work. A redirect cannot make a vague new page a good replacement for detailed old content.
+
+The workshop decision also deserves review. If its recordings or resources remain useful, retain an archive instead. “Old” is not a sufficient reason to remove a page. In this example, the owner has confirmed there is nothing worth preserving.
+
+For permanent moves, Google recommends permanent server-side redirects; 301 and 308 are supported options. A canonical tag expresses a preferred URL but does not transport a visitor from an old address to a new one. Use the correct mechanism for the job. [Google's redirect documentation](https://developers.google.com/search/docs/crawling-indexing/301-redirects) explains the distinction between permanent and temporary redirects.
+
+An intentionally removed URL should return the appropriate missing-content status, not a friendly error design with a successful 200 response. Google's [HTTP status-code guidance](https://developers.google.com/crawling/docs/troubleshooting/http-status-codes) explains how 404 and 410 responses communicate absent content. An error message returned with 200 can become a soft 404.
+
+## Build your URL decision map
+
+Use the planner for the pages you are changing, then give the exported map to the person implementing the migration. Keep a copy with the project handover so future changes do not accidentally remove needed redirects.
+
+<RedirectPlanner />
+
+The planner checks the entries you provide. It does not crawl your site, inspect live HTTP responses, or confirm that a destination is a relevant replacement. A clean map still needs a content review and testing against the deployed website.
+
+Treat each warning as a question to resolve. A repeated source URL may represent a contradictory decision. A destination that redirects again may create an unnecessary chain. A “keep” row with a different destination is really a move. Do not export a plausible-looking spreadsheet while leaving the actual decisions unsettled.
+
+## Avoid the homepage shortcut
+
+Redirecting every removed page to the homepage makes the migration file short, but it does not preserve the visitor's task. Someone looking for an audit guide now has to work out where the guide went.
+
+Google explicitly warns against sending many old URLs to an irrelevant destination such as the homepage; these can be treated as soft 404s. Relevant consolidations are different: the replacement genuinely contains the material people expected. [Google's migration guidance](https://developers.google.com/search/docs/crawling-indexing/site-move-with-url-changes) covers both cases.
+
+Ask the content owner to review the map using this test: “If I followed the old link because of its title, would the new page still help me?” If the answer is no, improve the replacement, preserve the original, or acknowledge that the content is gone.
+
+## Test a page's signals together
+
+For every important destination, check the actual response, page content, title, canonical URL, indexing rules, internal links, and sitemap entry as a group. Checking them in separate spreadsheets makes contradictions easier to miss.
+
+### Canonicals and sitemaps must agree
+
+Suppose the new website-design page loads correctly but its canonical still points to a staging domain. Fixing the redirect alone leaves a conflicting signal. Google's [canonicalization guidance](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls) identifies redirects and canonical annotations as strong signals, while sitemap inclusion is a weaker signal. It also advises against specifying different preferred URLs through different methods.
+
+For an ordinary unique page, the canonical should identify its intended public URL. Put the intended current URLs in the new sitemap. Submitting that sitemap helps discovery, but it does not guarantee crawling or indexing. See Google's [sitemap guidance](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap).
+
+### Inspect staging restrictions at launch
+
+Preview environments commonly need to stay out of search results. Confirm that any production pages intended for indexing no longer inherit a staging `noindex` directive or an accidental crawl block. Check response headers as well as page markup.
+
+Google's [noindex documentation](https://developers.google.com/search/docs/crawling-indexing/block-indexing) explains that the directive can appear in an HTML meta tag or HTTP header. It must be crawlable for Google to see it; blocking a URL in robots.txt is not an equivalent way to request its removal from the index.
+
+### Update the links you control
+
+Point navigation, related content, and service links directly at their final destinations. Review image and document links too. If a PDF or image that people link to is moving, include its old address in the migration work.
+
+Make important navigation work through ordinary crawlable links with meaningful text. Google's [link guidance](https://developers.google.com/search/docs/crawling-indexing/links-crawlable) explains that it generally relies on anchor elements with an `href` to discover linked pages. A functioning click handler by itself is not the same thing.
+
+## Use a launch acceptance table
+
+Assign a person to each check. “The agency will handle SEO” leaves too much room for the content owner and developer to assume the other person is responsible.
+
+| Check | Evidence to keep | Suggested owner |
+| --- | --- | --- |
+| Every changed old URL has an agreed outcome | Reviewed map with no unresolved rows | Content lead |
+| Moves reach the intended final page | Status and destination test results | Developer |
+| Important pages have the right content and indexing signals | Page review and inspection results | SEO or marketing lead |
+| Internal links and downloadable assets work | Crawl report plus manual checks | Developer |
+| Enquiries and analytics still work | Test submission and recorded event | Marketing lead |
+| Recovery is possible if deployment fails | Named owner and documented recovery steps | Developer |
+
+Test old addresses directly, not only by clicking through the new navigation. Include mobile visits and important enquiry flows. A technically correct redirect is not enough if the destination has lost the information or action that made the old page useful.
+
+Google's [URL Inspection tool](https://support.google.com/webmasters/answer/9012289) can help inspect indexing information and test a live URL. Understand which view you are reading: indexed information and a live test describe different moments. A successful live test is not a promise that the page will appear in search results.
+
+## Monitor the transition, not just launch day
+
+For a small site, a practical starting routine is to check critical URLs and enquiries immediately after launch, review errors and important landing pages daily for the first week, then weekly while the change settles. This cadence is an operational suggestion, not a Google requirement. Increase it for larger or business-critical migrations.
+
+Investigate unexpected changes by page and query. A drop isolated to a moved service page suggests different questions from a site-wide drop. Check whether the page moved correctly, remains indexable, and still satisfies the same intent before deciding that the redesign itself caused the change.
+
+Keep the redirect rules under version control or in another managed configuration, and identify who owns them after the project ends. Google recommends retaining redirects for as long as possible, generally at least a year. [Its site-move guide](https://developers.google.com/search/docs/crawling-indexing/site-move-with-url-changes) also notes that ranking fluctuations can occur while changes are processed.
+
+The handover should include the final map, test results, baseline exports, monitoring owner, and known follow-up work. That package gives the next person evidence to work with. If you are planning a redesign, [explore Techsouq's website services](/#services). Bring a clear description of the changes you intend to make; the map is a useful place to start a project brief.
+
+## Sources and further reading
+
+- [Google: Site moves with URL changes](https://developers.google.com/search/docs/crawling-indexing/site-move-with-url-changes).
+- [Google: Redirects and Search](https://developers.google.com/search/docs/crawling-indexing/301-redirects).
+- [Google: HTTP status codes](https://developers.google.com/crawling/docs/troubleshooting/http-status-codes).
+- [Google: Canonical URLs](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls).
+- [Google: Building a sitemap](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap).
+- [Google: Blocking indexing with noindex](https://developers.google.com/search/docs/crawling-indexing/block-indexing).
+- [Google: Crawlable links](https://developers.google.com/search/docs/crawling-indexing/links-crawlable).
+- [Search Console: URL Inspection](https://support.google.com/webmasters/answer/9012289).
+- [Search Console: Performance report](https://support.google.com/webmasters/answer/7576553).
+
+Sources checked on 19 October 2026. The studio, URL map, acceptance table, and monitoring routine are illustrative planning examples.

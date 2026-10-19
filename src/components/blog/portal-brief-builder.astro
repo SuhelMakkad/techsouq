@@ -1,0 +1,664 @@
+---
+import { createPortalBrief, DEFAULT_PORTAL_BRIEF } from '@/lib/blog/portal-brief';
+
+const defaultBrief = createPortalBrief(DEFAULT_PORTAL_BRIEF);
+---
+
+<portal-brief-builder class="portal-tool">
+  <div class="tool-heading">
+    <span class="tool-kicker">Leave with something useful</span>
+    <h3>Build your first-release portal brief</h3>
+    <p>
+      Start with one client journey. This example is a client approval workflow; change the inputs,
+      generate your brief, then edit the details before sharing it.
+    </p>
+  </div>
+
+  <div class="example-note">
+    <strong>The starting journey</strong>
+    <p>
+      A client opens an assigned task, reviews the latest deliverable, and records feedback or
+      approval. The project owner sees the outcome.
+    </p>
+  </div>
+
+  <div data-portal-interactive hidden>
+    <form class="portal-form" data-portal-form>
+      <label class="field">
+        <span>Who will use the portal?</span>
+        <input
+          name="clientType"
+          type="text"
+          value={DEFAULT_PORTAL_BRIEF.clientType}
+          maxlength="160"
+          required
+        />
+        <small>Describe the clients, rather than everyone who could eventually use it.</small>
+      </label>
+
+      <label class="field">
+        <span>The one task a client should finish</span>
+        <textarea
+          name="primaryTask"
+          rows="3"
+          maxlength="500"
+          required
+        >{DEFAULT_PORTAL_BRIEF.primaryTask}</textarea>
+        <small>Use a concrete verb: approve, upload, check, request, or pay.</small>
+      </label>
+
+      <label class="field">
+        <span>Roles that need access</span>
+        <input
+          name="roles"
+          type="text"
+          value={DEFAULT_PORTAL_BRIEF.roles}
+          maxlength="400"
+          required
+        />
+        <small>Include the internal person responsible for moving the task forward.</small>
+      </label>
+
+      <label class="field">
+        <span>
+          Current systems <em>(optional)</em>
+        </span>
+        <textarea
+          name="currentSystems"
+          rows="3"
+          maxlength="700"
+        >{DEFAULT_PORTAL_BRIEF.currentSystems}</textarea>
+        <small>
+          Name where the work and data live today. Leave blank if this is still unknown.
+        </small>
+      </label>
+
+      <div class="field-pair">
+        <label class="field">
+          <span>Document handling</span>
+          <select name="documentHandling">
+            <option value="none">No documents in this release</option>
+            <option value="download">View or download shared files</option>
+            <option value="upload">Upload and retrieve files</option>
+            <option value="review" selected>
+              Review and approve versions
+            </option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Billing in this release</span>
+          <select name="billing">
+            <option value="none" selected>
+              No billing
+            </option>
+            <option value="view">View invoices and status</option>
+            <option value="pay">Pay through hosted checkout</option>
+          </select>
+        </label>
+      </div>
+
+      <label class="field">
+        <span>How will you know it helped?</span>
+        <textarea
+          name="successMetric"
+          rows="3"
+          maxlength="400"
+          required
+        >{DEFAULT_PORTAL_BRIEF.successMetric}</textarea>
+        <small>
+          Use a baseline, a target, and a review period if you know them. The starting target is
+          illustrative.
+        </small>
+      </label>
+
+      <div class="generation-actions">
+        <button type="submit" class="primary-button" data-generate>
+          Generate updated brief <span aria-hidden="true">↗</span>
+        </button>
+        <button type="button" class="quiet-button" data-restore hidden>
+          Restore previous brief
+        </button>
+      </div>
+
+      <p class="generation-note" data-generation-status role="status">
+        Changing these inputs does not overwrite the brief. Generate when you are ready.
+      </p>
+      <p class="error-message" data-portal-error role="alert" hidden></p>
+    </form>
+
+    <div class="brief-output">
+      <div class="output-heading">
+        <h4>Your editable brief</h4>
+        <span class="output-badge">Ready to adapt</span>
+      </div>
+
+      <label class="output-label">
+        <span>Working brief text</span>
+        <textarea data-brief-output rows="19" spellcheck="true">{defaultBrief}</textarea>
+      </label>
+
+      <div class="export-actions">
+        <button type="button" class="secondary-button" data-copy>
+          Copy brief
+        </button>
+        <button type="button" class="secondary-button" data-download>
+          Download .txt
+        </button>
+      </div>
+
+      <p class="action-status" data-action-status role="status"></p>
+    </div>
+  </div>
+
+  <details class="static-brief" data-static-brief open>
+    <summary>Read the worked client approval brief</summary>
+    <pre>{defaultBrief}</pre>
+  </details>
+
+  <noscript>
+    <p class="no-script">
+      The worked brief above is available without JavaScript. Enable JavaScript to customize the
+      inputs, edit the output, or use copy and download.
+    </p>
+  </noscript>
+
+  <p class="privacy-note">
+    This tool runs entirely on this page. Nothing is sent or stored; copy or download your brief
+    before leaving or refreshing.
+  </p>
+</portal-brief-builder>
+
+<script>
+  import { createPortalBrief } from '@/lib/blog/portal-brief';
+  import type { BillingScope, DocumentHandling } from '@/lib/blog/portal-brief';
+
+  class PortalBriefBuilder extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready) return;
+
+      const form = this.querySelector<HTMLFormElement>('[data-portal-form]');
+      const output = this.querySelector<HTMLTextAreaElement>('[data-brief-output]');
+      const interactive = this.querySelector<HTMLElement>('[data-portal-interactive]');
+
+      const generationStatus = this.querySelector<HTMLElement>('[data-generation-status]');
+      const actionStatus = this.querySelector<HTMLElement>('[data-action-status]');
+      const error = this.querySelector<HTMLElement>('[data-portal-error]');
+
+      const generate = this.querySelector<HTMLButtonElement>('[data-generate]');
+      const restore = this.querySelector<HTMLButtonElement>('[data-restore]');
+
+      if (
+        !form ||
+        !output ||
+        !interactive ||
+        !generationStatus ||
+        !actionStatus ||
+        !error ||
+        !generate ||
+        !restore
+      )
+        return;
+
+      this.dataset.ready = 'true';
+      interactive.hidden = false;
+
+      const staticBrief = this.querySelector<HTMLElement>('[data-static-brief]');
+
+      if (staticBrief) staticBrief.hidden = true;
+
+      let lastGenerated = output.value;
+      let previousBrief: string | null = null;
+
+      const fieldValue = (name: string) => {
+        const field = form.elements.namedItem(name) as
+          HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+
+        return field.value;
+      };
+
+      const updateGenerateLabel = () => {
+        generate.textContent =
+          output.value === lastGenerated ? 'Generate updated brief ↗' : 'Replace edited brief ↗';
+      };
+
+      form.addEventListener('input', () => {
+        updateGenerateLabel();
+
+        generationStatus.textContent =
+          output.value === lastGenerated
+            ? 'Inputs changed. Generate when ready; your current brief is unchanged.'
+            : 'You have edited the brief. Generate will replace those edits; Restore previous brief can undo that replacement.';
+      });
+
+      output.addEventListener('input', () => {
+        updateGenerateLabel();
+        actionStatus.textContent = '';
+
+        generationStatus.textContent =
+          'You are editing the brief directly. Copy or download keeps these edits; generating replaces them.';
+      });
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        if (!form.reportValidity()) return;
+
+        try {
+          const next = createPortalBrief({
+            clientType: fieldValue('clientType'),
+            primaryTask: fieldValue('primaryTask'),
+            roles: fieldValue('roles'),
+            currentSystems: fieldValue('currentSystems'),
+            documentHandling: fieldValue('documentHandling') as DocumentHandling,
+            billing: fieldValue('billing') as BillingScope,
+            successMetric: fieldValue('successMetric'),
+          });
+
+          if (next === output.value) {
+            generationStatus.textContent =
+              'The brief already matches these inputs. You can edit it directly below.';
+            error.hidden = true;
+            return;
+          }
+
+          previousBrief = output.value;
+          output.value = next;
+          lastGenerated = next;
+
+          restore.hidden = false;
+          error.hidden = true;
+          actionStatus.textContent = '';
+
+          generationStatus.textContent =
+            'Brief updated. Review and edit it below; Restore previous brief brings back the version you just replaced.';
+          updateGenerateLabel();
+        } catch (cause) {
+          error.textContent =
+            cause instanceof Error ? cause.message : 'Check the inputs and try again.';
+          error.hidden = false;
+        }
+      });
+
+      restore.addEventListener('click', () => {
+        if (previousBrief === null) return;
+
+        output.value = previousBrief;
+        previousBrief = null;
+        restore.hidden = true;
+
+        actionStatus.textContent = '';
+        generationStatus.textContent = 'Previous brief restored. The form inputs have not changed.';
+        updateGenerateLabel();
+
+        output.focus();
+      });
+
+      this.querySelector('[data-copy]')?.addEventListener('click', async () => {
+        if (!output.value.trim()) {
+          actionStatus.textContent = 'Add some text to the brief before copying.';
+          return;
+        }
+
+        try {
+          if (!navigator.clipboard) throw new Error('Clipboard unavailable');
+
+          await navigator.clipboard.writeText(output.value);
+          actionStatus.textContent = 'Brief copied, including your edits.';
+        } catch {
+          output.focus();
+          output.select();
+          output.setSelectionRange(0, output.value.length);
+
+          actionStatus.textContent =
+            'Automatic copy is unavailable. Your brief is selected; press ⌘C or Ctrl+C to copy it.';
+        }
+      });
+
+      this.querySelector('[data-download]')?.addEventListener('click', () => {
+        if (!output.value.trim()) {
+          actionStatus.textContent = 'Add some text to the brief before downloading.';
+          return;
+        }
+
+        const blob = new Blob([output.value], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        link.href = url;
+        link.download = 'client-portal-brief.txt';
+        document.body.append(link);
+
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+        actionStatus.textContent =
+          'Download requested: client-portal-brief.txt, including your edits.';
+      });
+    }
+  }
+
+  if (!customElements.get('portal-brief-builder')) {
+    customElements.define('portal-brief-builder', PortalBriefBuilder);
+  }
+</script>
+
+<style>
+  .portal-tool {
+    display: block;
+    margin: 2.25rem 0;
+    padding: clamp(1.1rem, 3vw, 2rem);
+
+    border: 1px solid #dce4f3;
+    border-radius: 1.25rem;
+    background: #f7f8fb;
+
+    color: #18202f;
+    line-height: 1.5;
+  }
+
+  .portal-tool [hidden] {
+    display: none !important;
+  }
+
+  .portal-tool p,
+  .portal-tool h3,
+  .portal-tool h4 {
+    margin: 0;
+  }
+
+  .tool-kicker {
+    color: #2061ef;
+    font-size: 0.7rem;
+    font-weight: 700;
+
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .tool-heading h3 {
+    margin-top: 0.6rem;
+    font-size: clamp(1.35rem, 3vw, 1.7rem);
+    line-height: 1.25;
+
+    letter-spacing: -0.035em;
+  }
+
+  .tool-heading p {
+    margin-top: 0.85rem;
+    color: #566174;
+    font-size: 0.875rem;
+  }
+
+  .example-note {
+    margin-top: 1.5rem;
+    border-left: 3px solid #2061ef;
+    background: #eaf0ff;
+
+    padding: 1rem;
+    font-size: 0.8rem;
+  }
+
+  .example-note strong {
+    font-size: 0.75rem;
+  }
+
+  .example-note p {
+    margin-top: 0.35rem;
+    color: #3c4c66;
+  }
+
+  .portal-form {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1.75rem;
+  }
+
+  .field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 650;
+  }
+
+  .field em {
+    color: #5e697b;
+    font-style: normal;
+    font-weight: 400;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 2.8rem;
+
+    border: 1px solid #cbd4e1;
+    border-radius: 0.55rem;
+    background: white;
+
+    padding: 0.65rem 0.75rem;
+    color: #18202f;
+    font: inherit;
+
+    font-size: 0.85rem;
+    font-weight: 450;
+    line-height: 1.65;
+  }
+
+  .field textarea {
+    resize: vertical;
+  }
+
+  .field small {
+    color: #5e697b;
+    font-size: 0.7rem;
+    font-weight: 400;
+
+    line-height: 1.6;
+  }
+
+  .field-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .generation-actions,
+  .export-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 0.6rem 1rem;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .quiet-button {
+    min-height: 2.8rem;
+    border-radius: 0.55rem;
+    padding: 0.7rem 1rem;
+
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 650;
+  }
+
+  .primary-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.25rem;
+
+    border: 1px solid #18202f;
+    background: #18202f;
+    color: #fff;
+  }
+
+  .primary-button:hover {
+    border-color: #2061ef;
+    background: #2061ef;
+  }
+
+  .secondary-button {
+    border: 1px solid #cbd4e1;
+    background: white;
+    color: #18202f;
+  }
+
+  .secondary-button:hover {
+    border-color: #2061ef;
+    color: #164dd0;
+  }
+
+  .quiet-button {
+    border: 0;
+    background: transparent;
+    padding-inline: 0;
+
+    color: #164dd0;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .portal-tool .generation-note,
+  .portal-tool .action-status {
+    color: #3c4c66;
+    font-size: 0.725rem;
+    line-height: 1.65;
+  }
+
+  .portal-tool .generation-note {
+    margin-top: -0.6rem;
+  }
+
+  .portal-tool .error-message {
+    border-left: 3px solid #a33a32;
+    background: #fff4ee;
+    padding: 0.75rem;
+
+    color: #7e302a;
+    font-size: 0.8rem;
+  }
+
+  .brief-output {
+    margin-top: 1.75rem;
+    border-top: 1px solid #dce3ee;
+    padding-top: 1.5rem;
+  }
+
+  .output-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .output-heading h4 {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .output-badge {
+    border-radius: 999px;
+    background: #e9effc;
+    padding: 0.3rem 0.6rem;
+
+    color: #164dd0;
+    font-size: 0.65rem;
+    font-weight: 650;
+  }
+
+  .output-label {
+    display: block;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+
+    font-weight: 600;
+  }
+
+  .output-label textarea {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+
+    border: 1px solid #cbd4e1;
+    border-radius: 0.7rem;
+    background: white;
+
+    padding: 1rem;
+    color: #273449;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.7;
+
+    resize: vertical;
+  }
+
+  .export-actions {
+    margin-top: 1rem;
+  }
+  .portal-tool .action-status {
+    margin-top: 0.6rem;
+  }
+
+  .static-brief {
+    margin-top: 1.5rem;
+  }
+
+  .static-brief summary {
+    cursor: pointer;
+    color: #164dd0;
+    font-size: 0.8rem;
+
+    font-weight: 650;
+  }
+
+  .portal-tool .static-brief pre {
+    margin: 1rem 0 0;
+    border: 1px solid #dce3ee;
+    border-radius: 0.7rem;
+
+    background: white;
+    padding: 1rem;
+    font-size: 0.75rem;
+
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .portal-tool .privacy-note,
+  .portal-tool .no-script {
+    margin-top: 1.25rem;
+    color: #566174;
+    font-size: 0.725rem;
+
+    line-height: 1.65;
+  }
+
+  @media (max-width: 580px) {
+    .field input,
+    .field select,
+    .field textarea,
+    .output-label textarea {
+      font-size: 1rem;
+    }
+
+    .field-pair {
+      grid-template-columns: 1fr;
+    }
+    .generation-actions {
+      align-items: flex-start;
+    }
+  }
+</style>
