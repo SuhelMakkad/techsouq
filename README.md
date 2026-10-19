@@ -98,6 +98,8 @@ After changing the mapping or Google Form settings, send a clearly labelled test
 
 ## Writing blog articles
 
+Follow the [blog generation guide](docs/blog-generation-guide.md) for the full research, writing, interactive-tool, graphics, SEO, and validation workflow, including a reusable brief and generation request.
+
 Add a kebab-case `.mdx` file to `src/content/blog/`. Its filename becomes its stable `/blog/<filename>/` URL. The collection schema is in `src/content.config.ts`; public routes and navigation are generated from the collection. Use `@/modules/blog/components/` imports for blog components and `@/components/` for shared components, and keep each prose paragraph on one source line.
 
 Required frontmatter:
