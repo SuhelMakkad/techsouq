@@ -1,9 +1,24 @@
 ---
+const googleForm = {
+  responseUrl:
+    'https://docs.google.com/forms/d/e/1FAIpQLSfarfqAQz8B0tYfhcw9bPqcGNjmEdp8b_CyID4hnY-3ymW4HA/formResponse',
+  responderUrl:
+    'https://docs.google.com/forms/d/e/1FAIpQLSfarfqAQz8B0tYfhcw9bPqcGNjmEdp8b_CyID4hnY-3ymW4HA/viewform',
+
+  fields: {
+    name: 'entry.1981866054',
+    company: 'entry.622898311',
+    email: 'entry.1247774499',
+
+    project: 'entry.928610320',
+  },
+};
+
 const inputClass =
   'mt-2.5 w-full rounded-lg border border-line bg-white px-4 py-3.5 text-base text-ink placeholder:text-muted focus:border-brand focus:outline-2 focus:outline-offset-2 focus:outline-brand';
 ---
 
-<form id="inquiry-form" class="space-y-6" aria-describedby="inquiry-preview-note">
+<form id="inquiry-form" class="space-y-6" action={googleForm.responseUrl} method="post">
   <p class="text-sm text-muted">All fields are required unless marked optional.</p>
 
   <div class="grid gap-6 sm:grid-cols-2">
@@ -15,7 +30,7 @@ const inputClass =
         id="inquiry-name"
         class={inputClass}
         type="text"
-        name="name"
+        name={googleForm.fields.name}
         autocomplete="name"
         placeholder="Your full name"
         required
@@ -30,7 +45,7 @@ const inputClass =
         id="inquiry-company"
         class={inputClass}
         type="text"
-        name="company"
+        name={googleForm.fields.company}
         autocomplete="organization"
         placeholder="Your company or team"
       />
@@ -45,7 +60,7 @@ const inputClass =
       id="inquiry-email"
       class={inputClass}
       type="email"
-      name="email"
+      name={googleForm.fields.email}
       autocomplete="email"
       placeholder="you@company.com"
       required
@@ -59,34 +74,18 @@ const inputClass =
     <textarea
       id="inquiry-project"
       class:list={[inputClass, 'min-h-40 resize-y']}
-      name="project"
+      name={googleForm.fields.project}
       rows="5"
       placeholder="What would you like to build or improve? Share a little about your idea, goals, or the challenge ahead."
       required
     ></textarea>
   </div>
 
-  <p id="inquiry-preview-note" class="flex items-start gap-2.5 text-sm leading-6 text-muted">
-    <svg
-      class="mt-1 size-4 shrink-0"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.6"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="9"></circle>
-      <path stroke-linecap="round" d="M12 11v5m0-8v.01"></path>
-    </svg>
-    <span>Preview only — inquiries are not sent.</span>
-  </p>
-
   <button
     type="submit"
-    disabled
     class="inline-flex min-h-13 w-full items-center justify-center gap-8 rounded-lg bg-ink px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
   >
-    Preview inquiry
+    <span data-submit-label>Send enquiry</span>
     <svg
       class="size-4"
       viewBox="0 0 24 24"
@@ -101,7 +100,11 @@ const inputClass =
 
   <noscript>
     <p class="text-sm leading-6 text-muted">
-      Enable JavaScript to preview your inquiry. This preview does not send or save your details.
+      Submitting will take you to Google Forms for confirmation. You can also
+      <a class="underline underline-offset-4" href={googleForm.responderUrl}>
+        open the enquiry form
+      </a>
+      .
     </p>
   </noscript>
 
@@ -117,24 +120,67 @@ const inputClass =
 <script>
   const form = document.querySelector<HTMLFormElement>('#inquiry-form');
   const button = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
+  const buttonLabel = button?.querySelector<HTMLSpanElement>('[data-submit-label]');
+
   const status = document.querySelector<HTMLParagraphElement>('#inquiry-status');
 
-  if (form && button && status) {
-    form.addEventListener('submit', (event) => {
+  if (form && button && buttonLabel && status) {
+    let submitting = false;
+
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
 
-      if (!form.reportValidity()) {
+      if (submitting || !form.reportValidity()) {
         return;
       }
 
-      status.textContent =
-        'All required details are filled in. This is a preview only; your inquiry has not been sent or saved. Your details remain here for you to review.';
+      const body = new URLSearchParams();
+
+      for (const [name, value] of new FormData(form)) {
+        if (typeof value === 'string') {
+          body.append(name, value);
+        }
+      }
+
+      submitting = true;
+      button.disabled = true;
+      buttonLabel.textContent = 'Sending…';
+
+      form.setAttribute('aria-busy', 'true');
+      status.textContent = 'Sending your enquiry…';
+
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 15_000);
+
+      try {
+        await fetch(form.action, {
+          method: 'POST',
+          mode: 'no-cors',
+          credentials: 'omit',
+
+          body,
+          signal: controller.signal,
+        });
+
+        // Google returns an opaque response, so this does not confirm receipt.
+        status.textContent = 'Thanks for your enquiry.';
+      } catch {
+        status.textContent =
+          'We couldn’t confirm your enquiry was sent. Your details are still here. Please try again.';
+      } finally {
+        window.clearTimeout(timeout);
+        form.removeAttribute('aria-busy');
+
+        submitting = false;
+        button.disabled = false;
+        buttonLabel.textContent = 'Send enquiry';
+      }
     });
 
     form.addEventListener('input', () => {
-      status.textContent = '';
+      if (!submitting) {
+        status.textContent = '';
+      }
     });
-
-    button.disabled = false;
   }
 </script>

@@ -75,9 +75,26 @@ Run `pnpm format` to format the project, or `pnpm format:check` to check formatt
 
 Generated output, dependencies, and coverage are excluded from both tools. Prettier also leaves the package-manager lockfile and supplied SVG brand assets unchanged.
 
-## Project inquiry preview
+## Project enquiries
 
-The project inquiry is a local preview. Entered details are not delivered or stored. Connect a real contact destination before publishing the site.
+The homepage enquiry form posts directly to [Techsouq Project Enquiries](https://docs.google.com/forms/d/e/1FAIpQLSfarfqAQz8B0tYfhcw9bPqcGNjmEdp8b_CyID4hnY-3ymW4HA/viewform), owned by `makadsuhel11@gmail.com`. Use the [form editor and Responses tab](https://docs.google.com/forms/d/1dxTskOK7--oZiw-WygDG5GYwD_L1a0vF6Y1_FSaWKjo/edit) to manage the form and read enquiries. Responses are stored in Google Forms; a separate spreadsheet is not configured.
+
+Keep the form published with responder access set to anyone with the link. Leave Google’s email collection, “Limit to 1 response”, and “View results summary” disabled. Email is collected through the required email question with email validation; name and project details are also required, while company is optional.
+
+The public URLs and field mapping live in `src/modules/marketing/pages/landing/components/inquiry-form.astro`:
+
+| Website field | Google Forms field |
+| ------------- | ------------------ |
+| Name          | `entry.1981866054` |
+| Company       | `entry.622898311`  |
+| Email         | `entry.1247774499` |
+| Project       | `entry.928610320`  |
+
+If you replace the form or recreate a question, use the editor’s **More → Pre-fill form** option, enter distinct sample values in all four fields, and select **Get link**. Match each sample value to its `entry.*` query parameter and update the component. Verify the submission URL against the published form’s HTML action. These identifiers are public configuration, not credentials; no API key or server environment variables are needed.
+
+With JavaScript enabled, the website sends URL-encoded values using a credential-free `no-cors` POST and stays on the same page. Google’s opaque response does not let the website verify that a response was saved, so the acknowledgement does not claim confirmed receipt. The form retains entered values, blocks simultaneous submissions, and restores the submit button after completion, network failure, or a 15-second timeout. Requests are never retried automatically; a manual retry after an uncertain result may create a duplicate. Without JavaScript, the native form POST navigates to Google’s confirmation or validation page.
+
+After changing the mapping or Google Form settings, send a clearly labelled test enquiry and verify its values in the Responses tab, including a blank company and multiline project details. Confirm the form remains accessible without signing in before deploying the site.
 
 ## Writing blog articles
 
