@@ -1,4 +1,5 @@
 ---
+import { SITE_OG_IMAGE, SITE_OG_IMAGE_ALT } from '@/constants/site';
 import '@/styles/global.css';
 
 interface Props {
@@ -24,7 +25,11 @@ const {
 } = Astro.props;
 
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
-const socialImage = Astro.site && image ? new URL(image, Astro.site).href : undefined;
+
+const socialImagePath = image ?? SITE_OG_IMAGE;
+const socialImageAlt = imageAlt ?? (image === undefined ? SITE_OG_IMAGE_ALT : '');
+const socialImage =
+  Astro.site && socialImagePath ? new URL(socialImagePath, Astro.site).href : undefined;
 ---
 
 <meta charset="utf-8" />
@@ -47,7 +52,7 @@ const socialImage = Astro.site && image ? new URL(image, Astro.site).href : unde
     <meta property="og:image" content={socialImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={imageAlt ?? ''} />
+    <meta property="og:image:alt" content={socialImageAlt} />
   </>
 )}
 
@@ -59,4 +64,4 @@ const socialImage = Astro.site && image ? new URL(image, Astro.site).href : unde
 
 <meta name="twitter:description" content={description} />
 {socialImage && <meta name="twitter:image" content={socialImage} />}
-{socialImage && <meta name="twitter:image:alt" content={imageAlt ?? ''} />}
+{socialImage && <meta name="twitter:image:alt" content={socialImageAlt} />}
