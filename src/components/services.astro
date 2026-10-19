@@ -1,0 +1,68 @@
+---
+import SectionLabel from '@/components/section-label.astro';
+import ServiceIllustration from '@/components/service-illustration.astro';
+
+const services = [
+  {
+    number: '01',
+    kind: 'website' as const,
+    title: 'Websites with purpose.',
+    description:
+      'A clear story, a considered experience, and a strong first impression. Websites that help people understand you and take the next step.',
+    examples: 'Company websites · Landing pages · Content platforms',
+  },
+  {
+    number: '02',
+    kind: 'application' as const,
+    title: 'Applications that work.',
+    description:
+      'Turn complex tasks into intuitive experiences. Useful web applications built around the people who use them, every day.',
+    examples: 'Customer portals · SaaS products · Internal tools',
+  },
+  {
+    number: '03',
+    kind: 'software' as const,
+    title: 'Software that fits.',
+    description:
+      'When off-the-shelf gets in the way, build around your business. Connected systems and custom tools that make work flow better.',
+    examples: 'Business workflows · Integrations · Custom platforms',
+  },
+];
+---
+
+<section id="services" aria-labelledby="services-title" class="border-t border-line py-20 lg:py-25">
+  <div class="page-container">
+    <SectionLabel number="01" label="What we do" />
+
+    <div class="mt-7 flex flex-col justify-between gap-6 lg:flex-row lg:items-end lg:gap-12">
+      <h2 id="services-title" class="section-heading max-w-lg">
+        Good ideas deserve
+        <br class="hidden sm:block" /> a great build.
+      </h2>
+      <p class="max-w-sm text-sm leading-7 text-muted">
+        From your first digital presence to the software your business runs on. We bring clarity,
+        care, and craft to every build.
+      </p>
+    </div>
+
+    <div class="mt-11 grid gap-5 lg:grid-cols-3">
+      {services.map((service) => (
+        <article class="flex flex-col rounded-xl border border-line bg-white p-5 transition-colors hover:border-brand/35 sm:grid sm:grid-cols-[0.8fr_1fr] sm:items-center sm:gap-6 lg:flex lg:items-stretch lg:gap-0 lg:p-6">
+          <ServiceIllustration kind={service.kind} />
+
+          <div class="mt-7 flex flex-1 flex-col sm:mt-0 lg:mt-7">
+            <div class="flex items-center justify-between gap-4">
+              <h3 class="text-[19px] font-semibold tracking-[-0.04em]">{service.title}</h3>
+              <span class="font-mono text-[10px] text-muted">{service.number}</span>
+            </div>
+
+            <p class="mt-3 mb-7 text-[13px] leading-[1.9] text-muted">{service.description}</p>
+            <p class="mt-auto border-t border-line pt-4 text-[10px] leading-5 font-medium text-muted">
+              {service.examples}
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,140 @@
+---
+const inputClass =
+  'mt-2.5 w-full rounded-lg border border-line bg-white px-4 py-3.5 text-base text-ink placeholder:text-muted focus:border-brand focus:outline-2 focus:outline-offset-2 focus:outline-brand';
+---
+
+<form id="inquiry-form" class="space-y-6" aria-describedby="inquiry-preview-note">
+  <p class="text-sm text-muted">All fields are required unless marked optional.</p>
+
+  <div class="grid gap-6 sm:grid-cols-2">
+    <div>
+      <label for="inquiry-name" class="text-sm font-semibold text-ink">
+        Your name
+      </label>
+      <input
+        id="inquiry-name"
+        class={inputClass}
+        type="text"
+        name="name"
+        autocomplete="name"
+        placeholder="Your full name"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="inquiry-company" class="text-sm font-semibold text-ink">
+        Company <span class="font-normal text-muted">(optional)</span>
+      </label>
+      <input
+        id="inquiry-company"
+        class={inputClass}
+        type="text"
+        name="company"
+        autocomplete="organization"
+        placeholder="Your company or team"
+      />
+    </div>
+  </div>
+
+  <div>
+    <label for="inquiry-email" class="text-sm font-semibold text-ink">
+      Email address
+    </label>
+    <input
+      id="inquiry-email"
+      class={inputClass}
+      type="email"
+      name="email"
+      autocomplete="email"
+      placeholder="you@company.com"
+      required
+    />
+  </div>
+
+  <div>
+    <label for="inquiry-project" class="text-sm font-semibold text-ink">
+      Tell us about your project
+    </label>
+    <textarea
+      id="inquiry-project"
+      class:list={[inputClass, 'min-h-40 resize-y']}
+      name="project"
+      rows="5"
+      placeholder="What would you like to build or improve? Share a little about your idea, goals, or the challenge ahead."
+      required
+    ></textarea>
+  </div>
+
+  <p id="inquiry-preview-note" class="flex items-start gap-2.5 text-sm leading-6 text-muted">
+    <svg
+      class="mt-1 size-4 shrink-0"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.6"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="9"></circle>
+      <path stroke-linecap="round" d="M12 11v5m0-8v.01"></path>
+    </svg>
+    <span>Preview only — inquiries are not sent.</span>
+  </p>
+
+  <button
+    type="submit"
+    disabled
+    class="inline-flex min-h-13 w-full items-center justify-center gap-8 rounded-lg bg-ink px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+  >
+    Preview inquiry
+    <svg
+      class="size-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.7"
+      aria-hidden="true"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6 6 6-6 6"></path>
+    </svg>
+  </button>
+
+  <noscript>
+    <p class="text-sm leading-6 text-muted">
+      Enable JavaScript to preview your inquiry. This preview does not send or save your details.
+    </p>
+  </noscript>
+
+  <p
+    id="inquiry-status"
+    class="min-h-6 text-sm leading-6 text-ink"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+  ></p>
+</form>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#inquiry-form');
+  const button = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
+  const status = document.querySelector<HTMLParagraphElement>('#inquiry-status');
+
+  if (form && button && status) {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      if (!form.reportValidity()) {
+        return;
+      }
+
+      status.textContent =
+        'All required details are filled in. This is a preview only; your inquiry has not been sent or saved. Your details remain here for you to review.';
+    });
+
+    form.addEventListener('input', () => {
+      status.textContent = '';
+    });
+
+    button.disabled = false;
+  }
+</script>

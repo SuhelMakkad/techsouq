@@ -1,0 +1,81 @@
+<div
+  class="blueprint relative isolate mx-auto aspect-square w-full max-w-[490px] overflow-hidden rounded-2xl border border-[#dce5f5] bg-[#f3f7ff]"
+  aria-hidden="true"
+>
+  <div class="absolute inset-5 border border-brand/10 sm:inset-7"></div>
+
+  <div class="absolute inset-0 flex items-center justify-center">
+    <div class="size-[76%] rounded-full border border-brand/10"></div>
+  </div>
+
+  <div class="absolute inset-0 flex items-center justify-center">
+    <div class="size-[56%] rounded-full border border-dashed border-brand/15"></div>
+  </div>
+
+  <div class="absolute top-5 right-5 bottom-5 left-5 sm:inset-7">
+    <span class="registration top-0 left-0"></span>
+    <span class="registration top-0 right-0"></span>
+    <span class="registration bottom-0 left-0"></span>
+    <span class="registration right-0 bottom-0"></span>
+  </div>
+
+  <div class="absolute top-10 right-10 left-10 flex items-center justify-between text-[8px] font-semibold tracking-[0.14em] text-brand/70 sm:top-12 sm:right-12 sm:left-12 sm:text-[9px]">
+    <span>IDEAS, GIVEN FORM.</span>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M7 0v14M0 7h14M2 2l10 10M2 12 12 2" stroke="currentColor" />
+    </svg>
+  </div>
+
+  <img
+    src="/brand/techsouq-monogram.svg"
+    alt=""
+    width="800"
+    height="800"
+    class="absolute top-1/2 left-1/2 w-[66%] -translate-x-1/2 -translate-y-1/2"
+    fetchpriority="high"
+  />
+
+  <span class="absolute top-[32%] left-5 rounded-md border border-[#dce5f5] bg-white/95 px-3 py-2 text-[9px] font-semibold shadow-[0_3px_12px_#18202f04] sm:left-7 sm:text-[10px]">
+    Clear thinking<span class="ml-2 inline-block size-1.5 rounded-full bg-brand/80"></span>
+  </span>
+  <span class="absolute right-5 bottom-[28%] rounded-md border border-[#dce5f5] bg-white/95 px-3 py-2 text-[9px] font-semibold shadow-[0_3px_12px_#18202f04] sm:right-7 sm:text-[10px]">
+    <span class="mr-2 inline-block size-1.5 rounded-full bg-brand/80"></span>Thoughtful making
+  </span>
+
+  <div class="absolute right-10 bottom-10 left-10 flex items-center justify-between text-[8px] font-medium text-muted sm:right-12 sm:bottom-12 sm:left-12 sm:text-[9px]">
+    <span>STRATEGY + DESIGN + ENGINEERING</span>
+    <span class="font-mono text-brand">T / 01</span>
+  </div>
+</div>
+
+<style>
+  .blueprint {
+    background-image:
+      linear-gradient(#2061ef07 1px, transparent 1px),
+      linear-gradient(90deg, #2061ef07 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .registration {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+
+    background:
+      linear-gradient(#8ca9ea, #8ca9ea) center / 1px 9px no-repeat,
+      linear-gradient(#8ca9ea, #8ca9ea) center / 9px 1px no-repeat;
+    transform: translate(-50%, -50%);
+  }
+
+  .registration.right-0 {
+    transform: translate(50%, -50%);
+  }
+
+  .registration.bottom-0 {
+    transform: translate(-50%, 50%);
+  }
+
+  .registration.right-0.bottom-0 {
+    transform: translate(50%, 50%);
+  }
+</style>

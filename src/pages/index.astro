@@ -1,59 +1,136 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import Approach from '@/components/approach.astro';
+import ArrowIcon from '@/components/arrow-icon.astro';
+import BaseHead from '@/components/base-head.astro';
+
+import Footer from '@/components/footer.astro';
+import Header from '@/components/header.astro';
+import HeroGraphic from '@/components/hero-graphic.astro';
+
+import InquiryForm from '@/components/inquiry-form.astro';
+import SectionLabel from '@/components/section-label.astro';
+import Services from '@/components/services.astro';
+
+import { SITE_DESCRIPTION, SITE_TITLE } from '@/consts';
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to
-				build a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your{' '}
-				<code>astro.config.mjs</code> file. You can customize your setup with{' '}
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like
-				Tailwind, React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>
-					Edit this page in <code>src/pages/index.astro</code>
-				</li>
-				<li>
-					Edit the site header items in <code>src/components/Header.astro</code>
-				</li>
-				<li>
-					Add your name to the footer in <code>src/components/Footer.astro</code>
-				</li>
-				<li>
-					Check out the included blog posts in <code>src/content/blog/</code>
-				</li>
-				<li>
-					Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code>
-				</li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to{' '}
-				<a href="https://docs.astro.build/">read the docs</a> or{' '}
-				<a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out{' '}
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a> by{' '}
-				<a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+
+  <body>
+    <Header />
+
+    <main id="main-content" tabindex="-1">
+      <section
+        aria-labelledby="hero-title"
+        class="page-container pt-14 pb-10 sm:pt-18 lg:pt-22 lg:pb-10"
+      >
+        <div class="grid items-center gap-12 md:grid-cols-[1.12fr_1fr] md:gap-8 lg:gap-12 xl:gap-18">
+          <div>
+            <p class="eyebrow flex items-center gap-2.5 text-muted">
+              <span class="size-1.5 rounded-full bg-brand" aria-hidden="true"></span>A digital
+              product studio
+            </p>
+
+            <h1
+              id="hero-title"
+              class="mt-7 max-w-[660px] text-[clamp(2.6rem,5.1vw,4.7rem)] leading-[1.09] font-semibold tracking-[-0.06em]"
+            >
+              Thoughtful
+              <br class="hidden sm:block" /> digital products.
+              <br />{' '}
+              <span class="text-brand">
+                Built to move
+                <br class="hidden sm:block" /> you forward.
+              </span>
+            </h1>
+
+            <p class="mt-7 max-w-[410px] text-[14px] leading-[1.9] text-muted sm:text-[15px]">
+              We bring clarity, design, and engineering together to build websites, web
+              applications, and custom software. From your first idea to your next chapter.
+            </p>
+
+            <div class="mt-8 flex flex-wrap items-center gap-x-7 gap-y-5">
+              <a href="#contact" class="button-primary">
+                Start a project <ArrowIcon direction="diagonal" />
+              </a>
+              <a
+                href="#services"
+                class="inline-flex min-h-11 items-center gap-2.5 text-[12px] font-semibold transition-colors hover:text-brand"
+              >
+                Explore our services <ArrowIcon direction="down" class="size-3.5" />
+              </a>
+            </div>
+          </div>
+
+          <HeroGraphic />
+        </div>
+
+        <div class="mt-12 flex flex-col justify-between gap-4 border-t border-line pt-6 sm:flex-row sm:items-center lg:mt-17">
+          <p class="flex items-center gap-2.5 text-[11px] text-muted">
+            <span
+              class="flex size-5 items-center justify-center rounded-full bg-[#edf3ff] text-brand"
+              aria-hidden="true"
+            >
+              <svg viewBox="0 0 14 14" width="12" height="12" fill="none">
+                <path
+                  d="m3 7 2.5 2.5L11 4"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+            For ambitious startups and forward-thinking businesses.
+          </p>
+          <span class="text-[10px] font-medium tracking-[0.02em] text-muted">
+            Thoughtfully designed. Carefully engineered.
+          </span>
+        </div>
+      </section>
+
+      <Services />
+      <Approach />
+
+      <section id="contact" aria-labelledby="contact-title" class="py-20 lg:py-26">
+        <div class="page-container grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24">
+          <div>
+            <SectionLabel number="03" label="Make the next move" />
+            <h2 id="contact-title" class="section-heading mt-7">
+              What are you
+              <br /> working on<span class="text-brand">?</span>
+            </h2>
+
+            <p class="mt-6 max-w-sm text-sm leading-7 text-muted">
+              A new idea, a challenge to untangle, or something ready for its next chapter. Tell us
+              a little about it.
+            </p>
+
+            <div class="mt-10 flex items-start gap-4 border-t border-line pt-6 lg:mt-14">
+              <span
+                class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#edf3ff] text-brand"
+                aria-hidden="true"
+              >
+                <ArrowIcon direction="diagonal" class="size-5" />
+              </span>
+              <div>
+                <p class="text-xs font-semibold">Every good build starts with a conversation.</p>
+                <p class="mt-2 text-xs leading-6 text-muted">
+                  You don’t need a perfect brief. Just a place to start.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <InquiryForm />
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </body>
 </html>

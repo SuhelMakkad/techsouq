@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" role="img" aria-labelledby="logo-title logo-description">
+  <title id="logo-title">Techsouq monogram — rounded corners</title>
+  <desc id="logo-description">A vivid blue geometric monogram with three editable filled paths, an upper diagonal opening, and a vertical opening that continues straight through the bottom without a bend. All formerly sharp corners have smooth rounded transitions.</desc>
+  <g id="techsouq-monogram" fill="#2061EF">
+    <!-- Upper diagonal bar; the open channel below forms the head of the T. -->
+    <path id="upper-bar" d="M 80,356.583592 V 272 C 80,237 100,206 132,190 L 400,56 Q 432,40 464,56 L 570.533747,109.266874 A 12,12 0 0 1 570.533747,130.733126 L 97.366563,367.316718 A 12,12 0 0 1 80,356.583592 Z"/>
+
+    <!-- Lower-left segment; the straight inner edge defines the T stem. -->
+    <path id="lower-left" d="M 86.633437,436.683282 L 270.633437,344.683282 A 12,12 0 0 1 288,355.416408 L 288,612.583592 A 12,12 0 0 1 270.633437,623.316718 L 132,554 C 100,538 80,507 80,472 L 80,447.416408 A 12,12 0 0 1 86.633437,436.683282 Z"/>
+
+    <!-- Solid right body; the inner edge runs vertically to the bottom without a bend. -->
+    <path id="right-body" d="M 406.633437,276.683282 L 446.8,256.6 Q 472,244 497.2,257.86 L 668,351.8 C 700,369.4 720,400 720,436 V 568 C 720,600 702,625 672,640 L 456,748 Q 432,760 408,748 L 406.633437,747.316718 A 12,12 0 0 1 400,736.583592 L 400,287.416408 A 12,12 0 0 1 406.633437,276.683282 Z"/>
+  </g>
+</svg>

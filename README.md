@@ -1,63 +1,40 @@
-# Astro Starter Kit: Blog
+# Techsouq
+
+Techsouq's public-facing landing page, built with Astro and Tailwind CSS. The current version is a local preview for a digital product studio.
+
+## Local development
+
+Use pnpm and a Node.js version matching the `engines.node` range in `package.json`. The project is verified with Node.js 24.18.0. Run commands from the project root.
 
 ```sh
-pnpm create astro@latest -- --template blog
+pnpm install
+pnpm exec astro dev --background
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+The development server normally runs at `http://localhost:4321`. Manage it with:
 
-Features:
-
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and Open Graph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-├── public/
-├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+```sh
+pnpm exec astro dev status
+pnpm exec astro dev logs
+pnpm exec astro dev stop
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Build the site with `pnpm build`. The static output is written to `dist/`.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Code quality
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+Run `pnpm lint` to check JavaScript, TypeScript, and Astro files. Use `pnpm lint:fix` to apply available automatic fixes.
 
-Any static assets, like images, can be placed in the `public/` directory.
+Run `pnpm format` to format the project, or `pnpm format:check` to check formatting without changing files. Prettier supports Astro components and sorts Tailwind classes using the site's stylesheet. Markdown prose stays on one source line per paragraph.
 
-## 🧞 Commands
+Generated output, dependencies, and coverage are excluded from both tools. Prettier also leaves the package-manager lockfile and supplied SVG brand assets unchanged.
 
-All commands are run from the root of the project, from a terminal:
+## Project inquiry preview
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
+The project inquiry is a local preview. Entered details are not delivered or stored. Connect a real contact destination before publishing the site.
 
-## 👀 Want to learn more?
+## Future content
 
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+The Markdown and MDX blog collection schema in `src/content.config.ts` and reusable `src/layouts/blog-post.astro` article layout are retained for future writing. Demo articles and their public blog, RSS, and about routes have been removed; the landing page is the only content route currently provided.
 
-## Credit
-
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+No public domain or deployment is configured. Add the confirmed production URL and publishing setup when the site is ready to launch.

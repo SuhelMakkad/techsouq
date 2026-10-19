@@ -1,0 +1,33 @@
+---
+import ArrowIcon from '@/components/arrow-icon.astro';
+import Brand from '@/components/brand.astro';
+---
+
+<footer class="border-t border-line bg-white">
+  <div class="page-container flex flex-col gap-9 py-11 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <Brand />
+      <p class="mt-3 text-xs text-muted">Good thinking. Thoughtful making.</p>
+    </div>
+
+    <nav
+      aria-label="Footer navigation"
+      class="flex flex-wrap items-center gap-x-7 gap-y-4 text-xs font-medium"
+    >
+      <a href="/#services" class="transition-colors hover:text-brand">
+        Services
+      </a>
+      <a href="/#approach" class="transition-colors hover:text-brand">
+        Approach
+      </a>
+      <a href="/#contact" class="inline-flex items-center gap-2 transition-colors hover:text-brand">
+        Start a project <ArrowIcon class="size-3.5" direction="diagonal" />
+      </a>
+    </nav>
+  </div>
+
+  <div class="page-container flex flex-col gap-3 border-t border-line/70 py-5 text-[11px] text-muted sm:flex-row sm:items-center sm:justify-between">
+    <p>© {new Date().getFullYear()} Techsouq. All rights reserved.</p>
+    <p>Thoughtful digital products. From idea to impact.</p>
+  </div>
+</footer>

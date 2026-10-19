@@ -1,0 +1,108 @@
+---
+import ArrowIcon from '@/components/arrow-icon.astro';
+import Brand from '@/components/brand.astro';
+
+const links = [
+  { label: 'Services', href: '/#services' },
+  { label: 'Approach', href: '/#approach' },
+];
+---
+
+<a
+  href="#main-content"
+  class="fixed top-3 left-4 z-50 -translate-y-24 rounded-lg bg-ink px-5 py-3 text-sm text-white focus:translate-y-0"
+>
+  Skip to content
+</a>
+
+<header class="sticky top-0 z-40 border-b border-line/80 bg-white/95 backdrop-blur-md">
+  <div class="page-container flex h-21 items-center justify-between gap-5">
+    <Brand />
+
+    <nav aria-label="Main navigation" class="hidden items-center gap-9 md:flex">
+      {links.map(({ label, href }) => (
+        <a class="text-[13px] font-medium transition-colors hover:text-brand" href={href}>
+          {label}
+        </a>
+      ))}
+      <a
+        href="/#contact"
+        class="ml-2 inline-flex min-h-10 items-center gap-5 rounded-lg border border-line px-4 py-2.5 text-xs font-semibold transition-colors hover:border-ink hover:bg-ink hover:text-white"
+      >
+        Start a project <ArrowIcon class="size-3.5" direction="diagonal" />
+      </a>
+    </nav>
+
+    <button
+      id="menu-toggle"
+      type="button"
+      class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-line md:hidden"
+      aria-label="Open navigation"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      hidden
+    >
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M4 7h12M4 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+      </svg>
+    </button>
+  </div>
+
+  <nav
+    id="mobile-menu"
+    aria-label="Mobile navigation"
+    class="border-t border-line bg-white px-6 py-4 md:hidden"
+  >
+    <div class="mx-auto flex max-w-sm flex-col gap-1">
+      {links.map(({ label, href }) => (
+        <a
+          class="rounded-lg px-3 py-3 text-sm font-medium hover:bg-canvas hover:text-brand"
+          href={href}
+        >
+          {label}
+        </a>
+      ))}
+      <a
+        href="/#contact"
+        class="mt-2 flex items-center justify-between rounded-lg bg-ink px-3 py-3 text-sm font-medium text-white"
+      >
+        Start a project <ArrowIcon direction="diagonal" />
+      </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const menuToggle = document.querySelector<HTMLButtonElement>('#menu-toggle');
+  const mobileMenu = document.querySelector<HTMLElement>('#mobile-menu');
+
+  if (menuToggle && mobileMenu) {
+    menuToggle.hidden = false;
+    mobileMenu.hidden = true;
+
+    const setMenuOpen = (open: boolean) => {
+      mobileMenu.hidden = !open;
+      menuToggle.setAttribute('aria-expanded', String(open));
+      menuToggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+    };
+
+    menuToggle.addEventListener('click', () => {
+      setMenuOpen(menuToggle.getAttribute('aria-expanded') !== 'true');
+    });
+
+    mobileMenu.addEventListener('click', (event) => {
+      if (event.target instanceof Element && event.target.closest('a')) {
+        setMenuOpen(false);
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !mobileMenu.hidden) {
+        setMenuOpen(false);
+        menuToggle.focus();
+      }
+    });
+
+    window.matchMedia('(min-width: 48rem)').addEventListener('change', () => setMenuOpen(false));
+  }
+</script>

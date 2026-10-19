@@ -1,3 +1,11 @@
+## File naming
+
+Use kebab-case filenames for components and layouts, such as `hero-graphic.astro` and `blog-post.astro`. Keep imported component identifiers and template tags in PascalCase.
+
+## Imports
+
+Use the `@/` alias for imports within `src/`, such as `@/components/header.astro` and `@/styles/global.css`. The alias is configured in `tsconfig.json`.
+
 ## Development
 
 When starting the dev server, use background mode:
