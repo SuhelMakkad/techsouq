@@ -1,0 +1,103 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="1200"
+  height="630"
+  viewBox="0 0 1200 630"
+  fill="none"
+  role="img"
+  aria-labelledby="migration-title migration-description"
+>
+  <title id="migration-title">Prove your data arrived.</title>
+  <desc id="migration-description">
+    Three checks before switching systems: count the expected records, match their IDs, fields and
+    links, then test a real workflow. If a check fails, hold the switch, fix the issue and recheck.
+  </desc>
+  <rect width="1200" height="630" fill="#f7f8fb" />
+  <circle cx="1115" cy="5" r="220" stroke="#e4eaf6" stroke-width="40" />
+  <circle cx="1115" cy="5" r="140" stroke="#e4eaf6" stroke-width="1" />
+
+  <g font-family="Manrope, Arial, sans-serif" fill="#18202f">
+    <g transform="translate(60 45) scale(0.04)" fill="#2061ef">
+      <path
+        d="M 80,356.583592 V 272 C 80,237 100,206 132,190 L 400,56 Q 432,40 464,56 L 570.533747,109.266874 A 12,12 0 0 1 570.533747,130.733126 L 97.366563,367.316718 A 12,12 0 0 1 80,356.583592 Z"
+      />
+      <path
+        d="M 86.633437,436.683282 L 270.633437,344.683282 A 12,12 0 0 1 288,355.416408 L 288,612.583592 A 12,12 0 0 1 270.633437,623.316718 L 132,554 C 100,538 80,507 80,472 L 80,447.416408 A 12,12 0 0 1 86.633437,436.683282 Z"
+      />
+      <path
+        d="M 406.633437,276.683282 L 446.8,256.6 Q 472,244 497.2,257.86 L 668,351.8 C 700,369.4 720,400 720,436 V 568 C 720,600 702,625 672,640 L 456,748 Q 432,760 408,748 L 406.633437,747.316718 A 12,12 0 0 1 400,736.583592 L 400,287.416408 A 12,12 0 0 1 406.633437,276.683282 Z"
+      />
+    </g>
+    <text x="104" y="69" font-size="18" font-weight="700">TECHSOUQ</text>
+    <text x="1136" y="69" font-size="14" letter-spacing="2" text-anchor="end" fill="#536176">
+      BUSINESS SYSTEMS / 04
+    </text>
+
+    <text x="64" y="151" font-size="62" font-weight="750" letter-spacing="-2.5">
+      Prove your data arrived.
+    </text>
+    <text x="66" y="196" font-size="27" fill="#536176">
+      Three checks before you switch systems.
+    </text>
+
+    <rect x="64" y="235" width="1072" height="308" rx="24" fill="white" stroke="#dfe5ef" />
+    <path d="M392 352H452M748 352H808" fill="none" stroke="#a9b8d2" stroke-width="2" />
+    <path
+      d="m442 345 10 7-10 7m356-14 10 7-10 7"
+      fill="none"
+      stroke="#a9b8d2"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <rect x="96" y="275" width="296" height="146" rx="16" fill="#f2f5fb" stroke="#dfe5ef" />
+    <rect x="452" y="275" width="296" height="146" rx="16" fill="#2061ef" />
+    <rect x="808" y="275" width="296" height="146" rx="16" fill="#f2f5fb" stroke="#dfe5ef" />
+
+    <text x="122" y="311" font-size="14" font-weight="700" letter-spacing="1.4" fill="#536176">
+      01 / RECONCILE
+    </text>
+    <text x="122" y="357" font-size="36" font-weight="750">Count</text>
+    <text x="122" y="394" font-size="20" fill="#536176">Expected records</text>
+
+    <text x="478" y="311" font-size="14" font-weight="700" letter-spacing="1.4" fill="#dce8ff">
+      02 / COMPARE
+    </text>
+    <text x="478" y="357" font-size="36" font-weight="750" fill="white">Match</text>
+    <text x="478" y="394" font-size="20" fill="white">IDs, fields and links</text>
+
+    <text x="834" y="311" font-size="14" font-weight="700" letter-spacing="1.4" fill="#536176">
+      03 / TEST
+    </text>
+    <text x="834" y="357" font-size="36" font-weight="750">Use</text>
+    <text x="834" y="394" font-size="20" fill="#536176">A real workflow</text>
+
+    <path
+      d="M956 421V481Q956 495 942 495H258Q244 495 244 481V432M600 421V455"
+      fill="none"
+      stroke="#2061ef"
+      stroke-width="2"
+      stroke-dasharray="6 6"
+    />
+    <path
+      d="m238 439 6-8 6 8m344 0 6 8 6-8"
+      fill="none"
+      stroke="#2061ef"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <rect x="381" y="455" width="438" height="60" rx="12" fill="white" />
+    <text x="600" y="477" font-size="14" font-weight="700" text-anchor="middle" fill="#536176">
+      ANY CHECK FAILS?
+    </text>
+    <text x="600" y="504" font-size="22" font-weight="700" text-anchor="middle" fill="#2061ef">
+      Hold → fix → recheck
+    </text>
+
+    <text x="64" y="589" font-size="18" fill="#536176">
+      Equal totals can still hide missing records, wrong values and broken links.
+    </text>
+  </g>
+</svg>

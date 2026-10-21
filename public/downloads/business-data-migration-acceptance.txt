@@ -1,0 +1,95 @@
+TECHSOUQ — BUSINESS DATA MIGRATION ACCEPTANCE WORKSHEET
+
+Companion guide: https://techsouqhq.com/blog/business-data-migration-checklist/
+Prepared: 21 October 2026
+
+Use this as a manual record of evidence and decisions. It does not validate data or certify a migration. Store the completed document in your own approved project location; avoid putting unnecessary customer details in it.
+
+PROJECT AND SCOPE
+
+Business / project:
+Source system:
+Destination system:
+Record types included:
+Record types excluded and approval owner:
+Source snapshot / export identifier:
+Cutoff date, time, and time zone:
+Source and destination filters:
+Destination starts empty or contains existing records:
+Expected changes after the snapshot and how they are handled:
+
+REPEAT FOR EACH RECORD TYPE
+
+Record type and definition of one record:
+Source record count:
+Approved exclusions (count and evidence):
+Additional rows absorbed by merges (count and survivor mapping):
+Other transformations, splits, or pre-existing destination records:
+Expected destination count and calculation:
+Actual destination count:
+Difference (actual minus expected):
+Missing expected IDs:
+Unexpected IDs:
+Unapproved duplicate destination records or ambiguous matches:
+Source IDs without an approved mapping:
+
+For an empty destination with one source row per record and no splits: expected count = source count - approved exclusions - additional rows absorbed by merges. Exclusions and absorbed rows must not overlap. Use a different agreed model for other cases. Import failures are unresolved expected records, not automatic exclusions.
+
+FIELD AND RELATIONSHIP CHECKS
+
+Approved field mapping and transformation rules:
+Important fields compared:
+Parent / child relationships compared:
+Required-field or relationship mismatches:
+Records pending, unable to be checked, or sampled only:
+Sampling method and limits, if used:
+Attachment count, access, and file-open evidence:
+Safe re-run method and proof it does not duplicate records:
+
+BUSINESS TASKS
+
+Task and user role:
+Expected result:
+Observed result:
+Evidence:
+Issue and owner:
+
+Repeat for normal and awkward cases, including merged customers, access boundaries, and relevant integrations. Complete tests with the roles people will actually use.
+
+CUTOVER AND RECOVERY
+
+Rehearsal date and evidence:
+Measured export / import / validation / recovery times:
+Agreed cutover window:
+Decision deadline:
+Person authorized to proceed, hold, or recover:
+Source write paths and owners (staff, forms, integrations, jobs):
+Pause / queue / final synchronization plan:
+Backup or source reference location and tested recovery method:
+How new destination records and edits survive a return:
+How queued work is restarted without duplication:
+Communication and support owners:
+Post-switch creation, update, and integration checks:
+Source access and retention decision:
+
+ACCEPTANCE LOG — REPEAT FOR EACH AREA
+
+Area (scope / merges / identities / fields / relationships / files / tasks / recovery):
+Named owner and backup:
+Evidence location:
+Result (PASS / FAIL / NOT CHECKED):
+Unresolved issue and business impact:
+Blocks switch (yes / no, with reason and approver):
+Correction owner and agreed date:
+Retest evidence and date:
+
+FINAL DECISION
+
+Decision (PROCEED / HOLD / RECOVER):
+Approver:
+Date, time, and time zone:
+Evidence reviewed:
+Accepted remaining issues and reasons:
+Next action and responsible person:
+
+Matching counts alone do not establish correctness. Do not treat blank results, pending checks, or an import completion message as approval.
