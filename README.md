@@ -133,10 +133,10 @@ JS
 
 ## Production URLs and search indexing
 
-The configured production origin is `https://techsouqhq.com`. Set `SITE_URL` in the build environment to override it. It must be an absolute HTTP(S) origin without a path, credentials, query, or fragment. Configuration reads the process environment; export the variable in your shell or hosting build settings.
+The configured production origin is `https://www.techsouqhq.com`, matching the hosting redirect from `techsouqhq.com` to `www.techsouqhq.com`. Keep production `SITE_URL` overrides aligned with that destination so canonical URLs, social metadata, structured data, and sitemaps agree. Set `SITE_URL` in the build environment to override it. It must be an absolute HTTP(S) origin without a path, credentials, query, or fragment. Configuration reads the process environment; export the variable in your shell or hosting build settings.
 
 ```sh
-SITE_URL=https://techsouqhq.com pnpm build
+SITE_URL=https://www.techsouqhq.com pnpm build
 ```
 
 An explicit empty value supports local-only verification: `SITE_URL='' pnpm build`. This omits canonical URLs, absolute social-image URLs, sitemap generation, and the robots sitemap reference instead of substituting a fictitious domain. The site still renders normally. A missing variable uses the configured production origin.

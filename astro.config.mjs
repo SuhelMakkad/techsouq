@@ -4,8 +4,8 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 
-// Preserve the configured domain; an explicit empty override supports local-only previews.
-const site = process.env.SITE_URL?.trim() ?? 'https://techsouqhq.com';
+// Match the production redirect destination; an empty override supports local-only previews.
+const site = process.env.SITE_URL?.trim() ?? 'https://www.techsouqhq.com';
 
 if (site) {
   const url = new URL(site);

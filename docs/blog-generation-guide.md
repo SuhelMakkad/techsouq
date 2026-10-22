@@ -180,10 +180,10 @@ Write a distinct, descriptive title and description that match the visible artic
 
 The shared head and article layout generate canonical URLs, social tags, article dates, `BlogPosting` data, and breadcrumbs from the visible content and frontmatter. Do not duplicate these in MDX or add unsupported ratings, FAQs, credentials, or author claims. The author is Techsouq. Use `updatedDate` only for a substantive revision, not to make an unchanged article look fresh.
 
-The production origin is controlled by `SITE_URL` in `astro.config.mjs`. An unset variable currently defaults to `https://techsouqhq.com`; an explicit empty value disables absolute canonical and social-image URLs, sitemap generation, and the robots sitemap reference. An empty value does not make a public preview private or add `noindex`. Configuration reads the process environment, so use the shell or hosting build settings rather than assuming a `.env` entry is loaded here.
+The production origin is controlled by `SITE_URL` in `astro.config.mjs`. An unset variable currently defaults to `https://www.techsouqhq.com`, matching the hosting redirect destination. Keep production overrides aligned with that destination. An explicit empty value disables absolute canonical and social-image URLs, sitemap generation, and the robots sitemap reference. An empty value does not make a public preview private or add `noindex`. Configuration reads the process environment, so use the shell or hosting build settings rather than assuming a `.env` entry is loaded here.
 
 ```sh
-SITE_URL=https://techsouqhq.com pnpm build
+SITE_URL=https://www.techsouqhq.com pnpm build
 ```
 
 Use an absolute HTTP(S) origin without credentials, a path, a query, or a fragment. Local builds must not invent a production domain. For intentional local-only metadata verification:
