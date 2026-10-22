@@ -235,6 +235,20 @@ Use the Node version range in `package.json`. Format the files you changed with 
 
 After an authorized deployment, verify the live article and social image, production canonical, sitemap, and crawl settings. Use the production Search Console property to inspect the URL and monitor indexing, impressions, clicks, and relevant business outcomes. Diagnose actual reader or search problems before expanding the article; avoid treating a publication date change as an improvement.
 
+### Notify Google after production publication
+
+For each authorized article publication or substantive revision, submit the production sitemap through the [Search Console Sitemaps API](https://developers.google.com/webmaster-tools/v1/sitemaps/submit) after CI and production deployment succeed. This is the supported discovery request for ordinary blog articles; describe the result as a sitemap submission, not confirmed reindexing. [Google's guidance](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap#submit) explains that submission is a hint and does not guarantee crawling or indexing.
+
+**Authentication setup:** enable the Search Console API in a Google Cloud project and configure an authorized identity with access to the site's verified Search Console property. Requests require an OAuth 2.0 access token with the `https://www.googleapis.com/auth/webmasters` scope; a normal API key alone cannot authorize submission. Configure unattended token renewal once using the supported credential flow, such as OAuth refresh credentials. Keep credentials in the execution environment's secret storage, never in the repository, generated site, task prompt, or logs. See [Google's authorization requirements](https://developers.google.com/webmaster-tools/v1/how-tos/authorizing).
+
+1. Confirm the required CI checks and the pushed commit's production Vercel deployment succeeded. Tie the deployment to the exact commit SHA. A successful build or push alone is insufficient; do not submit for a preview, failed or unverified deployment, documentation-only change, or unchanged rebuild.
+2. Verify the production article returns HTTP 200, has the intended canonical URL, and permits indexing. Check its social image and blog listing entry, then confirm the live sitemap contains the article with the expected `<lastmod>`. Verify `https://www.techsouqhq.com/sitemap-index.xml` and its referenced sitemap are accessible.
+3. Using existing authorized credentials, submit `https://www.techsouqhq.com/sitemap-index.xml` with the API's `PUT /webmasters/v3/sites/{siteUrl}/sitemaps/{feedpath}` method, URL-encoding both path parameters and sending no request body. Use the existing verified property: `sc-domain:techsouqhq.com` if that Domain property is configured, or `https://www.techsouqhq.com/` for the matching URL-prefix property. Do not assume a property exists or use an unrelated property.
+4. Record the publication SHA, sitemap URL, property, submission time, and actual API result in the run report. Submit once per verified publication; consult the run's existing record before repeating a successful submission. Use bounded retries with backoff for transient failures. A successful API response has an empty body and confirms submission only. The [URL Inspection API](https://developers.google.com/webmaster-tools/v1/urlInspection.index/inspect) can read index status; it cannot request indexing.
+5. If credentials, property access, or submission are unavailable, report the exact blocker and mark Google notification as skipped or failed separately from the verified publication. Preserve the published article and report any required credential setup; do not claim reindexing or roll back a successful publication because notification failed.
+
+Do not use the [retired sitemap ping endpoint](https://developers.google.com/search/blog/2023/06/sitemaps-lastmod-ping) or Google's [Indexing API](https://developers.google.com/search/apis/indexing-api/v3/quickstart), which is restricted to eligible job-posting and livestream pages. The existing public sitemap and `robots.txt` discovery remain available without Google credentials.
+
 ## 9. Maintain existing articles
 
 Recheck sources when a product, policy, or technical behavior changes. For a substantive revision, update `updatedDate`, explain changed assumptions where readers need that context, and synchronize examples, tool rules, tests, and graphics. Keep the original `pubDate`.
@@ -257,6 +271,8 @@ Give each article a specific reader outcome, an original worked example, and use
 Implement the article in the existing Astro/MDX collection and visual style. Add the required metadata, accessible cover, and matching PNG social preview. Follow the current module structure and import aliases. Use the Techsouq byline and actual publication date.
 
 Validate factual claims, numeric examples, accessibility, responsive rendering, tool behavior, static HTML, internal links, metadata, structured data, and sitemap inclusion. Run the applicable repository checks and report the article URLs, what was added, verification performed, and any limitations.
+
+After an authorized publication, wait for successful CI and the pushed commit's production Vercel deployment, verify the live article and sitemap, then submit the production sitemap through the authenticated Search Console Sitemaps API as described in the guide. Report submission separately from deployment and indexing; if credentials or access are missing, report the blocker without claiming a submission.
 
 Topic constraints or exclusions: [details, or none].
 Commit, push, and deployment instructions: [explicit scope].
