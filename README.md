@@ -69,7 +69,7 @@ Use `@/` for shared imports, such as `@/components/layout/header.astro` and `@/s
 
 Run `pnpm lint` to check JavaScript, TypeScript, and Astro files. Use `pnpm lint:fix` to apply available automatic fixes.
 
-Run `pnpm test` for the interactive tools' calculation, brief-generation, and redirect-validation tests in `src/modules/blog/utils/__test__/`. These use Node's built-in test runner and TypeScript stripping; no test framework is required. Tests import helpers with relative `.ts` paths so they run without resolving Astro's aliases.
+Run `pnpm test` for blog utilities, including tool calculations, brief generation, redirect validation, and sitemap dates, in `src/modules/blog/utils/__test__/`. These use Node's built-in test runner and TypeScript stripping; no test framework is required. Tests import helpers with relative `.ts` paths so they run without resolving Astro's aliases.
 
 Run `pnpm format` to format the project, or `pnpm format:check` to check formatting without changing files. Prettier supports Astro components and sorts Tailwind classes using the site's stylesheet. Markdown prose stays on one source line per paragraph.
 
@@ -142,5 +142,9 @@ SITE_URL=https://www.techsouqhq.com pnpm build
 An explicit empty value supports local-only verification: `SITE_URL='' pnpm build`. This omits canonical URLs, absolute social-image URLs, sitemap generation, and the robots sitemap reference instead of substituting a fictitious domain. The site still renders normally. A missing variable uses the configured production origin.
 
 Production builds include `/sitemap-index.xml`, `/sitemap-0.xml`, and `/robots.txt`. Articles include canonical URLs, social previews, `BlogPosting` structured data, and breadcrumbs. There is no RSS feed or search analytics integration in this version.
+
+Article sitemap entries include `<lastmod>` from the latest of their publication date, substantive revision date (`updatedDate`), and the recorded shared article metadata change. The sitemap integration reads the dates already rendered in `BlogPosting` structured data; missing or invalid article dates fail the build. The homepage and blog listing omit `<lastmod>` until they have a reliable modification-date source. Rebuilding alone never advances these dates.
+
+The shared date lives in `src/modules/blog/utils/article-lastmod.ts`, currently recording the successful deployment of the canonical/structured-data domain correction in commit `3f3d4c3` at `2026-10-22T08:23:02Z`. Advance it only when a significant shared change affects existing article pages, and record the reason. Keep article-specific revisions in `updatedDate`; a shared metadata correction does not change the visible editorial revision date. Never use build time, file modification times, or routine copyright/style changes as freshness signals.
 
 After deployment, verify the homepage, blog index, and all article URLs return successful responses; confirm the canonical and social-image URLs use the intended origin. Check that robots rules permit crawling and the sitemap contains all articles. Use Google's Rich Results Test to inspect an article, verify the production property in Search Console, and submit `/sitemap-index.xml`. Monitor indexing, query impressions, and clicks to assess which articles need improvement; a sitemap submission does not guarantee indexing or rankings.

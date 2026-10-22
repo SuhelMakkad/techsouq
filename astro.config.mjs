@@ -1,8 +1,9 @@
 // @ts-check
 import mdx from '@astrojs/mdx';
-import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
+
+import blogSitemap from './src/modules/blog/lib/blog-sitemap.ts';
 
 // Match the production redirect destination; an empty override supports local-only previews.
 const site = process.env.SITE_URL?.trim() ?? 'https://www.techsouqhq.com';
@@ -25,5 +26,5 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 
-  integrations: [mdx(), ...(site ? [sitemap()] : [])],
+  integrations: [mdx(), ...(site ? [blogSitemap()] : [])],
 });

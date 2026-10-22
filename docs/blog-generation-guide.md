@@ -180,6 +180,8 @@ Write a distinct, descriptive title and description that match the visible artic
 
 The shared head and article layout generate canonical URLs, social tags, article dates, `BlogPosting` data, and breadcrumbs from the visible content and frontmatter. Do not duplicate these in MDX or add unsupported ratings, FAQs, credentials, or author claims. The author is Techsouq. Use `updatedDate` only for a substantive revision, not to make an unchanged article look fresh.
 
+The sitemap reads publication and revision dates from each rendered article's `BlogPosting` data. Its `<lastmod>` is the latest of `pubDate`, `updatedDate` when present, and the recorded shared metadata correction in `src/modules/blog/utils/article-lastmod.ts`. New posts and substantive revisions get their own dates automatically. Do not advance the shared date for a new post, routine rebuild, typo, or styling change; change it only for a significant change affecting existing article pages and document why. The homepage and blog listing intentionally omit `<lastmod>`. The sitemap index also records the latest modification date among its article entries.
+
 The production origin is controlled by `SITE_URL` in `astro.config.mjs`. An unset variable currently defaults to `https://www.techsouqhq.com`, matching the hosting redirect destination. Keep production overrides aligned with that destination. An explicit empty value disables absolute canonical and social-image URLs, sitemap generation, and the robots sitemap reference. An empty value does not make a public preview private or add `noindex`. Configuration reads the process environment, so use the shell or hosting build settings rather than assuming a `.env` entry is loaded here.
 
 ```sh
@@ -226,7 +228,7 @@ Use the Node version range in `package.json`. Format the files you changed with 
 ### Generated output and publication
 
 - [ ] Inspect `dist/blog/<slug>/index.html`: substantive text is rendered statically, the title and description are correct, and structured data agrees with the visible article.
-- [ ] Verify internal URLs and fragments, image paths, descriptive alt text, canonical origin, social-image dimensions, and publication dates. Confirm the article is included in the configured-domain sitemap.
+- [ ] Verify internal URLs and fragments, image paths, descriptive alt text, canonical origin, social-image dimensions, and publication dates. Confirm the article is included in the configured-domain sitemap with the expected `<lastmod>`; unchanged articles must retain their dates on a rebuild.
 - [ ] If changing shared metadata or site configuration, also verify an empty `SITE_URL` and a different valid test origin. Restore a production-configured build before preparing production output.
 - [ ] Review the diff for unintended changes, generated output, temporary screenshots, credentials, and unfinished drafts. Report checks actually performed and any remaining limitations.
 - [ ] Follow the current task's instructions for committing, pushing, or deploying. Completing an article does not itself authorize publishing it externally.
