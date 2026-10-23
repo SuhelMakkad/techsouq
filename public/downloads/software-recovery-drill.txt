@@ -1,0 +1,126 @@
+TECHSOUQ — SOFTWARE RECOVERY BRIEF AND DRILL WORKSHEET
+
+Companion guide: https://www.techsouqhq.com/blog/software-backup-recovery-plan/
+Prepared: 23 October 2026
+
+Use this manual worksheet for one workflow and one failure scenario. It does not test your system, certify recovery, or send information to Techsouq. Store the completed document in your approved project location. Record evidence references rather than customer details or passwords. Objectives are agreed limits, not measured guarantees.
+
+1. BUSINESS BOUNDARY
+
+Workflow and business owner:
+Users and normal access roles:
+Data, files, configuration, and connected services required:
+Failure scenario being tested:
+Minimum usable service (observable tasks that must work):
+Conditions excluded from this scenario:
+Manual fallback while unavailable:
+How requests received during the outage are recorded and reconciled:
+Must all missing work be reconstructed before service counts as usable? Explain:
+
+2. AGREED TARGETS — COMPLETE BEFORE THE DRILL
+
+Recovery point objective (RPO), in minutes or hours:
+Consequence behind this data-loss limit:
+Records and changes covered by it:
+Recovery time objective (RTO), in minutes or hours:
+Consequence behind this interruption limit:
+Clock start: interruption of the agreed workflow.
+Clock end: agreed minimum usable service has passed its checks.
+Dependencies or incident types requiring different targets:
+Target approver and date:
+
+3. RECOVERY ARRANGEMENT
+
+Technical recovery owner and backup person:
+Supplier vs business responsibilities:
+Items protected and explicit omissions:
+Backup frequency and evidence of usable recovery points:
+Retention period and late-discovered corruption scenario:
+How an older clean point is selected and verified:
+Backup location and protection from failure of the primary system/account:
+Access owner and location of approved recovery instructions (NO SECRETS):
+Application/configuration/identity requirements:
+Restore route for every exported object or file:
+Support access, agreed terms, costs, and limitations:
+Monitoring and response to failed backup jobs:
+
+4. SAFE TEST CONDITIONS
+
+Drill date and participants:
+Isolated environment and representative dataset:
+Approved handling of personal data, access, and test cleanup:
+How real emails/messages, payments, and production writes are blocked:
+Differences from production (volume, load, infrastructure, access, staffing):
+Conditions those differences leave untested:
+
+5. CLOCKS AND EVIDENCE
+
+Record FULL dates, times, and time zones for every timestamp.
+
+Interruption timestamp:
+Detection timestamp:
+Authorization/access timestamp:
+Restore start and finish:
+Effective timestamp of the latest usable recovered data state:
+Evidence for that boundary (do not substitute backup-job completion time):
+Workflow validation completion / usable-service timestamp:
+
+Observed data gap = interruption time - recovered data effective timestamp.
+Observed recovery time = usable-service time - interruption time.
+
+Use consistent time units. These formulas assume a known interruption and a usable recovery point at or before it. Late corruption and inconsistent points across systems need separate analysis. Measure elapsed time; do not sum overlapping tasks. If reconstructing all affected work is required for usable service, include that work before stopping the recovery clock.
+
+Observed data gap and calculation:
+Compared with RPO — PASS / FAIL / NOT CHECKED:
+Observed recovery time and calculation:
+Compared with RTO — PASS / FAIL / NOT CHECKED:
+
+6. WORKFLOW CHECKS — REPEAT FOR EACH CONDITION
+
+Condition / user role:
+Expected result:
+Actual result:
+Evidence reference:
+Result: PASS / FAIL / NOT CHECKED
+Issue, owner, and retest date:
+
+Suggested checks: find known old and recent records; verify key values and customer relationships; open attachments; create/change a booking as an ordinary user; check restrictions on other users' records; verify required connections without sending real actions. These checks are a starting point, not proof of complete integrity or security.
+
+7. UNCERTAIN WORK AND RESTART
+
+Changes between the recovered point and the interruption:
+Separate reconstruction source and evidence it is available/correct:
+Updates/cancellations/files that a new-record count would miss:
+Requests received during the outage (separate backlog):
+How uncertain records are flagged and prevented from causing incorrect actions:
+Which reconciliation must finish before service is usable:
+Which work can safely continue afterwards, with owner and deadline:
+Queued actions paused and checked:
+How duplicates or repeat charges/messages are prevented before restart:
+Person authorized to resume each connection:
+
+8. DECISION AND FOLLOW-UP
+
+Overall decision: REQUIREMENTS MET / REMEDIATION REQUIRED / EVIDENCE INCOMPLETE
+Decision owner and date:
+Evidence reviewed:
+Failed or untested conditions:
+Correction owner, agreed action, and date:
+Retest scope and scheduled date:
+Next routine review/rehearsal date and responsible owner:
+Changes that trigger another test:
+Test data and environment cleanup owner:
+
+Do not treat empty results as success. A successful drill supports only the tested conditions; it does not guarantee recovery in a different incident.
+
+ILLUSTRATIVE EXAMPLE — NOT AN INDUSTRY BENCHMARK
+
+Fictional booking company, database unavailable; same date, 23 October 2026, UTC.
+Agreed RPO: 60 minutes. Agreed RTO: 120 minutes.
+Latest usable recovered state: 10:00. Interruption: 11:20.
+Agreed minimum service usable: 12:50, allowing controlled reconciliation afterwards.
+Data gap: 80 minutes — FAIL, 20 minutes beyond RPO.
+Recovery time: 90 minutes — PASS, 30 minutes inside RTO.
+Sequential assumed phases: 15 minutes detection/authorization/access + 45 minutes restore + 30 minutes validation = 90 minutes.
+Overall: remediation required; faster restoration alone does not fix the stale recovery point.
+At an assumed uniform 12 new bookings/hour, 12 x 80 / 60 = 16 new bookings in the gap. This is exposure, not confirmed loss, and excludes edits/cancellations/files and new requests during the outage.

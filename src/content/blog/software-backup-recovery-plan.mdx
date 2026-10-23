@@ -1,0 +1,137 @@
+---
+title: 'Software Backup and Recovery: Set RPO and RTO Before You Buy'
+description: 'Decide how much data loss and downtime your business can tolerate. Use a worked recovery drill and a supplier worksheet to test what backups really deliver.'
+pubDate: 2026-10-23
+category: 'Business systems'
+heroImage: '../../assets/blog/software-backup-recovery-plan.svg'
+heroImageAlt: 'A timeline separates two recovery targets around an outage: RPO asks how much work could be missing, while RTO asks how long until work resumes.'
+socialImage: '/images/blog/software-backup-recovery-plan.png'
+---
+
+Before accepting “backups included” in a software proposal, agree two limits: how much recent work the business could lose, and how long the essential workflow could stop. Then ask the supplier to demonstrate recovery against both limits. A restored login screen is only one part of that evidence.
+
+Those limits are called the **recovery point objective (RPO)** and **recovery time objective (RTO)**. They describe what your business needs, not what a backup schedule or sales promise has proved. AWS's [recovery-objective guidance](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_planning_for_recovery_objective_defined_recovery.html) defines them in terms of acceptable data loss and interruption, and recommends setting them from business impact.
+
+This guide helps a founder buying a hosted application or commissioning custom software write a recovery brief for one important workflow. The example is a fictional booking business, followed by a downloadable drill worksheet. It covers planning and evidence, not instructions for handling an active cyberattack or choosing a particular backup product.
+
+## Start with the work that must resume
+
+Choose a business task, such as “the operations team can find a booking, see its current appointment time, and record a change.” Name the people who use it and the systems it depends on. For a booking application, that might include customer records, attachments, staff access, a calendar connection, and a queue of confirmation messages.
+
+Define the minimum usable service before discussing recovery speed. In our example, staff must be able to view and edit verified bookings under their normal permissions. Bookings whose status is uncertain must be flagged and handled through an agreed reconciliation process. Automated messages stay paused until their contents and recipients have been checked. A working dashboard alone does not satisfy that definition.
+
+Ask the owner of the workflow two questions:
+
+| Decision | Practical question | What to write down |
+| --- | --- | --- |
+| Data-loss limit: RPO | How far back could we go before missing changes become unacceptable? | A time limit, the records it applies to, and why the business can tolerate it |
+| Interruption limit: RTO | How long can this workflow be unavailable before the impact becomes unacceptable? | A time limit and the observable conditions for service to count as restored |
+
+Explain the consequence behind each answer. Could the team reconstruct recent bookings from a separate confirmation log? Would missing a cancellation cause someone to attend the wrong appointment? Can staff record new requests safely while the application is unavailable, and who enters them afterwards?
+
+Choose targets for this workflow and failure scenario, then ask the supplier what meeting them requires. [AWS cautions](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_planning_for_recovery_objective_defined_recovery.html) that unnecessarily strict objectives can add cost and complexity, while dependencies can make a proposed target unachievable. Its guidance also recognizes that different incidents may need different recovery objectives. A simple database restore and loss of access to the entire hosting account should not share an unexamined promise.
+
+## Keep the two clocks separate
+
+The data clock looks backwards from the interruption to the latest usable state recovered. The service clock runs forwards from the interruption until the agreed workflow is usable again.
+
+For a simple outage followed by a snapshot restore:
+
+- **Observed data gap = interruption time − recovered data's effective timestamp.** Compare that interval with the RPO.
+- **Observed recovery time = usable-service time − interruption time.** Compare that interval with the RTO.
+
+Use the timestamp of the state the recovery actually provides. A backup job that finishes at 10:15 might contain a consistent view from 10:00. Its completion time alone does not establish which changes survived. Ask for evidence of the recovered boundary and check representative records around it.
+
+Keep full dates and time zones in the drill log. The formulas above assume a known interruption and a usable recovery point at or before it. If corruption started earlier, or several systems recover to different moments, a single subtraction does not establish a consistent business state. Record the separate boundaries and have the supplier reconcile them.
+
+## Work through a recovery that passes only one test
+
+Imagine a fictional service company testing recovery after its booking database becomes unavailable. These are original illustrative assumptions, not a Techsouq client result or typical recovery times.
+
+The owner has agreed an **RPO of 60 minutes** and an **RTO of 120 minutes** for this scenario. Assume the latest usable recovered state is consistent across the booking data in scope. No later recovery point is available during this drill. All times below are on 23 October 2026 in UTC.
+
+| Event | Time | What the evidence establishes |
+| --- | --- | --- |
+| Latest recovered data state | 10:00 | Verified records and their relationships reflect this point |
+| Workflow becomes unavailable | 11:20 | Start of the interruption, including time before the team reacts |
+| Agreed minimum service is usable | 12:50 | Staff workflow, access, and the controlled reconciliation process pass the agreed checks |
+
+The 90-minute recovery consists of 15 minutes to detect the problem, authorize recovery, and obtain access; 45 minutes to restore the application and data; and 30 minutes to validate the workflow and establish safe handling of uncertain bookings. These phases are sequential assumptions for this example. In a real drill, measure elapsed time directly; adding overlapping tasks would overstate it.
+
+| Recovery test | Calculation | Result against the agreed target |
+| --- | --- | --- |
+| Data recency | 11:20 − 10:00 = **80 minutes** | **Fail:** 20 minutes beyond the 60-minute RPO |
+| Service interruption | 12:50 − 11:20 = **90 minutes** | **Pass:** 30 minutes inside the 120-minute RTO |
+
+**The drill does not meet the agreed recovery requirements.** The application is usable within the downtime limit, but its recovered state is too old. Improving restore speed alone would not fix that failure. Investigate why a more recent usable recovery point was unavailable, change the recovery arrangement, and repeat the affected checks.
+
+To make the data gap tangible, assume 12 new bookings arrive per hour, evenly throughout this interval. Then **12 × 80 ÷ 60 = 16 new bookings** fall into the gap. That is an exposure estimate under the stated assumption, not proof that 16 bookings were lost. Updates, cancellations, attachments, and bursts of demand are excluded. A separate source might recover some changes, but it must itself be available and checked.
+
+The example's usable-service definition permits controlled reconciliation after the application returns. If your team cannot operate until every affected booking has been reconstructed, that work belongs inside the recovery clock. Do not keep the 12:50 endpoint while silently changing what “usable” means. Likewise, requests received during the outage create a separate backlog to reconcile; they are not part of the 80-minute pre-outage data-gap estimate.
+
+## Check the path from a backup to a working application
+
+Ask the supplier to show what is protected and how each item becomes usable again. The UK National Cyber Security Centre's [small-organisation backup guidance](https://www.ncsc.gov.uk/collection/small-organisations-guide-to-cyber-security/backing-up-your-data) recommends knowing how to restore backups and checking that they contain the important data. Treat that as a starting point for a workflow demonstration.
+
+| Part of the workflow | Evidence to request |
+| --- | --- |
+| Records and files | Recover known records, open their attachments, and check important relationships |
+| Application and configuration | Start the required application version with its settings and dependencies |
+| Staff access | Demonstrate sign-in and correct permissions for an ordinary user, not only an administrator |
+| Connected services | Identify which connections can resume, which remain paused, and who checks queued actions before release |
+| Recovery access | Show that the recovery owner can reach the instructions, backup, and required access even if the normal application is unavailable |
+
+Keep credentials out of the worksheet. Record who controls access and where approved recovery instructions live; use your organization's secure credential-management process for the secrets themselves.
+
+An export also needs a tested route back into a useful system. Shopify's [backup and duplication documentation](https://help.shopify.com/en/manual/shopify-admin/duplicate-store/) lists order exports but says orders cannot be imported through its admin. It points to third-party apps or the API as alternatives and states that Shopify does not support that import process. That is a specific platform limitation, not a claim that Shopify cannot be backed up. Ask the equivalent question for your supplier: “Which exported objects can we restore, by what method, and what will be missing?”
+
+For a custom application, include recovery instructions and a demonstration in the delivery scope. For a hosted product, ask which recovery actions the provider performs, which your team performs, whether individual deletions can be recovered, and what support access is needed. Request the actual terms and a demonstration for the scenario you care about rather than assuming a general availability commitment answers those questions.
+
+## Keep the rehearsal separate from live work
+
+Agree an isolated test environment and a representative dataset with the supplier. Protect any personal data used in the exercise, restrict access, and prevent the test application from sending real customer messages, taking payments, or changing live connected systems. Record what those safeguards mean for the test's realism.
+
+AWS's [periodic recovery guidance](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_backing_up_data_periodic_recovery_testing_data.html) recommends restoring into a new location, checking data usability, and comparing recovery results with the objectives. The following sequence applies that principle to our booking workflow:
+
+1. **Define the scenario and acceptance conditions.** Record the workflow, data in scope, RPO, RTO, minimum usable service, dependencies, and decision owner before the test starts.
+2. **Recover using the documented process.** Log the interruption, detection, authorization, restored data boundary, and usable-service timestamps. Note any undocumented intervention or unavailable access.
+3. **Prove the workflow.** Have an ordinary staff user find a known booking, open its files, make a permitted change, and verify the result. Check that another user's restricted records remain inaccessible.
+4. **Account for uncertain work.** Identify changes after the recovered boundary and requests received during the outage. Demonstrate how to reconcile them and restart queued actions without duplicate messages or transactions.
+5. **Record the decision and retest failures.** Compare the two measured intervals with their targets, attach evidence, and assign an owner to every failed or untested condition.
+
+A recovery exercise is evidence for its tested conditions. A small test dataset, readily available administrator, or already-running test environment may make the drill faster than a real incident. Record those differences and test the important missing conditions before treating the result as representative.
+
+Keep backup protection in scope too. [NCSC recommends](https://www.ncsc.gov.uk/collection/small-organisations-guide-to-cyber-security/backing-up-your-data) protecting online backups with two-step verification and disconnecting external backup devices when not in use because malware can affect connected devices. Ask the supplier how your backups remain usable when the primary account or system is compromised; copying files to another folder under the same access is not a demonstrated answer.
+
+Agree retention separately from backup frequency. A frequently created copy is little help with a mistake discovered weeks later if every retained version already contains it. Record how far back a clean state may need to exist and how the team would find and verify it.
+
+Set a review and rehearsal schedule with the people responsible, and repeat relevant tests after changes to the application, data volume, access process, or integrations. Choose the frequency from the workflow's importance and rate of change. This guide does not assign a universal testing interval or claim that one successful drill guarantees recovery.
+
+## Send a recovery brief with your software request
+
+Copy the following headings into your project brief or <a href="/downloads/software-recovery-drill.txt" download>download the plain-text recovery drill worksheet</a>. It works without JavaScript. The worksheet is a manual record; it does not test a system or send information to Techsouq.
+
+| Brief section | Decision or evidence to include |
+| --- | --- |
+| Business boundary | Workflow, users, dependencies, failure scenario, and minimum usable service |
+| Recovery targets | RPO and RTO, the consequence behind each, and who approves them |
+| Recovery arrangement | Items protected, effective recovery points, retention, access owners, restore method, and exclusions |
+| Test conditions | Environment, dataset, blocked external actions, and differences from production |
+| Drill evidence | Full timestamps, recovered-record checks, ordinary-user workflow results, and both interval calculations |
+| Remaining work | Data-gap reconciliation, outage backlog, queued actions, failures, owners, and retest date |
+| Decision | Pass, fail, or not checked for each condition; explicit approval or remediation required |
+
+Do not let an empty result imply success. If the supplier cannot demonstrate a particular recovery path, record it as **not checked** and decide what evidence is needed before accepting the proposal.
+
+Bring the brief into your [software cost comparison](/blog/custom-software-vs-off-the-shelf-cost/) so recovery work, storage, support, and rehearsals have an explicit place in the scope. Use the record and relationship checks in our [data migration guide](/blog/business-data-migration-checklist/) when validating a restore, and the permission questions in our [customer portal scope guide](/blog/customer-portal-mvp-scope/) for customer-facing workflows.
+
+The useful next request is specific: “Price and demonstrate recovery of this workflow, with these data and downtime limits, and show us the unresolved gaps.” For a new web application or custom business system, [Techsouq's services](/#services) can help turn that request into implementation and acceptance work.
+
+## Sources and further reading
+
+- [AWS: Define recovery objectives for downtime and data loss](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_planning_for_recovery_objective_defined_recovery.html) — definitions, business impact, dependencies, and scenario-specific targets.
+- [AWS: Perform periodic recovery tests](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_backing_up_data_periodic_recovery_testing_data.html) — restored-data validation and measured recovery.
+- [Shopify: Backups and duplication](https://help.shopify.com/en/manual/shopify-admin/duplicate-store/) — the distinction between order export and import routes.
+- [NCSC: Backing up your data](https://www.ncsc.gov.uk/collection/small-organisations-guide-to-cyber-security/backing-up-your-data) — backup access protection, separation, and checking restoration.
+
+Sources checked on 23 October 2026. The booking business, targets, timestamps, arrival rate, test sequence, and worksheet are original illustrative planning examples. Official guidance supports the cited principles and platform behavior; it does not certify the example or establish requirements for every business.
