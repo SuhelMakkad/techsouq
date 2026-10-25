@@ -1,0 +1,118 @@
+TECHSOUQ — WORKFLOW AUTOMATION ACCEPTANCE WORKSHEET
+Published 25 October 2026
+Companion: https://www.techsouqhq.com/blog/workflow-automation-checklist/
+
+Use this manual worksheet with your supplier. It does not connect to your systems, test an integration, or send information to Techsouq. Store completed copies under your own access rules. Use synthetic references in tests; do not include passwords, API keys, or unnecessary customer/payment data.
+
+1. BUSINESS JOB AND BOUNDARY
+
+Workflow and business owner:
+Trigger:
+Eligibility rules (including cancellations/changes):
+Authoritative source for each important fact:
+Stable business job reference:
+Source event reference:
+Intended outcome and evidence of completion:
+Actions included / excluded:
+Test environment and differences from production:
+How live payments, customer messages and production writes are blocked:
+
+2. ACTION RULES — REPEAT FOR EACH ACTION
+
+Action and destination:
+Evidence of an already completed action:
+Destination result reference:
+How repeated and concurrent attempts are controlled:
+Safe retry mechanism, scope and retention/lifetime:
+What happens after its protection expires:
+Temporary failure handling, retry limit and wait policy:
+Missing or invalid data handling:
+Unknown outcome handling (request may have succeeded):
+Where replay starts and which previous results it retains:
+Authorized manual resolution and how it is recorded:
+
+3. WORK LEDGER — ONE ENTRY PER JOB/ACTION
+
+Business job reference:
+Source event reference(s):
+Action attempted:
+Last attempt timestamp with time zone:
+State: PENDING / IN PROGRESS / VERIFIED COMPLETE / NEEDS CORRECTION / OUTCOME UNKNOWN
+Destination result reference and verification evidence:
+Completed actions that must not be repeated:
+Next action, owner and next review time:
+Manual changes, operator and time:
+Resolution evidence:
+
+4. EXCEPTION OWNERSHIP AND MISSING WORK
+
+Primary owner and backup:
+Coverage hours and time zone:
+Maximum acceptable waiting time and reason:
+Escalation route when retry/wait limit is reached:
+Who can view, correct, replay, pause and resume:
+Source-to-outcome comparison method and review interval:
+How missing notifications are detected and recovered:
+Ledger/alert data minimization and access arrangements:
+
+5. ACCEPTANCE REHEARSALS
+
+For each case record: test ID; job reference; starting state; action taken; expected result; observed result; evidence link; PASS / FAIL / NOT CHECKED; owner; next step; retest date. Blank is NOT CHECKED, never a pass.
+
+A. Duplicate notification, including simultaneous attempts.
+Expected: one correct project, with both attempts traceable to it.
+
+B. Old notification arrives after cancellation.
+Expected: current eligibility checked; cancelled work is not recreated/reopened.
+
+C. Required customer reference missing.
+Expected: no guess; hold, assign, correct and deliberately resume.
+
+D. Project created but response interrupted.
+Expected: find or safely resolve the result without duplicate creation.
+
+E. Next action fails after project creation.
+Expected: preserve the verified project; complete only unfinished work under the replay rules.
+
+F. Dependency remains unavailable beyond the retry limit.
+Expected: retries stop as agreed; owner sees the outstanding job; no false completion.
+
+G. Source notification withheld.
+Expected: comparison finds the missing job; recovery yields one verified outcome.
+
+Also test an operator completing work while automation is paused: restart must recognize the manual result and avoid duplicate work.
+
+6. PAUSE, RESTART AND PILOT
+
+Who can pause and authorize restart:
+Does pause stop intake, downstream actions, or both?
+Where waiting jobs remain and how they are protected:
+Who reviews jobs before restart:
+How manually completed actions are recognized:
+Pilot boundary and supervision:
+Exception volume, resolution time and unresolved jobs to review:
+Conditions for expanding, changing or stopping the automation:
+
+7. WORKED EXAMPLE — FICTIONAL, NOT A BENCHMARK
+
+Assumptions: 12 distinct eligible paid bookings; one deposit and one intended project each; no cancellations or eligibility changes during this numeric scenario. The three repeat deliveries concern bookings among the ten straightforward cases.
+
+Notifications: 12 original + 3 repeats = 15 deliveries.
+Initial job ledger: 10 verified + 1 held + 1 unknown = 12 distinct bookings.
+
+B-112: create request timed out. Investigation finds existing project P-812, verifies the customer and records the link. No new project is created.
+B-111: required customer reference missing. Operations corrects it; automation rechecks eligibility and existing work, then creates and verifies one project.
+
+Final projects: 10 initially verified + 1 existing confirmed + 1 newly created = 12 verified projects.
+Verify each booking-to-project mapping and no extra project for the same booking. Fifteen deliveries are not fifteen business jobs. If the unknown result cannot be established, keep it unknown with an owner and next review time.
+
+8. ACCEPTANCE DECISION
+
+Required conditions and evidence:
+Passed conditions:
+Failed conditions and remediation owners:
+Not-checked conditions and evidence still needed:
+Accepted exclusions and limitations:
+Decision: APPROVE DEFINED SCOPE / REMEDIATION REQUIRED / EVIDENCE STILL NEEDED
+Decision owner and date:
+Next review or retest:

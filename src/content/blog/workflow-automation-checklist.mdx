@@ -1,0 +1,128 @@
+---
+title: 'Workflow Automation Checklist: Plan for Duplicates and Failures'
+description: 'Before connecting business apps, agree how duplicates, timeouts, and missing data are handled. Includes a worked example and a supplier acceptance worksheet.'
+pubDate: 2026-10-25
+category: 'Business systems'
+heroImage: '../../assets/blog/workflow-automation-checklist.svg'
+heroImageAlt: 'An automation checks existing work before completing a business job. An uncertain result branches to review before retrying, so repeated notifications do not become duplicate work.'
+socialImage: '/images/blog/workflow-automation-checklist.png'
+---
+
+A customer pays a deposit. Your automation creates a project, then loses the connection before receiving confirmation. The run shows a failure. Should someone press “try again”?
+
+First establish whether the project already exists. Repeating the whole workflow could create a second project even though the first run looked unsuccessful. Before buying or building an automation, agree how it identifies the same business job, checks the result of each action, and hands uncertain cases to a named person.
+
+This guide is for a founder connecting existing business apps or commissioning a small integration. It provides a worked deposit-to-project example and an acceptance worksheet you can give a supplier. It covers operational decisions and tests, rather than implementation code, payment processing, or a guarantee that a workflow can never fail.
+
+## Define one job and its completed outcome
+
+Start with a sentence that includes the trigger, the work, and the evidence of completion:
+
+> For each eligible paid booking, create one project linked to that booking and its customer, then record the project reference where the operations team can find it.
+
+In this example, the payment system is the authority for payment status, the booking system owns the booking and customer reference, and the project system owns the project. “Eligible” means the booking has the required deposit and has not been cancelled. A notification starts a check; it does not replace those business rules.
+
+Name a stable reference for the business job, such as a booking ID. Keep the source event reference and the resulting project ID alongside it. These answer different questions: which notification arrived, which job it concerns, and what work resulted. A customer email address alone is a poor job reference when the same customer can make several bookings.
+
+A webhook is a notification one system sends to another when something happens. Stripe's [webhook documentation](https://docs.stripe.com/webhooks#handle-duplicate-events) says the same event may arrive more than once; its [delivery guidance](https://docs.stripe.com/webhooks#event-ordering) also says events are not guaranteed to arrive in generation order. Those are specific documented behaviors, not a claim that every automation platform works identically. Ask what your actual connectors promise.
+
+Agree the destination state that counts as complete. For our workflow, staff must be able to open the right project, see the correct customer, and trace it back to the booking. A received notification or a green run indicator is not that evidence. Stripe, for example, [recommends acknowledging webhook receipt before complex processing](https://docs.stripe.com/webhooks#quickly-return-a-2xx-response). Our business completion check therefore belongs after the downstream work.
+
+## Give each failure a different next action
+
+A missing customer reference, a temporary outage, and an unknown create result should not all trigger the same retry button.
+
+| Situation | Decision to agree before launch | Evidence the owner should see |
+| --- | --- | --- |
+| Repeated notification for an already completed job | Recognize the job and reuse its verified outcome | The existing project reference; no extra project |
+| Temporary service failure with a safe repeat path | Retry within an agreed limit, waiting between attempts | Attempt history, next action, and escalation when the limit is reached |
+| Missing or invalid business data | Hold the job until an authorized person corrects it | The field needing attention and its owner |
+| Request timed out; the action may have succeeded | Check the destination or use its documented safe retry mechanism | A verified existing result or a controlled path to complete the missing action |
+| An earlier action succeeded but a later one failed | Resume only the unfinished work under the agreed rules | Separate status and evidence for each action |
+
+AWS's [retry guidance](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/retry-backoff.html) describes waiting longer between a bounded number of retries for temporary failures. It also warns that repeated calls need to have the same effect as one call, and that excessive retries can overload a service. A missing required field needs correction; waiting longer does not supply it.
+
+Developers call the same-effect property **idempotency**. Stripe's [idempotent-request documentation](https://docs.stripe.com/api/idempotent_requests) gives one example: a request key lets its API recognize a repeat attempt. That protection has documented scope and lifetime rules. It does not automatically protect a project-creation action in another application. Ask the supplier which actions are safe to repeat, for how long, and what happens after that protection expires.
+
+Require a demonstration with two attempts arriving together, not only one after another. A design that checks for an existing project and then creates one still needs to prevent both concurrent attempts from deciding that no project exists. The acceptance condition is one project for that booking; the supplier should explain how the destination and integration enforce it.
+
+## Work through an uncertain project creation
+
+Imagine a fictional service company testing the workflow above. The following counts are deliberately constructed test inputs, not a Techsouq client result, a failure-rate estimate, or a platform benchmark.
+
+Assume there are **12 distinct eligible paid bookings**, with one deposit and one intended project per booking. None is cancelled or changes eligibility during the test. The test delivers 12 original notifications plus three repeats for bookings among the ten straightforward cases: **12 + 3 = 15 notification deliveries**. Those repeats must not add business jobs.
+
+The first review shows:
+
+| Booking group | Distinct bookings | Observed result | Next action |
+| --- | --- | --- | --- |
+| Straightforward cases | 10 | Ten projects verified and linked; three repeat deliveries reuse those results | No further creation |
+| Missing customer reference | 1 | Held before project creation | Operations corrects the reference, then releases the job |
+| Lost response after project creation | 1 | Create request timed out; the integration has not verified the result | Investigate the destination before retrying creation |
+| Total | **12** | **10 verified + 1 held + 1 unknown** | Resolve both outstanding jobs |
+
+For the unknown case, booking `B-112`, the project system actually created project `P-812`. The integration did not receive the response. During investigation, the operator finds `P-812` using the booking reference, checks its customer, and records that link. No new project is needed. This is an assumed fact revealed by the test evidence, not something the timeout alone establishes.
+
+For held booking `B-111`, operations corrects the customer reference. The integration rechecks eligibility and existing work, creates its project, and records the result. After those two resolutions, **10 initially verified projects + 1 existing project confirmed + 1 new project created = 12 verified projects**.
+
+The final check is that each of the 12 booking IDs maps to its intended project, with no extra project for the same booking. A total of 12 by itself would not establish that mapping. Keep the fifteen notification deliveries in the history, but do not report fifteen completed bookings or treat the three repeats as failures requiring new work.
+
+If investigation cannot establish what happened to `B-112`, leave it marked **unknown**, with an owner and a next review time. The worksheet must not turn lack of evidence into a successful outcome. Where a destination cannot support a safe automated repeat or a reliable lookup, retaining a controlled manual step may be the better first release.
+
+## Keep a work ledger and a visible exception queue
+
+Ask for a small operational view that a person can actually use. For each business job, record the stable reference, source event reference, action attempted, result reference, current state, last attempt time, and next action. If the workflow also sends a welcome message, track that action separately from project creation.
+
+Use distinct states such as **pending**, **in progress**, **verified complete**, **needs correction**, and **outcome unknown**. Define what moves a job between them. An operator who resolves a job manually should record what they did and link the evidence, so the automated path can recognize that work when it resumes.
+
+Microsoft's [Power Automate resubmission guidance](https://learn.microsoft.com/en-us/power-automate/guidance/coding-guidelines/test-cloud-flows#resubmit-cloud-flow-runs) warns that resubmitting can repeat completed actions, including creating records or sending emails. Ask the equivalent question of any platform: does replay start at the beginning, at the failed step, or somewhere else, and which previous results does it retain?
+
+For exceptions, name a primary owner and a backup, the hours they cover, how long a job may wait, and what happens when that limit is exceeded. Choose these times from the business consequence. This article does not prescribe a universal response target.
+
+Monitor missing work as well as visible failures. At an agreed interval, compare eligible source bookings with verified projects and open exceptions. A job whose notification never arrived may have no failed run to alert on. Include delayed or missed delivery in the rehearsal, and agree a way to find and recover those jobs.
+
+Keep the ledger useful without copying full customer or payment payloads into every alert. Ask who may view it, correct a record, replay an action, or pause the automation. Record approved access arrangements in the brief; keep passwords and connection secrets out of it.
+
+## Rehearse the cases a successful demo misses
+
+Use a test environment and synthetic records with live payments, customer messages, and production writes blocked. Record any differences from the real connectors. Run the following tests with your supplier, capture the destination evidence, and mark each **pass**, **fail**, or **not checked**.
+
+| Rehearsal | Observable acceptance condition |
+| --- | --- |
+| Deliver the same job twice, including simultaneous attempts | One correct project exists; both attempts can be traced to it |
+| Deliver an older notification after a cancellation | Current eligibility is checked; the old notification does not recreate or reopen cancelled work |
+| Remove a required customer reference | No guess is used; the job is held, assigned, corrected, and deliberately resumed |
+| Create a project but interrupt the response | The result is found or safely resolved; retry does not create another project |
+| Fail the next action after project creation | The verified project remains; only unfinished work is completed under the replay rules |
+| Keep a dependency unavailable beyond the retry limit | Retries stop as agreed, the owner sees the outstanding job, and it is not marked complete |
+| Withhold a source notification | The agreed comparison finds the missing job, and recovery produces one verified outcome |
+
+For each rehearsal, include the booking ID, the actions already completed, who may intervene, and the evidence needed to close it. Test manual handling and automation together: an operator creating a project during an outage must not cause a second project when processing resumes.
+
+Agree a pause and restart procedure too. State whether pausing stops intake, downstream actions, or both; where waiting jobs remain; and who reviews them before resuming. Never use “clear the queue” as an unexplained recovery step when it might discard unprocessed jobs.
+
+Start with one bounded workflow and a supervised pilot. Review exception volume, time spent resolving it, and unresolved jobs before expanding the automation. Keep a human approval step for actions whose consequences are difficult to reverse unless the business has explicitly agreed and tested the alternative.
+
+## Take a failure-handling brief to your supplier
+
+You can <a href="/downloads/workflow-automation-acceptance.txt" download>download the workflow automation acceptance worksheet</a> or copy these headings into your project brief:
+
+- **Job and outcome:** trigger, eligibility rules, authoritative systems, stable job reference, and evidence of completion.
+- **Action rules:** duplicate handling, concurrent attempts, safe retry boundaries, time limits, and unknown outcomes.
+- **Operational ownership:** ledger, exception owner and backup, review times, permissions, and pause/restart procedure.
+- **Acceptance evidence:** test inputs, observed destination results, manual interventions, failures, and retests.
+
+The plain-text worksheet includes the worked example and a reusable action ledger. It downloads without JavaScript, makes no connection to your systems, and sends no information to Techsouq. Its purpose is to record decisions and evidence; completing it does not itself test an integration.
+
+Use the [customer portal scope guide](/blog/customer-portal-mvp-scope/) if the automation sits inside a larger customer journey. Include monitoring, exception handling, and supplier support in your [software cost comparison](/blog/custom-software-vs-off-the-shelf-cost/) so the quote covers operating the workflow as well as building it.
+
+Your next request can be concrete: “Show us one normal job, one duplicate, and one uncertain result, including what our team does next.” For an integration or custom application, [Techsouq's services](/#services) can help turn those decisions into a buildable scope and observable acceptance tests.
+
+## Sources and further reading
+
+- [Stripe: Webhook delivery behavior and handling](https://docs.stripe.com/webhooks) — duplicate delivery, event order, and acknowledgement before downstream processing.
+- [Stripe: Idempotent requests](https://docs.stripe.com/api/idempotent_requests) — safe repeat requests within the documented API behavior.
+- [AWS: Retry with backoff pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/retry-backoff.html) — bounded retry, waiting between attempts, and idempotency considerations.
+- [Microsoft: Resubmit a flow run](https://learn.microsoft.com/en-us/power-automate/guidance/coding-guidelines/test-cloud-flows#resubmit-cloud-flow-runs) — replay behavior and the risk of repeating completed actions.
+
+Sources checked on 25 October 2026. The company, booking references, counts, operational states, test matrix, and worksheet are original illustrative planning examples. The cited platform behavior supports the questions to ask; it does not certify another connector or guarantee a particular business outcome.
