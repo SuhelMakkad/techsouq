@@ -1,0 +1,121 @@
+---
+title: 'Software Handover Checklist: Can Your Next Developer Ship?'
+description: 'Test whether another developer can maintain your website or app. Map account control, rehearse a release, and record gaps with a practical handover worksheet.'
+pubDate: 2026-10-27
+category: 'Business systems'
+heroImage: '../../assets/blog/software-handover-checklist.svg'
+heroImageAlt: 'Business-controlled accounts lead to an independent release and a verified change; failed verification returns to closing the gaps.'
+socialImage: '/images/blog/software-handover-checklist.png'
+---
+
+Before accepting a software handover, ask a developer who did not build the system to make one small, reversible change using the delivered accounts and instructions. Have them build it in a clean environment, release it to a safe test environment, and show the result. Record every missing permission, dependency, and instruction they encounter.
+
+That rehearsal answers a practical question for a founder: **can the next maintainer operate this system without relying on the original developer's laptop, personal accounts, or memory?** Receiving the source code is one part of the answer. The business also needs an agreed way to manage access, pay for services, release changes, and get support.
+
+Use the checklist below when commissioning a website or application, before a supplier leaves, or when bringing maintenance in-house. It produces an evidence record and a list of unresolved dependencies. It does not determine intellectual-property rights or replace the ownership and licence terms in your agreement.
+
+## Agree what the business must control
+
+Start with the operating arrangement you bought. A custom application may belong in accounts administered by your business. A managed service may deliberately run in the supplier's infrastructure. Write that boundary down: who can operate each service, what you can export, how a replacement supplier gets access, and what assistance an exit requires.
+
+For a hosted website builder, the useful rehearsal may be inviting another editor, changing a page, and testing the supported export path. Rebuilding the platform itself would be outside that arrangement. For a custom build, ask for a repeatable path from source code to the running application.
+
+Create an asset register with one row per service. Split services that share a brand but have different administrators; access to hosting does not establish who controls the domain registration.
+
+| Asset | Record before handover | Evidence to request |
+| --- | --- | --- |
+| Domain registration and DNS | Registrar, DNS provider, renewal contact, billing owner, and authorized administrators | Your designated owner can inspect settings and recovery arrangements without changing live records |
+| Source code and build dependencies | Repository, release version, private packages, runtime version, and dependency lockfile | The incoming maintainer retrieves the required source and installs dependencies with their own authorized access |
+| Hosting and release process | Project, production branch, build commands, deployment permissions, and rollback instructions | A release from the receiving team's account can be traced to its source version |
+| Data and external services | Database, file storage, email, payments if used, and environment-specific connections | Named owners can administer the relevant services; a safe test proves the connections the application needs |
+| Design, content, and paid assets | Editable files, fonts, plugins, templates, licence contacts, and renewals | The team can find the files and confirm what its agreement permits it to use and maintain |
+| Operations and support | Alerts, known defects, scheduled jobs, incident contact, and support end date | The receiving team gets a test alert and knows who handles the next issue |
+
+Record account identifiers and where protected credentials are managed, not passwords or recovery codes in the worksheet. Give named people the access they need through the provider's supported invitation or transfer process. Include a backup administrator and a recovery route controlled by the business.
+
+Check each provider's transfer rules. For example, Vercel documents that project integrations need to be added again after transfer. It also explains that delegating a subdomain can leave the root domain in the original account. Those are reasons to inspect the actual dependency list rather than assume that moving a project moves everything it uses. See [Vercel's project-transfer documentation](https://vercel.com/docs/projects/transferring-projects#what-is-not-transferred).
+
+## Ask for instructions that survive a clean start
+
+Ask the supplier to identify the source version currently running in production and provide the steps for building that version. A repository can contain unfinished work as well as released code; the incoming maintainer needs to know which version they are checking.
+
+The release instructions should name:
+
+- The required runtime and package-manager versions, dependency installation command, build command, and checks that must pass.
+- The configuration variable names, their purpose, which environment uses them, and the approved way to obtain or replace protected values.
+- The release destination, approval step, evidence of success, and procedure for reversing the chosen change.
+- Private packages, paid components, generated files, scheduled jobs, and external services that are required outside the main repository.
+
+Use a fresh checkout and a clean build environment with no credentials inherited from the outgoing developer. This is our recommended rehearsal condition: it exposes dependencies that their usual machine may already satisfy. Keep customer data and production secrets out of that environment; use synthetic records and test accounts.
+
+The receiving developer should follow the written instructions while the supplier observes. If the supplier must repair a setting or explain an undocumented step, record it, update the instructions, and repeat the affected part. The goal is a process the receiving team can repeat, not a demonstration that only the original developer can complete.
+
+## Work through a handover that looks complete
+
+Consider a fictional services business taking over a custom website with an enquiry form. Assume the release uses a private interface package, a database, and an email service. The parties have agreed that the business will administer the necessary accounts and hold authorization to use the private package. The incoming developer has permission to perform a rehearsal.
+
+The change is deliberately small: replace the form's confirmation sentence without changing the database structure. The test environment has synthetic enquiries and an email sandbox that cannot send to customers. The following six checks are constructed examples, not client results or typical failure rates.
+
+| Check | Initial evidence | Result |
+| --- | --- | --- |
+| Core account administration | Designated owners can administer source hosting, web hosting, test data, and email accounts; package authorization is checked separately | Pass |
+| Released source is available | Incoming developer retrieves the identified production version | Pass |
+| Test configuration is documented | Variable names, test destinations, and protected access instructions are present | Pass |
+| Test database is isolated | A synthetic enquiry can be read without accessing production records | Pass |
+| Clean build can fetch the private package | Installation is denied; the package still depends on the supplier's access | Fail |
+| Form notification reaches the test inbox | The new release has not been built or exercised | Not checked |
+
+The inventory is **4 passed + 1 failed + 1 not checked = 6 checks**. Do not turn that into a readiness percentage. The failed package access blocks the release; the untested email route remains unknown. An existing website continuing to run would not prove that a new version can be built.
+
+In this example, the supplier arranges the agreed package access for the business, checks the applicable licence arrangement, and documents how the build obtains authorization. The incoming developer starts again in a clean environment, installs the dependencies, runs the checks, and deploys the changed sentence to the isolated test site.
+
+They submit a synthetic enquiry, verify its test database record, and find the notification in the sandbox inbox. They then reverse the text change and confirm the original sentence returns. The package-build check and notification check can now be marked passed, with links to the evidence; the first four checks remain valid for this unchanged test setup. That leaves **6 passed, 0 failed, and 0 not checked within this rehearsal's scope**.
+
+Production remains a separate step. The rehearsal has not proved production permissions, production-only configuration, or live message delivery. Keep those items open until an approved production check establishes them. Passing six example checks is neither complete product acceptance nor a security or recovery certification.
+
+## Verify the release destination, not just the preview
+
+Use the test result to decide whether to authorize a small production release. Agree the change, the person approving it, the observation window, and a return path before touching live services. Avoid using payments, customer mailouts, or data migrations as a handover exercise.
+
+Record the source version, deployment identifier, environment, and live URL together. Open that URL and verify the expected change. A screenshot of a successful build without its destination does not establish that the intended site received it.
+
+Configuration can differ between environments. Vercel, for example, scopes variables by environment and applies changes to new deployments; changing a value does not alter previous deployments. A working preview therefore leaves the production configuration to be checked separately. See [Vercel's environment-variable documentation](https://vercel.com/docs/environment-variables).
+
+For the fictional enquiry site, an authorized production check could use one clearly labelled internal test enquiry sent to an approved internal destination. Confirm the saved record and message, then handle the test data under the agreed cleanup procedure. If that check cannot be run safely, mark it not checked and assign an owner and follow-up date. Do not let preview evidence silently close it.
+
+Reversing a text-only release proves only that limited return path. A database change or a restore from backup needs its own plan and evidence. Use the [backup and recovery guide](/blog/software-backup-recovery-plan/) for that separate exercise.
+
+## Finish access changes without breaking the release
+
+Agree which supplier access continues for support and when it ends. Review people, automation credentials, installed applications, and service connections separately. Have the incoming maintainer confirm the replacement access works before retiring credentials on which the application still depends.
+
+GitHub says a repository transfer retains associated secrets and deploy keys, and that the original owner is added as a collaborator. A transfer is therefore not evidence that the former supplier's access has ended. Check the actual collaborator and integration lists after the move. See [GitHub's repository-transfer documentation](https://docs.github.com/en/repositories/creating-and-managing-repositories/transferring-a-repository).
+
+GitHub also documents that a deploy key can remain active after the person who created it leaves the organization. Removing a person and reviewing machine access are separate tasks. Use the provider's credential replacement process, test the new path, and record what was retired without putting secret values in the evidence log. See [GitHub's deploy-key guidance](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys).
+
+Keep a short support record: known defects, outstanding handover gaps, who responds to incidents, what maintenance is included, and when any transition assistance ends. If the original supplier will continue operating a service, describe that dependency explicitly rather than marking it transferred.
+
+## Take an evidence worksheet to the handover
+
+You can <a href="/downloads/software-handover-acceptance.txt" download>download the software handover worksheet</a> or copy the following fields into your project records:
+
+- **Operating boundary:** what the business controls, what remains managed by a supplier, and who accepts each dependency.
+- **Asset register:** provider, account or project identifier, business owner, backup administrator, billing or renewal contact, and evidence of access.
+- **Release rehearsal:** source version, clean environment, test data, configuration references, chosen change, observed result, and reversal evidence.
+- **Gap record:** pass, fail, or not checked; evidence; next action; owner; and retest date.
+- **Production and support decision:** authorized live checks, unresolved limitations, continuing access, support responsibilities, and acceptance decision.
+
+The plain-text worksheet contains the worked example and blank records. It downloads without JavaScript and sends no entered information to Techsouq. It cannot inspect your accounts or validate a release; the people performing the checks supply that evidence. Leave missing evidence marked not checked.
+
+For a new project, include the rehearsal in your [first-release scope](/blog/customer-portal-mvp-scope/) and the handover work in your [software cost comparison](/blog/custom-software-vs-off-the-shelf-cost/). Agree it while planning the work, when the supplier can build the instructions and access arrangements alongside the system.
+
+Your next request can be specific: “Have our incoming maintainer release one reversible change using the accounts and instructions we will keep.” [Techsouq's website and custom software services](/#services) can include that handover evidence in the delivery scope.
+
+## Sources and further reading
+
+- [GitHub: Transferring a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/transferring-a-repository) — what transfers with the source repository and which access remains.
+- [Vercel: Transferring a project](https://vercel.com/docs/projects/transferring-projects) — integration exclusions and domain delegation behavior.
+- [Vercel: Environment variables](https://vercel.com/docs/environment-variables) — environment scope and when configuration changes apply.
+- [GitHub: Managing deploy keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys) — machine access that can outlast a person's membership.
+
+Sources checked on 27 October 2026. Platform-specific statements apply to the cited services, not every hosting provider. The fictional business, six checks, rehearsal sequence, and worksheet are original planning examples with the assumptions stated above.

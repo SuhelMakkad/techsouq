@@ -1,0 +1,117 @@
+TECHSOUQ — SOFTWARE HANDOVER EVIDENCE WORKSHEET
+Article: https://www.techsouqhq.com/blog/software-handover-checklist/
+Version: 27 October 2026
+
+Use PASS / FAIL / NOT CHECKED with evidence, not a readiness percentage.
+This worksheet does not inspect accounts or test software. It is not a security,
+legal ownership, complete product acceptance, or recovery certification.
+Do not enter passwords, recovery codes, private keys, or customer data.
+Store this completed worksheet in your own approved project records.
+
+1. OPERATING BOUNDARY
+Project and intended handover date:
+Outgoing supplier:
+Incoming maintainer:
+Business approver:
+Business-controlled services:
+Supplier-managed services and accepted dependencies:
+Relevant agreement and licence references:
+Supported export / exit process for managed services:
+Excluded checks and reasons:
+
+2. ASSET REGISTER — REPEAT FOR EACH SERVICE
+Asset type (domain registration, DNS, source, package, hosting, data, email,
+other integration, design/content/licence, monitoring):
+Provider and account / project identifier:
+Business owner and backup administrator:
+Billing / renewal contact and review date:
+Authorized incoming maintainer and permission level:
+Recovery arrangement confirmed by:
+Protected credential location reference (no secret values):
+Environment (production / test / both):
+Observed access evidence and date:
+Transfer required or continuing supplier dependency:
+Result (PASS / FAIL / NOT CHECKED):
+Gap, next action, owner, and retest date:
+
+3. RELEASE INSTRUCTIONS
+Production source version / commit:
+Repository and private dependency references:
+Runtime and package-manager versions:
+Install, build, and test commands:
+Configuration variable names, purpose, and environments:
+Protected access process (no values):
+Generated files and external prerequisites:
+Deployment destination and required approval:
+Observable success checks:
+Reversal steps for the chosen change:
+Instructions location and version:
+
+4. SAFE REHEARSAL
+Authorization and supervising owner:
+Small reversible change (avoid database structure changes):
+Clean environment and receiving developer's authorized account:
+Synthetic data and isolated test database:
+Outbound actions blocked / sandboxed:
+Source version and test deployment identifier:
+Observed change at test URL:
+Observed business workflow result:
+Reversal evidence:
+Supplier interventions or undocumented steps:
+Updated instructions and affected retests:
+Differences from production and checks still open:
+
+5. RESULT / GAP RECORD — REPEAT FOR EACH CHECK
+Check and observable acceptance condition:
+Environment and source version:
+Result (PASS / FAIL / NOT CHECKED):
+Evidence reference and observation date:
+Who performed and reviewed the check:
+Gap / dependency:
+Next action and owner:
+Retest date and actual retest result:
+Do not turn an empty result or missing evidence into PASS.
+
+6. FICTIONAL WORKED EXAMPLE
+Assumptions: custom enquiry website; private interface package; test database;
+email sandbox; permission to rehearse; a text-only confirmation change.
+
+Initial checks:
+1. Core account administration: PASS (source hosting, web hosting, test data, and email; private package authorization checked separately).
+2. Released source available: PASS.
+3. Test configuration documented: PASS.
+4. Test database isolated: PASS.
+5. Clean build can fetch private package: FAIL (supplier access dependency).
+6. Form notification reaches test inbox: NOT CHECKED.
+
+4 passed + 1 failed + 1 not checked = 6 checks.
+The build failure blocks release; this is not a readiness percentage.
+
+Remedy: arrange agreed package authorization, check the licence arrangement, and document access. Incoming developer repeats the clean build, runs checks, and deploys to the isolated test site. A synthetic enquiry creates the test record and reaches the sandbox inbox. Reverse the text change and verify it.
+
+Checks 5 and 6 now pass with evidence. The first four remain valid for the unchanged test setup: 6 passed, 0 failed, 0 not checked within rehearsal scope. Production access, configuration, and message delivery remain separate checks. These are invented test conditions, not client results or benchmarks.
+
+7. PRODUCTION CHECK AND ACCESS TRANSITION
+Business approval, chosen live change, and observation window:
+Production source version, deployment identifier, and live URL:
+Observed live change and evidence:
+Authorized internal test destination and synthetic record:
+Observed workflow result and test-data cleanup:
+Return path for this change:
+Unchecked items, owner, follow-up date, and accepted limitations:
+Replacement people / machine access verified:
+Old access retired and date (identifiers only, no secrets):
+Continuing supplier access, purpose, review date, and expiry:
+Recheck affected release / integration paths after access changes:
+
+8. SUPPORT AND ACCEPTANCE
+Known defects and evidence references:
+Open handover gaps and named owners:
+Incident contact and backup:
+Included maintenance and transition support end date:
+Accepted continuing dependencies:
+Decision (ACCEPT / ACCEPT WITH RECORDED LIMITATIONS / REQUEST CHANGES):
+Business approver and date:
+Incoming maintainer and date:
+Outgoing supplier acknowledgement and date:
+Next review:
