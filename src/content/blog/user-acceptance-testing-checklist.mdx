@@ -1,0 +1,138 @@
+---
+title: 'User Acceptance Testing: How to Decide If Your Software Is Ready'
+description: 'Turn a software demo into repeatable business checks. Use a worked booking example and a downloadable UAT worksheet to record defects and a release decision.'
+pubDate: 2026-10-29
+category: 'Product planning'
+heroImage: '../../assets/blog/user-acceptance-testing-checklist.svg'
+heroImageAlt: 'A business rule becomes a test scenario, an observed result, and a release decision; failed or blocked critical checks return to fixing and retesting.'
+socialImage: '/images/blog/user-acceptance-testing-checklist.png'
+---
+
+Before accepting a custom application, have the people who will use it complete agreed business tasks on an identified version of the software. Write down the expected result before they start, capture what actually happens, and decide what each unresolved finding means for launch. A polished demonstration is useful, but you need evidence that your own rules and working conditions are supported.
+
+**User acceptance testing, or UAT, asks whether a particular release supports the business work you agreed it would do.** For a founder, the useful output is a decision record: what was tested, what remains unknown, which problems prevent release, and who accepts any remaining limitations.
+
+This guide works through a fictional booking application and provides a worksheet you can take to your supplier. It focuses on business acceptance. Security, accessibility, performance, recovery, and production deployment still need appropriate checks of their own; a short UAT exercise cannot establish all of them.
+
+## Agree the outcome before testing the screen
+
+Start with one complete task, such as “a coordinator creates and amends a group booking, and the customer receives the correct confirmation.” Name the user, the business rule, and the result another person can inspect. “The booking screen works” leaves too much open to interpretation.
+
+GOV.UK's service manual describes acceptance criteria as outcomes used to check that a service meets a user need, and recommends connecting them to supporting evidence. That is a useful planning method for a private business too; the manual's government delivery requirements are not universal obligations. See [GOV.UK's guidance on user stories and acceptance criteria](https://www.gov.uk/service-manual/agile-delivery/writing-user-stories#acceptance-criteria).
+
+For each task, agree:
+
+- **Who performs it:** use the intended staff or customer role, rather than an administrator who can bypass restrictions.
+- **What must be true first:** accounts, starting records, prices, permissions, and connected test services.
+- **What they do:** include an ordinary case, a relevant limit, an invalid input, and a change to existing information.
+- **What proves success:** a visible result, a reopened record, a report, or a message received by the intended test recipient.
+- **What prevents release:** describe the business consequence, such as an incorrect customer price, before seeing the results.
+
+Choose someone who does the work to run the scenarios and a business owner with authority to make the decision. The developer helps investigate and fix findings. If the developer has to guide every action, record that assistance and repeat the task independently after improving the instructions or interface.
+
+Set these expectations during [first-release scoping](/blog/customer-portal-mvp-scope/). Waiting until the final demo to decide how prices, approvals, or amendments should behave creates avoidable disagreement.
+
+## Make each test repeatable
+
+An acceptance criterion is the rule. A test case is a specific situation that demonstrates whether the rule is met. Give each case an identifier and record the software version, environment, user role, starting data, action, expected result, actual result, and evidence.
+
+A useful writing pattern is **Given** a starting situation, **When** an action happens, **Then** an observable result follows. Cucumber's Gherkin reference defines this structure and recommends checking observable outputs such as an interface, report, or message. You can borrow the structure for a manual worksheet without installing Cucumber or writing automated tests. See [Cucumber's scenario and outcome guidance](https://cucumber.io/docs/gherkin/reference/#example).
+
+For example:
+
+> Given a saved booking for 10 attendees at USD 80 each with a 10% group discount, when the coordinator changes the quantity to 9 and saves, then the discount is removed and the booking total is USD 720. Reopening that booking must show 9 attendees and the same USD 720 total.
+
+Record expected values independently of the application. Copying its displayed total into the “expected” column would make a wrong calculation look correct. Reset test records between cases unless the case explicitly depends on a previous action; otherwise an old discount or a prior edit can change what you are testing.
+
+Use synthetic customers and an isolated test environment with approved destinations for messages. Record where that environment differs from production. A simulated integration can establish the application's response to a test message; it cannot prove the real service delivered anything.
+
+## Work through a booking that passes the demo
+
+Consider a fictional training business buying an internal booking tool. The first demonstration creates a booking for 10 attendees, shows USD 720, and saves it successfully. That result is correct under the following **illustrative rules**, which are assumptions for this example, not market prices or a client engagement:
+
+- Each attendee costs USD 80. Quantity must be a positive whole number.
+- At 10 or more attendees, a 10% discount applies to the entire booking, not just the tenth attendee onward.
+- Changing the quantity recalculates the discount and total. Saving and reopening preserves the current values.
+- An authorized coordinator can complete the tested booking flow using a keyboard. A confirmation goes to an approved test inbox and matches the saved booking.
+- Taxes, fees, payment collection, capacity limits, and cancellation rules are outside this narrow exercise. A real project must specify and test the rules it actually uses.
+
+For quantities from 1 to 9, **total = quantity × USD 80**. For quantities of 10 or more, **total = quantity × USD 80 × 0.90**. These values avoid fractional cents; a different price or discount also needs an agreed rounding rule.
+
+Test the value just below the discount threshold, the threshold itself, and the value just above it. Also test crossing the threshold by editing a saved booking. The business rule applies during amendment as well as creation. This selection uses boundary testing: checking where a rule changes and neighboring values, as described in section 4.2.2 of the [ISTQB Foundation Level syllabus](https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf#page=40).
+
+| Case | Action and expected result | Illustrative observation | Status |
+| --- | --- | --- | --- |
+| UAT-01 | Create 9 attendees: 9 × USD 80 = USD 720 | Shows and saves USD 720 | Pass |
+| UAT-02 | Create 10 attendees: 10 × USD 80 × 0.90 = USD 720 | Shows and saves USD 720 | Pass |
+| UAT-03 | Create 11 attendees: 11 × USD 80 × 0.90 = USD 792 | Shows and saves USD 792 | Pass |
+| UAT-04 | Try 0 attendees: explain the invalid quantity and prevent saving | Error is shown; no booking is saved | Pass |
+| UAT-05 | Amend a saved booking from 10 to 9: remove discount, save USD 720 | Retains discount and saves USD 648 | Fail |
+| UAT-06 | Reopen the booking from UAT-05: show 9 attendees and USD 720 | Shows 9 attendees and USD 648 | Fail |
+| UAT-07 | Create a fresh 9-person booking using only the keyboard: reach controls, see focus, save USD 720 | Tested flow is completed with visible focus | Pass |
+| UAT-08 | Send a confirmation for UAT-01: approved test inbox receives 9 attendees and USD 720 | Test inbox connection is unavailable; receipt cannot be checked safely | Blocked |
+
+The initial record contains **5 passed + 2 failed + 1 blocked = 8 scenarios**. The two failed cases may come from one defect: a discount that is not removed when quantity falls below 10. Count the scenarios and the underlying issues separately so the team does not mistake two observations for two independent causes.
+
+The incorrect amended total is **9 × USD 80 × 0.90 = USD 648**, which is **USD 72 below the expected USD 720**. That difference describes this one constructed booking. It is not a forecast of lost revenue. The fact that both a fresh 9-person booking and a fresh 10-person booking total USD 720 is intentional: the whole-booking discount offsets the extra attendee at the threshold.
+
+For this business, the agreed release rule is that customer prices must be correct and confirmation delivery must be demonstrated. The decision is therefore **hold this release**. Several successful checks cannot compensate for a wrong price, and the blocked inbox check is missing evidence rather than a pass or proof of a delivery defect.
+
+The keyboard case is useful but limited. W3C's Easy Checks covers keyboard access and visible focus while explicitly warning that passing preliminary checks can still leave significant accessibility barriers. Plan the wider assessment separately. See [W3C's keyboard and accessibility review guidance](https://www.w3.org/WAI/test-evaluate/preliminary/#interaction).
+
+## Separate a defect, a missing decision, and a new request
+
+Compare every finding with the agreed rule and evidence. This keeps the discussion specific without treating every late discovery as something to postpone.
+
+| Finding | How to handle it |
+| --- | --- |
+| The amendment keeps a discount that the agreed rule says must be removed | Log a defect with the starting booking, steps, expected USD 720, actual USD 648, version, and evidence |
+| Nobody agreed whether the discount applies to the whole booking or only additional attendees | Resolve a missing requirement with the business owner; agree the rule and test before accepting that behavior |
+| A stakeholder now wants promotional codes as well as the group discount | Record a change request, assess its value and delivery impact, and decide whether it belongs in this release |
+| Confirmation cannot be checked because the safe test inbox is unavailable | Record a blocked test, name the setup owner, and arrange a safe rerun |
+
+A newly discovered risk may still prevent launch even if the original brief missed it. Calling something a change request does not make its business consequence disappear. Likewise, the record here is a delivery aid, not a ruling on payment, warranty, or contract terms.
+
+Use four test statuses consistently: **Pass** means the observed result matched the expectation; **Fail** means it did not; **Blocked** means a known prerequisite prevented a meaningful check; **Not run** means the case has not yet been attempted. Keep evidence and a next action beside the status. An empty cell does not tell the approver whether someone forgot the test or could not perform it.
+
+## Retest the change and record the release decision
+
+Ask the supplier to identify the fixed version and explain which behavior changed. Rerun the failed cases, then the related cases that the fix could affect. In the example, removing a stale discount must not accidentally remove valid discounts from new bookings of 10 or 11 people. The distinction between confirming a fix and checking for unwanted effects elsewhere is explained in section 2.2.3 of the [ISTQB syllabus](https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf#page=30).
+
+For this small exercise, the team elects to rerun all eight scenarios on the fixed version after connecting the isolated test inbox. In the fictional second run, all eight match their expected outcomes, including an actual confirmation received in that inbox. Keep the original failures and attach the new results; do not overwrite the history.
+
+That establishes **8 passes within this defined test scope**, not approval for every possible booking or every aspect of production operation. The example deliberately omits cases such as negative or fractional quantities, blank values, unauthorized users, large groups, and interrupted saves. Add relevant cases to your own plan before treating it as complete.
+
+The decision record should name:
+
+- The exact release, workflows, roles, environments, and devices or browsers covered.
+- Passed, failed, blocked, and unrun cases, with links to evidence and the latest retest.
+- Remaining issues, their business impact, any tested workaround, an owner, and a review date.
+- The decision: hold, proceed within an explicitly reduced scope, or approve the stated scope with any recorded limitations.
+- The person making the decision and the separate checks still required before production use.
+
+If a required workflow remains unsafe or unproven, keep the release on hold or actually remove that workflow from the proposed launch. A note saying “fix later” does not prevent people from using it. A limited pilot still needs explicit boundaries, support, and a way to stop if the agreed conditions are not met.
+
+Keep product acceptance separate from the ability to maintain and release the software. Use the [software handover checklist](/blog/software-handover-checklist/) for account control and an independent release rehearsal. Neither record substitutes for the other.
+
+## Take a worksheet to your next review
+
+You can <a href="/downloads/user-acceptance-testing-worksheet.txt" download>download the acceptance testing worksheet</a> or copy these fields into the project tool your team already uses:
+
+1. **Release agreement:** business task, agreed rule, scope exclusions, release blockers, testers, and decision owner.
+2. **Test case:** identifier, requirement, version, environment, role, starting data, action, and expected result.
+3. **Execution record:** actual result, status, evidence reference, tester, date, and any assistance required.
+4. **Finding and retest:** defect, missing requirement, or change request; impact; owner; next action; fixed version; and fresh evidence.
+5. **Release decision:** accepted scope, open limitations, remaining production checks, approver, and date.
+
+The plain-text download includes the example arithmetic, eight scenarios, and blank records. It works without JavaScript and can be edited locally; it does not inspect your software, calculate a readiness score, or send your notes to Techsouq.
+
+For your next supplier review, choose one business rule that would be costly to get wrong and write its expected outcomes together before opening the application. [Techsouq's web application and custom software services](/#services) can include those acceptance scenarios in the delivery plan, so the review ends with evidence and a decision.
+
+## Sources and further reading
+
+- [GOV.UK: Writing user stories](https://www.gov.uk/service-manual/agile-delivery/writing-user-stories) — user needs, acceptance outcomes, and supporting evidence.
+- [Cucumber: Gherkin reference](https://cucumber.io/docs/gherkin/reference/) — starting context, actions, and observable expected outcomes.
+- [ISTQB: Foundation Level syllabus v4.0.1](https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf) — boundary testing and confirmation versus regression testing; copyright ISTQB and the syllabus authors.
+- [W3C WAI: Easy Checks](https://www.w3.org/WAI/test-evaluate/preliminary/) — keyboard access, visible focus, and the limits of a preliminary accessibility review.
+
+Sources checked on 29 October 2026. The training business, prices, discount rule, test outcomes, decision method, and worksheet are original illustrative planning material. They are not reported client results, a universal acceptance standard, or a complete test plan.

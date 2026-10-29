@@ -1,0 +1,140 @@
+TECHSOUQ — USER ACCEPTANCE TESTING WORKSHEET
+
+Companion article:
+https://www.techsouqhq.com/blog/user-acceptance-testing-checklist/
+
+Use this worksheet to record evidence from your software. It is not a complete test plan, readiness score, security/accessibility certification, or ruling on contract terms. Edit your copy locally; the file does not send notes to Techsouq. Do not include passwords, secrets, or customer personal data.
+
+1. RELEASE AGREEMENT
+
+Business task and user need:
+Agreed business rule / requirement reference:
+Included workflows and user roles:
+Excluded workflows and reasons:
+Conditions that prevent release and their business consequences:
+Business testers:
+Supplier contact:
+Authorized decision owner:
+Separate security, accessibility, performance, recovery and production checks:
+
+2. TEST CASE — COPY FOR EACH SCENARIO
+
+Case identifier:
+Requirement / rule reference:
+Critical to this release? Why?
+Software version / release identifier:
+Environment and differences from production:
+User role / authorized synthetic test account:
+Device and browser:
+Prerequisites, test data and approved external destinations:
+Given (starting situation):
+When (action):
+Then (expected observable result):
+Independent calculation or reference for expected result:
+Reset / cleanup steps and any dependencies on another case:
+
+3. EXECUTION RECORD — KEEP EACH RUN
+
+Case identifier and run identifier:
+Actual result:
+Status: PASS / FAIL / BLOCKED / NOT RUN
+Evidence location (redact personal information and secrets):
+Tester and date:
+Assistance needed from the developer:
+Business consequence:
+Finding identifier:
+Next action, owner and date:
+
+PASS: observed result matches the expected result.
+FAIL: observed result differs from the expected result.
+BLOCKED: a known prerequisite prevented a meaningful check.
+NOT RUN: case has not yet been attempted.
+
+A blank cell is not a status. A blocked test is missing evidence, not a pass or automatic proof of a software defect.
+
+4. FINDING AND RETEST
+
+Finding identifier and related case identifiers:
+Type: defect / missing requirement / change request / test prerequisite
+Agreed rule or unresolved decision:
+Reproduction steps and starting data:
+Expected and actual result:
+Business impact and release-blocking decision:
+Owner and next action:
+Fixed software version:
+Cases to rerun and why (including related behavior affected by the fix):
+New execution record and evidence:
+Remaining limitations:
+
+Keep the original failure record. Multiple failed scenarios can share one underlying defect; do not count them as independent causes without investigation.
+
+5. RELEASE DECISION
+
+Release version and tested scope:
+Counts: passed ___ + failed ___ + blocked ___ + not run ___ = total ___
+Critical scenarios without passing evidence:
+Open issues and impact:
+Tested workarounds, owners and review dates:
+Decision: HOLD / PROCEED WITH EXPLICITLY REDUCED SCOPE / APPROVE STATED SCOPE
+Accepted scope and recorded limitations:
+How excluded workflows are actually prevented from use:
+Remaining production checks and responsible people:
+Support and stop conditions for any limited pilot:
+Decision owner and role:
+Decision date:
+Evidence references:
+
+A high pass count does not outweigh a critical failure. UAT evidence applies to the named version and scope; approval is not proof that software is defect-free or production operation is verified.
+
+6. WORKED EXAMPLE — FICTIONAL TRAINING BOOKING TOOL
+
+All prices, rules and results below are illustrative assumptions, not client results or market benchmarks. Quantity is a positive whole number; USD 80 per attendee; a 10% discount applies to the entire booking at 10 or more attendees. Amendments must reapply the rule. Taxes, fees, payment collection, capacity limits and cancellation rules are excluded from this narrow exercise. Prices avoid fractional cents; other prices/discounts require an agreed rounding rule.
+
+Formula for 1–9 attendees: quantity x USD 80.
+Formula for 10 or more attendees: quantity x USD 80 x 0.90.
+
+UAT-01 — Create 9 attendees.
+Expected: 9 x USD 80 = USD 720.
+Observed: shows and saves USD 720. PASS.
+
+UAT-02 — Create 10 attendees.
+Expected: 10 x USD 80 x 0.90 = USD 720.
+Observed: shows and saves USD 720. PASS.
+
+UAT-03 — Create 11 attendees.
+Expected: 11 x USD 80 x 0.90 = USD 792.
+Observed: shows and saves USD 792. PASS.
+
+UAT-04 — Try 0 attendees.
+Expected: explain invalid quantity and prevent saving.
+Observed: error shown; no booking saved. PASS.
+
+UAT-05 — Amend a saved booking from 10 attendees to 9.
+Expected: remove discount and save USD 720.
+Observed: retains discount and saves USD 648. FAIL.
+
+UAT-06 — Reopen the booking from UAT-05.
+Expected: 9 attendees and USD 720.
+Observed: 9 attendees and USD 648. FAIL.
+
+UAT-07 — Create a fresh 9-person booking using only the keyboard.
+Expected: reach controls, see focus, save USD 720.
+Observed: tested flow completed with visible focus. PASS.
+This is not a comprehensive accessibility assessment.
+
+UAT-08 — Send confirmation for UAT-01.
+Expected: approved test inbox receives 9 attendees and USD 720.
+Observed: test inbox connection unavailable; receipt cannot be checked safely. BLOCKED.
+
+Initial results: 5 passed + 2 failed + 1 blocked = 8 scenarios.
+The two failures may share one stale-discount defect; investigation must establish the cause.
+Incorrect amended total: 9 x USD 80 x 0.90 = USD 648.
+Difference: USD 720 - USD 648 = USD 72 below the expected total for this one booking, not a revenue forecast.
+Both fresh 9-person and 10-person bookings total USD 720 because of the whole-booking discount at 10.
+
+Agreed rule for this example: customer prices must be correct and confirmation delivery must be demonstrated.
+Initial decision: HOLD this release. Wrong price is a release blocker; confirmation evidence is missing.
+
+Illustrative follow-up: supplier identifies a fixed version; team connects the isolated test inbox and reruns all eight scenarios. All eight match expectations, including actual receipt in the test inbox. Preserve initial findings and attach fresh evidence: 8 passes within this defined test scope. Production checks remain separate.
+
+This is a deliberately incomplete teaching example. Add relevant cases such as negative/fractional/blank quantities, unauthorized users, large groups and interrupted saves before treating your own plan as complete. Identify rounding, tax, payment and other real business rules separately. Passing these eight scenarios cannot approve all possible bookings or production operation.
