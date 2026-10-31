@@ -1,0 +1,367 @@
+<section
+  class="permission-explorer"
+  data-permission-explorer
+  aria-label="Fictional permission explorer"
+>
+  <div class="explorer-heading">
+    <p class="eyebrow">Interactive example</p>
+    <h3>Try one technician request.</h3>
+    <p>
+      This explorer applies the fictional policy below. The role is always technician; it does not
+      check permissions in your own application.
+    </p>
+  </div>
+
+  <p class="static-rule">
+    <strong>Fixed rule:</strong> an active technician may view job ID, site, appointment, and work
+    notes on assigned jobs, open or closed. Editing work notes also requires an open job. Billing
+    fields and job-list exports are always denied.
+  </p>
+
+  <noscript>
+    <p class="explorer-note">
+      Enable JavaScript to change the example. The permission matrix and worked examples in this
+      article explain the same rules without it.
+    </p>
+  </noscript>
+
+  <form data-explorer-form hidden novalidate autocomplete="off">
+    <fieldset>
+      <legend>Fictional technician request</legend>
+
+      <div class="field-grid">
+        <label class="field">
+          <span>Account</span>
+          <select name="account" data-field="account">
+            <option value="active" selected>
+              Active
+            </option>
+            <option value="suspended">Suspended</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Job assignment</span>
+          <select name="assignment" data-field="assignment">
+            <option value="assigned" selected>
+              Assigned to you
+            </option>
+            <option value="unassigned">Not assigned to you</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Job status</span>
+          <select name="jobStatus" data-field="jobStatus">
+            <option value="open" selected>
+              Open
+            </option>
+            <option value="closed">Closed</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Action</span>
+          <select name="action" data-field="action">
+            <option value="view-work" selected>
+              View work details
+            </option>
+            <option value="edit-notes">Edit work notes</option>
+            <option value="view-billing">View billing fields</option>
+            <option value="export-jobs">Export job list</option>
+          </select>
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="explorer-actions">
+      <button class="primary-button" type="submit">
+        Check example permission
+      </button>
+      <button class="secondary-button" type="button" data-reset>
+        Reset example
+      </button>
+    </div>
+
+    <div class="example-result" data-result role="status" aria-live="polite" aria-atomic="true">
+      <p class="result-title" data-result-title></p>
+      <p class="result-reason" data-result-reason></p>
+    </div>
+  </form>
+
+  <p class="explorer-note boundary-note">
+    These selections stay in page memory and are not sent or saved by this tool. The output
+    illustrates only this fixed policy; agreeing on a policy is separate from implementing and
+    testing it in a real system.
+  </p>
+</section>
+
+<script>
+  import {
+    checkExamplePermission,
+    DEFAULT_PERMISSION_EXAMPLE,
+    type PermissionExampleField,
+  } from '@/modules/blog/utils/permission-explorer';
+
+  document
+    .querySelectorAll<HTMLElement>('[data-permission-explorer]')
+    .forEach((explorer, index) => {
+      const form = explorer.querySelector<HTMLFormElement>('[data-explorer-form]')!;
+      const result = explorer.querySelector<HTMLElement>('[data-result]')!;
+      const title = explorer.querySelector<HTMLElement>('[data-result-title]')!;
+
+      const reason = explorer.querySelector<HTMLElement>('[data-result-reason]')!;
+      const reset = explorer.querySelector<HTMLButtonElement>('[data-reset]')!;
+      const fields = Object.keys(DEFAULT_PERMISSION_EXAMPLE) as PermissionExampleField[];
+
+      const control = (field: PermissionExampleField) =>
+        form.querySelector<HTMLSelectElement>(`[data-field="${field}"]`)!;
+
+      reason.id = `permission-example-${index}-reason`;
+
+      function renderResult(resetExample = false) {
+        const values = Object.fromEntries(fields.map((field) => [field, control(field).value]));
+        const checked = checkExamplePermission(values);
+
+        title.textContent = `Example ${checked.allowed ? 'allows' : 'denies'} this action`;
+        reason.textContent = `${resetExample ? 'Example reset. ' : ''}${checked.reason}`;
+        result.dataset.state = checked.allowed ? 'allowed' : 'denied';
+
+        fields.forEach((field) => {
+          const invalid = checked.invalidFields.includes(field);
+
+          control(field).setAttribute('aria-invalid', String(invalid));
+
+          if (invalid) control(field).setAttribute('aria-describedby', reason.id);
+          else control(field).removeAttribute('aria-describedby');
+        });
+
+        if (checked.invalidFields[0]) control(checked.invalidFields[0]).focus();
+      }
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        renderResult();
+      });
+
+      form.addEventListener('change', () => {
+        title.textContent = 'Selections changed';
+        reason.textContent = 'Choose “Check example permission” to apply the fictional policy.';
+        result.dataset.state = 'pending';
+
+        fields.forEach((field) => {
+          control(field).removeAttribute('aria-invalid');
+          control(field).removeAttribute('aria-describedby');
+        });
+      });
+
+      reset.addEventListener('click', () => {
+        fields.forEach((field) => {
+          control(field).value = DEFAULT_PERMISSION_EXAMPLE[field];
+        });
+
+        renderResult(true);
+      });
+
+      fields.forEach((field) => {
+        control(field).value = DEFAULT_PERMISSION_EXAMPLE[field];
+      });
+
+      renderResult();
+      form.hidden = false;
+    });
+</script>
+
+<style>
+  .permission-explorer {
+    margin: 2rem 0;
+    padding: clamp(1.1rem, 4vw, 2rem);
+    border: 1px solid #dbe3f2;
+
+    border-radius: 1.25rem;
+    background: #f7f8fb;
+    color: #18202f;
+
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .permission-explorer [hidden] {
+    display: none !important;
+  }
+
+  .explorer-heading p {
+    margin: 0.7rem 0 1.25rem;
+  }
+
+  .explorer-heading .eyebrow {
+    margin: 0 0 0.6rem;
+    color: #2061ef;
+    font-size: 0.73rem;
+
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .explorer-heading h3 {
+    margin: 0;
+    font-size: clamp(1.35rem, 3vw, 1.8rem);
+    line-height: 1.3;
+
+    letter-spacing: -0.035em;
+  }
+
+  .static-rule {
+    padding: 1rem;
+    border-left: 3px solid #2061ef;
+    background: white;
+
+    font-size: 0.9rem;
+  }
+
+  fieldset {
+    min-width: 0;
+    margin: 1.5rem 0;
+    padding: 1rem;
+
+    border: 1px solid #dbe3f2;
+    border-radius: 0.8rem;
+    background: white;
+  }
+
+  legend {
+    padding: 0 0.4rem;
+    color: #2061ef;
+    font-size: 0.8rem;
+
+    font-weight: 800;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+
+    min-height: 2.8rem;
+    padding: 0.65rem 0.7rem;
+    border: 1px solid #bdc8db;
+
+    border-radius: 0.45rem;
+    background: white;
+    color: #18202f;
+
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  select[aria-invalid='true'] {
+    border-color: #b42318;
+  }
+
+  .explorer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  button {
+    min-height: 2.75rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid transparent;
+
+    border-radius: 0.5rem;
+    font: inherit;
+    font-size: 0.85rem;
+
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .primary-button {
+    background: #2061ef;
+    color: white;
+  }
+
+  .primary-button:hover {
+    background: #174dcc;
+  }
+
+  .secondary-button {
+    border-color: #bdc8db;
+    background: white;
+    color: #18202f;
+  }
+
+  .secondary-button:hover {
+    border-color: #2061ef;
+    color: #2061ef;
+  }
+
+  button:focus-visible,
+  select:focus-visible {
+    outline: 2px solid #2061ef;
+    outline-offset: 3px;
+  }
+
+  .example-result {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    border: 1px solid #bdc8db;
+
+    border-radius: 0.7rem;
+    background: white;
+  }
+
+  .result-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  .result-reason {
+    margin: 0.5rem 0 0;
+    font-size: 0.9rem;
+  }
+
+  .explorer-note {
+    margin: 1rem 0;
+    color: #536079;
+    font-size: 0.85rem;
+
+    line-height: 1.65;
+  }
+
+  .boundary-note {
+    margin: 1.25rem 0 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid #dbe3f2;
+  }
+
+  @media (max-width: 540px) {
+    .field-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .explorer-actions button {
+      width: 100%;
+    }
+  }
+</style>

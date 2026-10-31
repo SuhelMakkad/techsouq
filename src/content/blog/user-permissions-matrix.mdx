@@ -1,0 +1,127 @@
+---
+title: 'User Permissions: Write a Matrix Your Developer Can Build'
+description: 'Specify who can view, edit, and export business data. Use a worked permissions matrix, an interactive example, and a worksheet to brief your developer.'
+pubDate: 2026-10-31
+category: 'Product planning'
+heroImage: '../../assets/blog/user-permissions-matrix.svg'
+heroImageAlt: 'A permission decision checks the person, record, fields, and action: an assigned technician can read work details but cannot read billing fields or export jobs.'
+socialImage: '/images/blog/user-permissions-matrix.png'
+---
+
+import PermissionExplorer from '@/modules/blog/components/permission-explorer.astro';
+
+Before asking a developer to add “admin and user roles,” write down who may perform each business action, on which records, using which fields, and under what conditions. A role name alone does not explain whether a technician can see every customer, change a closed job, or export the entire job list.
+
+**A useful permissions matrix connects a person's work to the minimum information and actions that work requires.** It also says what must be refused. This gives a founder something concrete to discuss with a supplier before permissions become a collection of exceptions.
+
+This guide uses a fictional internal maintenance system. You will leave with a sample matrix, a small explorer that demonstrates its rules, and a downloadable specification worksheet. These are planning aids; they do not inspect your application or establish that its access controls are secure.
+
+## Specify a permission, not just a job title
+
+Login establishes identity. Authorization decides whether that identity may perform a particular action. OWASP distinguishes those questions and recommends granting only needed access, denying unmatched requests by default, and checking permissions on every request. See its [authorization guidance](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html).
+
+For a business brief, turn “technicians can use the jobs screen” into a sentence with four parts:
+
+> An active technician may read the operational fields of a job currently assigned to them. They may change its work notes only while that job is open.
+
+The **person** is an active technician; the **record scope** is their assigned jobs; the **fields** are operational details or work notes; and the **action and condition** distinguish reading from editing an open job. “Can use the screen” leaves all four decisions unresolved.
+
+Start with one real task and list the information someone needs to finish it. If the task is recording work completed at a site, access to invoice amounts may be unnecessary. If it is reconciling invoices, detailed technician notes may be unnecessary. Decide this with the people responsible for the work rather than copying the current spreadsheet's access settings.
+
+## Work through an internal permissions matrix
+
+Assume a fictional maintenance business has one internal application, three operational roles, and a separate account-administration function. No customer login, offline mode, file attachments, deletion, or combined operational roles are included in this example. All records belong to this one business. The rules below are illustrative business decisions, not a standard configuration every company should adopt.
+
+For this deliberately small model, **operational fields** means job ID, site, appointment, and work notes. **Billing fields** means invoice number, amount, and payment status. Assignment and open/closed status are separate control fields; the application uses them to decide access and displays status where needed.
+
+| Role | Records and readable fields | Permitted changes | Export |
+| --- | --- | --- | --- |
+| Dispatcher | All jobs; operational fields, assignment, and status | Change appointments on open jobs; change technician assignments on open or closed jobs; no work-note or billing changes | None |
+| Technician | Currently assigned jobs; operational fields and status | Work notes on assigned, open jobs only | None |
+| Finance | Jobs with invoices; job ID and billing fields | Payment status only | Job ID and billing fields for jobs with invoices |
+
+Every row assumes an active account. A suspended account receives no access through these roles. Closing and reopening jobs is deliberately reserved for a separately specified supervisor action; it is not an implied power of the dispatcher. Likewise, none of these roles can change their own permissions.
+
+Account administration needs its own rule: who can approve, grant, remove, and review access? For this example, the business owner approves grants and a named administrator applies them. Account administration does not itself grant job or billing access. A real platform may bundle those powers; ask the supplier to identify that difference before accepting the design.
+
+The matrix is intentionally specific about fields. A person allowed to open a record is not necessarily allowed to read or change every field inside it. OWASP's [property-level authorization guidance](https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/) explains why APIs must restrict both the properties they return and the properties a caller may update. Hiding an invoice amount on the screen does not protect it if the server still sends it to that person's browser.
+
+## Follow one technician across four jobs
+
+Imagine a technician named Alex with an active account and only the technician role. These four synthetic records make the policy observable:
+
+| Job  | Assigned to Alex? | Status | Expected access for Alex                 |
+| ---- | ----------------- | ------ | ---------------------------------------- |
+| J101 | Yes               | Open   | Read operational fields; edit work notes |
+| J102 | No                | Open   | No access                                |
+| J103 | Yes               | Closed | Read operational fields; no edits        |
+| J104 | No                | Closed | No access                                |
+
+Alex can read operational details for **2 of the 4 jobs**. Counting only the four named operational fields, that is **2 jobs × 4 fields = 8 readable field values**, assuming one populated value per field. Status is displayed separately and excluded from this count. This is an illustration of record and field scope, not a security score or a calculation of how many tests are sufficient.
+
+For J101, viewing work details and editing work notes are allowed. Viewing its billing fields and exporting jobs are denied even though Alex is assigned to it. For J103, assignment still permits reading, but closure blocks editing. Removing Alex's assignment to J101 removes both reading and editing access on subsequent requests under this example's policy.
+
+Ask the supplier to demonstrate the denied record as well as the allowed one. Opening J102 directly must not reveal its details merely because Alex can open J101. OWASP's [object-level authorization guidance](https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/) calls for checking the requested action against the specific record, including when a request supplies that record's identifier.
+
+### Change one condition in the example
+
+The explorer below applies only Alex's fictional technician policy. Start with an active account, an assigned open job, and “View work details.” Then choose “Edit work notes” and close the job. The first request is permitted; the second is denied. Try billing access next: reopening the job does not grant it.
+
+The complete rule is: **reading work details requires active account + current assignment; editing work notes also requires an open job. Billing access and job exports are always denied for this role.** All conditions joined by “+” must hold; this is a logical rule, not addition.
+
+<PermissionExplorer />
+
+The selector values stand in for facts your real application would establish and check on the server. Choosing “Assigned to you” here changes only this illustration; a real user must not be able to grant access by sending that claim themselves.
+
+## Treat exports and other routes as separate decisions
+
+An export can combine many records and fields into a portable file. Specify its permitted rows and columns explicitly. In the fictional matrix, finance can export job IDs and billing fields for jobs with invoices. That does not include work notes, and it gives the dispatcher no export permission at all.
+
+Use the same questions for search results, dashboards, printed reports, email notifications, and integrations. Which records appear? Which details are included? Who receives them? A restricted detail page is only one route to the information.
+
+For a bulk operation, decide what happens if some selected records are outside the user's scope: reject the operation, or process only permitted records with an explicit result. Do not leave the behavior to an accidental implementation choice. If exports run in the background, agree when access is checked and what happens if it changes before the file is generated or downloaded.
+
+A permission change can stop future access through the application; it cannot retrieve a file someone already downloaded or information they already copied. That distinction is a reason to decide whether an export is necessary before granting it, and to agree how exported information will be handled.
+
+## Decide what happens when access changes
+
+The matrix describes a state. Real businesses also need transitions: someone joins, changes teams, covers a colleague's work, or leaves. Name the person who approves each change, the person who applies it, and the evidence that it took effect. OWASP recommends reviewing deployed permissions for [privilege creep](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html#enforce-least-privileges), where users retain access beyond their intended duties.
+
+For Alex's example, agree these outcomes before implementation:
+
+- **Assignment removed:** the next request for that job is denied, including a save from a page opened earlier. Existing text already displayed is not proof of continuing access.
+- **Job closed:** reading an assigned job still works, but a later work-note save is refused. The application should explain the failed save without claiming the notes were stored.
+- **Account suspended:** subsequent reads, writes, and export requests are denied, including requests from an already open session.
+- **Temporary cover ends:** the temporary assignment is removed rather than silently becoming permanent access.
+
+These are requirements for this example, not claims about every product. Ask a supplier how quickly changes take effect across active sessions, cached decisions, background jobs, and connected systems. If a platform cannot meet the agreed behavior, record its actual delay and decide whether it is acceptable for the information involved.
+
+Also ask what happens when a person has two roles. Does either role granting access win, or can a restriction override it? Our example excludes combined roles to keep the rules small; your project must define them if they occur. Do not assume adding a restrictive role removes access granted elsewhere.
+
+## Turn the matrix into a supplier brief
+
+For each important permission, record an allowed case and a closely related denied case. Use synthetic records in an agreed test environment. A useful brief for Alex's work-note update looks like this:
+
+| Decision | Example specification |
+| --- | --- |
+| Person and action | Active technician updates work notes |
+| Record and field scope | Currently assigned job; work notes only |
+| Additional condition | Job is open when the update is checked |
+| Allowed case | Alex edits J101's notes; reopening shows the saved text |
+| Denied cases | J102 is unassigned; J103 is closed; billing fields cannot be changed |
+| Access-change case | Remove the assignment while J101 is open, then try to save; no change is stored |
+| Evidence to request | Test identity, starting state, requested action, observed result, and record after the attempt |
+
+Have the supplier verify these rules through the server's data and action routes as well as the visible interface. Keep business-policy approval with the business owner and implementation verification with people qualified to assess the chosen system. The examples identify important behavior; they are not a complete security assessment.
+
+You can <a href="/downloads/user-permissions-worksheet.txt" download>download the permissions specification worksheet</a> for a filled example and a blank template. It is a plain-text file you can edit locally or paste into a project brief. The article's tables and worked example remain available without JavaScript; the worksheet download also works without it.
+
+If an existing product can express and demonstrate the rules you need, configure those capabilities before commissioning a custom permission system. If it cannot, describe the precise missing behavior: “technicians must not receive billing fields” is more useful than “we need better security.” Use our [customer portal scoping guide](/blog/customer-portal-mvp-scope/) to place those rules within a complete workflow, and our [acceptance testing guide](/blog/user-acceptance-testing-checklist/) to record the supplier's observed results. A clear permission specification also gives Techsouq a practical starting point for [planning a business application](/#services).
+
+## Sources and further reading
+
+- [OWASP: Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html) — identity versus authorization, minimum privileges, request checks, and permission review.
+- [OWASP API1:2023: Broken Object Level Authorization](https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/) — checking access to the particular record and action.
+- [OWASP API3:2023: Broken Object Property Level Authorization](https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/) — restricting fields returned and fields changed.
+
+Sources checked on 31 October 2026. The maintenance business, people, records, matrix, counts, and explorer are original illustrative examples, not a client engagement or a report of tested production security. The source documents support the access-control distinctions; the particular business permissions are assumptions chosen for this guide.

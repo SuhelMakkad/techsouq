@@ -1,0 +1,85 @@
+TECHSOUQ — USER PERMISSIONS SPECIFICATION
+Published 31 October 2026
+Companion guide: https://www.techsouqhq.com/blog/user-permissions-matrix/
+
+Use this as a planning document with your business owner and supplier. It does not inspect an application or establish security. Use synthetic example records, not private customer data or credentials.
+
+FILLED EXAMPLE — FICTIONAL MAINTENANCE BUSINESS
+
+Policy owner: business owner
+Access grants: business owner approves; named account administrator applies
+Role: technician, with no additional roles
+Account condition: active
+Action: update work notes
+Record scope: jobs currently assigned to this technician
+Fields allowed to change: work notes only
+Additional condition: job must be open when the update is checked
+Default for a request without an applicable permission: deny
+
+Operational fields in the example: job ID, site, appointment, work notes.
+Billing fields in the example: invoice number, amount, payment status.
+Assignment and status are separate control fields. Status is displayed where needed.
+
+Synthetic records for Alex:
+- J101: assigned, open. Read operational details and edit work notes.
+- J102: unassigned, open. No access.
+- J103: assigned, closed. Read operational details; no edits.
+- J104: unassigned, closed. No access.
+
+Alex can read operational details for 2 of 4 jobs. Counting only four populated operational fields per permitted job: 2 x 4 = 8 readable field values. Status is excluded from this illustrative count. This is not a security score or test-coverage target.
+
+Allowed case: Alex updates J101 work notes; reopening J101 shows the saved text.
+Denied cases: update J102; update closed J103; read or change billing fields; export the job list.
+Access change: remove assignment while J101 is open. A subsequent save is denied and stores no change.
+Suspension: subsequent requests from an existing session are denied.
+Combined roles: excluded from this example; specify separately if required.
+Exports: technician has no export permission. Finance may export only job ID and billing fields for jobs with invoices.
+
+Expected evidence: identified software version and environment, synthetic test identity, starting record state, attempted action, observed outcome, resulting stored state, and reviewer. Test direct data/action routes as well as the interface with appropriately qualified people.
+
+BLANK PERMISSION SPECIFICATION — COPY FOR EACH ACTION
+
+System and workflow:
+Business policy owner:
+Person who approves access:
+Person who applies access:
+Role and account conditions:
+Action (read, update, export, approve, assign, etc.):
+Record scope (whose records, which team/account/assignment):
+Fields permitted to read:
+Fields permitted to change:
+Additional conditions (record status, expiry, etc.):
+Explicit exclusions:
+Default when no permission applies:
+Behavior when a person has multiple roles:
+Export rows, columns, destination, and background-job rules:
+Other routes (search, dashboards, reports, notifications, integrations):
+
+ALLOWED CASE
+Synthetic identity and starting state:
+Action:
+Expected observable result and stored state:
+
+DENIED CASE
+One relevant condition changed:
+Action:
+Expected refusal and evidence no forbidden data/action was released:
+
+ACCESS-CHANGE CASE
+Event (assignment removed, role changed, account suspended, temporary access ends):
+Required effective time:
+Active sessions, caches, background jobs, and connected systems affected:
+Expected behavior for an already open page or pending operation:
+Observed propagation delay, if any:
+Decision owner and accepted limitations:
+
+VERIFICATION RECORD
+Build/version and environment:
+Reviewer and date:
+Observed outcome for each case:
+Evidence location:
+Issues and unresolved policy decisions:
+Follow-up owner:
+Next access review trigger/date:
+
+Removing application access cannot recall files already downloaded or information already copied. Define handling of exported information separately. This worksheet is a business-policy aid, not a complete security test plan.
