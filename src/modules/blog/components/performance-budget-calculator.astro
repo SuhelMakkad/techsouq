@@ -1,0 +1,393 @@
+---
+import {
+  DEFAULT_PERFORMANCE_BUDGET,
+  PERFORMANCE_BUDGET_FIELDS,
+} from '@/modules/blog/utils/performance-budget';
+---
+
+<section class="budget-tool" data-performance-budget aria-label="Transfer budget calculator">
+  <div class="tool-heading">
+    <p class="tool-kicker">Try your own change</p>
+    <h3>Does the proposed transfer fit?</h3>
+    <p>
+      Compare a transfer estimate with a ceiling you choose. The starting values are fictional
+      planning assumptions. Use the same capture window and cache condition for every value.
+    </p>
+  </div>
+
+  <form data-budget-form hidden novalidate autocomplete="off">
+    <fieldset>
+      <legend>Transfer estimates in decimal kB</legend>
+      <p class="units-note" data-units-note>
+        1 kB = 1,000 bytes. Enter whole numbers without commas. Each input is limited to 1,000,000
+        kB as a tool guard, not a performance recommendation. The ceiling must be at least 1 kB;
+        other values may be zero.
+      </p>
+
+      <div class="field-grid">
+        {PERFORMANCE_BUDGET_FIELDS.map(({ key, label, hint }) => (
+          <label class="field">
+            <span>{label} (kB)</span>
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]+"
+              name={key}
+              value={DEFAULT_PERFORMANCE_BUDGET[key]}
+              data-budget-input={key}
+              required
+            />
+            <small data-budget-hint={key}>{hint}</small>
+            <span class="field-error" data-budget-error={key} hidden></span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+
+    <div class="tool-actions">
+      <button class="primary-button" type="submit">
+        Calculate transfer
+      </button>
+      <button class="secondary-button" type="reset">
+        Reset example
+      </button>
+    </div>
+  </form>
+
+  <noscript>
+    <p class="no-script">
+      Enable JavaScript to change the inputs. To calculate manually, add current transfer and
+      proposed additions, then subtract net removals after replacement costs. Subtract that total
+      from your chosen ceiling. The complete fictional example is below.
+    </p>
+  </noscript>
+
+  <div class="result" role="status" aria-live="polite" aria-atomic="true" data-budget-result>
+    <h4 data-result-title>Within the chosen ceiling</h4>
+    <p class="result-message" data-result-message>
+      Projected transfer: 740 kB. Headroom: 60 kB below the chosen 800 kB ceiling.
+    </p>
+    <p class="result-formula" data-result-formula>
+      640 kB current + 240 kB additions − 140 kB net removals = 740 kB. 800 − 740 = 60 kB remaining.
+    </p>
+  </div>
+
+  <p class="model-note">
+    This only checks the transfer estimates you enter. It does not measure your website or predict
+    loading time or Core Web Vitals. Inputs stay in page memory; this tool does not transmit or
+    store them.
+  </p>
+</section>
+
+<script>
+  import {
+    calculatePerformanceBudget,
+    parseTransferKb,
+    PERFORMANCE_BUDGET_FIELDS,
+    PerformanceBudgetInputError,
+    type PerformanceBudgetField,
+    type PerformanceBudgetInputs,
+  } from '@/modules/blog/utils/performance-budget';
+
+  document.querySelectorAll<HTMLElement>('[data-performance-budget]').forEach((tool, index) => {
+    const form = tool.querySelector<HTMLFormElement>('[data-budget-form]')!;
+    const title = tool.querySelector<HTMLElement>('[data-result-title]')!;
+    const message = tool.querySelector<HTMLElement>('[data-result-message]')!;
+
+    const formula = tool.querySelector<HTMLElement>('[data-result-formula]')!;
+    const units = tool.querySelector<HTMLElement>('[data-units-note]')!;
+
+    const input = (key: PerformanceBudgetField) =>
+      form.querySelector<HTMLInputElement>(`[data-budget-input="${key}"]`)!;
+
+    const error = (key: PerformanceBudgetField) =>
+      form.querySelector<HTMLElement>(`[data-budget-error="${key}"]`)!;
+
+    units.id = `transfer-budget-${index}-units`;
+
+    for (const { key } of PERFORMANCE_BUDGET_FIELDS) {
+      const hint = form.querySelector<HTMLElement>(`[data-budget-hint="${key}"]`)!;
+
+      hint.id = `transfer-budget-${index}-${key}-hint`;
+      error(key).id = `transfer-budget-${index}-${key}-error`;
+      input(key).setAttribute('aria-describedby', `${hint.id} ${units.id} ${error(key).id}`);
+    }
+
+    const clearErrors = () => {
+      for (const { key } of PERFORMANCE_BUDGET_FIELDS) {
+        input(key).removeAttribute('aria-invalid');
+        error(key).textContent = '';
+        error(key).hidden = true;
+      }
+    };
+
+    const calculate = (reset = false) => {
+      clearErrors();
+
+      try {
+        const values = Object.fromEntries(
+          PERFORMANCE_BUDGET_FIELDS.map(({ key }) => [key, parseTransferKb(input(key).value, key)]),
+        ) as PerformanceBudgetInputs;
+
+        const result = calculatePerformanceBudget(values);
+        const format = (value: number) => value.toLocaleString('en-US');
+
+        const titles = {
+          within: 'Within the chosen ceiling',
+          at: 'At the chosen ceiling',
+          over: 'Over the chosen ceiling',
+        };
+
+        title.textContent = titles[result.status];
+
+        const difference =
+          result.remaining < 0
+            ? `Overage: ${format(-result.remaining)} kB above`
+            : `Headroom: ${format(result.remaining)} kB below`;
+
+        message.textContent = `${reset ? 'Example reset. ' : ''}Projected transfer: ${format(result.total)} kB. ${result.status === 'at' ? `No headroom remains at the chosen ${format(values.ceiling)} kB ceiling.` : `${difference} the chosen ${format(values.ceiling)} kB ceiling.`}`;
+
+        formula.textContent = `${format(values.current)} kB current + ${format(values.added)} kB additions − ${format(values.removed)} kB net removals = ${format(result.total)} kB. ${format(values.ceiling)} − ${format(result.total)} = ${format(result.remaining)} kB remaining.`;
+        formula.hidden = false;
+      } catch (cause) {
+        title.textContent = 'Check your inputs';
+        message.textContent = 'Correct the highlighted input, then calculate again.';
+        formula.textContent = '';
+
+        formula.hidden = true;
+
+        if (cause instanceof PerformanceBudgetInputError) {
+          input(cause.field).setAttribute('aria-invalid', 'true');
+          error(cause.field).textContent = cause.message;
+          error(cause.field).hidden = false;
+
+          input(cause.field).focus();
+        }
+      }
+    };
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      calculate();
+    });
+
+    form.addEventListener('input', () => {
+      clearErrors();
+      title.textContent = 'Inputs changed';
+      message.textContent = 'Choose “Calculate transfer” to check the new values.';
+
+      formula.textContent = '';
+      formula.hidden = true;
+    });
+
+    form.addEventListener('reset', (event) => {
+      event.preventDefault();
+
+      for (const { key } of PERFORMANCE_BUDGET_FIELDS) {
+        input(key).value = input(key).defaultValue;
+      }
+
+      calculate(true);
+    });
+
+    form.hidden = false;
+  });
+</script>
+
+<style>
+  .budget-tool {
+    margin: 2rem 0;
+    border: 1px solid #dbe3f2;
+    border-radius: 1.25rem;
+
+    background: #f7f8fb;
+    padding: clamp(1.1rem, 4vw, 2rem);
+    color: #18202f;
+
+    line-height: 1.5;
+  }
+
+  .budget-tool [hidden] {
+    display: none !important;
+  }
+
+  .budget-tool p,
+  .budget-tool h3,
+  .budget-tool h4 {
+    margin: 0;
+  }
+
+  .tool-kicker {
+    color: #2061ef;
+    font-size: 0.7rem;
+    font-weight: 700;
+
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .tool-heading h3 {
+    margin-top: 0.6rem;
+    font-size: clamp(1.35rem, 3vw, 1.7rem);
+    line-height: 1.25;
+
+    letter-spacing: -0.035em;
+  }
+
+  .tool-heading > p:last-child {
+    margin-top: 0.85rem;
+    color: #566174;
+    font-size: 0.875rem;
+  }
+
+  fieldset {
+    min-width: 0;
+    margin: 1.5rem 0 0;
+    border: 1px solid #dce3ee;
+
+    border-radius: 0.85rem;
+    background: #fff;
+    padding: 1rem;
+  }
+
+  legend {
+    padding: 0 0.4rem;
+    color: #164dd0;
+    font-size: 0.8rem;
+
+    font-weight: 700;
+  }
+
+  .units-note,
+  .model-note,
+  .no-script {
+    color: #566174;
+    font-size: 0.8rem;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.15rem;
+
+    margin-top: 1.25rem;
+  }
+
+  .field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 650;
+  }
+
+  input {
+    width: 100%;
+    min-width: 0;
+    min-height: 2.8rem;
+
+    border: 1px solid #cbd4e1;
+    border-radius: 0.55rem;
+    background: #fff;
+
+    padding: 0.65rem 0.75rem;
+    color: #18202f;
+    font: inherit;
+
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  input[aria-invalid='true'] {
+    border-color: #9b342b;
+  }
+
+  .field small,
+  .field-error {
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+
+  .field small {
+    color: #566174;
+  }
+
+  .field-error {
+    color: #9b342b;
+  }
+
+  .tool-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    margin-top: 1rem;
+  }
+
+  button {
+    min-height: 2.8rem;
+    border: 1px solid #2061ef;
+    border-radius: 0.55rem;
+
+    padding: 0.65rem 1rem;
+    font: inherit;
+    font-size: 0.8rem;
+
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  .primary-button {
+    background: #2061ef;
+    color: #fff;
+  }
+
+  .secondary-button {
+    background: #fff;
+    color: #164dd0;
+  }
+
+  input:focus-visible,
+  button:focus-visible {
+    outline: 3px solid #18202f;
+    outline-offset: 3px;
+  }
+
+  .result {
+    margin-top: 1.5rem;
+    border-left: 3px solid #2061ef;
+    border-radius: 0 0.65rem 0.65rem 0;
+
+    background: #e9effc;
+    padding: 1rem;
+  }
+
+  .result h4 {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .budget-tool .result-message {
+    margin-top: 0.6rem;
+    font-size: 0.875rem;
+  }
+
+  .budget-tool .result-formula {
+    margin-top: 0.65rem;
+    color: #45526a;
+    font-size: 0.8rem;
+  }
+
+  .budget-tool .model-note,
+  .budget-tool .no-script {
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 520px) {
+    .field-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

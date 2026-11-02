@@ -1,0 +1,161 @@
+---
+title: 'Website Performance Budget: Set Limits Before You Build'
+description: 'Agree useful website speed requirements with a worked asset budget, a simple calculator, and a supplier brief that separates launch tests from real visitor data.'
+pubDate: 2026-11-02
+category: 'Websites & search'
+heroImage: '../../assets/blog/website-performance-budget.svg'
+heroImageAlt: 'Three website performance checks: real visits measure user experience, repeatable tests compare the same setup, and asset limits cap what a page loads. A byte limit is not a speed prediction.'
+socialImage: '/images/blog/website-performance-budget.png'
+---
+
+import PerformanceBudgetCalculator from '@/modules/blog/components/performance-budget-calculator.astro';
+
+“Make the website fast” leaves too much unresolved. Fast on whose phone, on which page, and before or after the booking widget opens? A supplier can show a good test result while your most important customer journey still feels slow.
+
+Before commissioning a website or redesign, agree a performance brief with three parts: targets for real visitors, repeatable checks before launch, and limits on the assets added to each page. Record who owns a failed check and what happens when marketing wants another video, font, or integration.
+
+This guide gives you a worked transfer budget and a brief to take to your developer. The figures in the example are fictional planning assumptions, not measured client results or recommended limits for every website.
+
+## Choose the pages and journeys that matter
+
+Start with the task a visitor needs to finish. For a services business, that might be reading a service page, opening a booking form, and sending an enquiry. Include the page with the richest content or heaviest integration, not just the homepage.
+
+Write down the states to test: a first visit, a return visit, the consent choices your site offers, and the booking form after it opens. Choose devices and connection conditions that reflect the customers you serve. A global audience may need checks from more than one region; name the locations instead of writing “test globally.” These are project choices to agree with your supplier.
+
+A useful starting scope is one representative page from each important template, plus any page with a distinct third-party feature. If you are also changing addresses, keep the [redesign URL map](/blog/website-redesign-seo-checklist/) alongside this brief. Speed checks do not verify redirects or preserve old links.
+
+## Separate visitor targets from launch evidence
+
+Google's current Core Web Vitals cover loading, response to interaction, and visual stability. The recommended “good” thresholds are shown below. Evaluate the 75th percentile for each metric, with mobile and desktop considered separately: this looks beyond the average experience. See [web.dev's Core Web Vitals definitions and thresholds](https://web.dev/articles/vitals#core-web-vitals).
+
+<table tabIndex="0" aria-label="Core Web Vitals targets">
+  <thead>
+    <tr>
+      <th scope="col">Metric</th>
+      <th scope="col">What it helps assess</th>
+      <th scope="col">Good threshold</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">LCP: Largest Contentful Paint</th>
+      <td>When the largest visible content element appears</td>
+      <td>2.5 seconds or less</td>
+    </tr>
+    <tr>
+      <th scope="row">INP: Interaction to Next Paint</th>
+      <td>How promptly the page responds visually to interactions</td>
+      <td>200 milliseconds or less</td>
+    </tr>
+    <tr>
+      <th scope="row">CLS: Cumulative Layout Shift</th>
+      <td>Unexpected movement of page content</td>
+      <td>0.1 or less; a score, not seconds</td>
+    </tr>
+  </tbody>
+</table>
+
+Use these as named visitor-experience targets, then agree how you will collect and review evidence. They are not a guarantee that every visitor has a good experience or that a page converts well.
+
+**Field data** comes from real visits. **Lab data** comes from a controlled test with specified conditions. They answer different questions: field data describes observed experience; lab tests help investigate problems and compare changes. A lab run cannot reproduce the full mix of devices, networks, locations, and interactions. [Google's explanation of lab and field differences](https://web.dev/articles/lab-and-field-data-differences) describes why their results can disagree.
+
+PageSpeed Insights displays Chrome User Experience Report data from the previous 28-day collection period. If a page lacks enough data, it may show results for the whole origin instead; if that also lacks data, no field result is available. Check whether the report is about the exact URL or the broader site. A missing field result is an evidence gap, not a pass. [PageSpeed Insights' real-user data documentation](https://developers.google.com/speed/docs/insights/v5/about#crux) explains this behavior.
+
+For a new site, agree a prelaunch lab check and a separate post-launch field review. Do not make the launch decision depend on a field history that cannot yet exist, or describe a Lighthouse score as proof that the real-user targets have been met.
+
+## Make the test repeatable before choosing a number
+
+Ask the supplier to put the test setup beside every result. At minimum, record the exact page and release, browser and tool version, device or emulation profile, network and CPU settings, test location, cache state, consent state, and actions performed.
+
+For example, your brief might require three runs under the same agreed mobile profile, saving every report and reviewing the median and the spread. That is an illustrative review method, not an official pass rule or a field percentile. Agree the lab limits after testing representative content on a prototype; keep them separate from the field thresholds above. Investigate a large spread instead of presenting only the best run.
+
+Include actual interactions. Open the navigation, use the booking widget, trigger validation errors, and complete a test enquiry in a safe test environment. A page-load report alone does not cover that journey. Google notes that lab tests generally miss the effect of real-user behavior such as scrolling and tapping. [Lab test limitations](https://web.dev/articles/lab-and-field-data-differences#why_lab_and_field_data_are_different) are a reason to extend the test, not to abandon measurement.
+
+Keep functional checks alongside performance checks. A fast form that cannot deliver an enquiry still fails the business task; the [user acceptance testing guide](/blog/user-acceptance-testing-checklist/) explains how to record that outcome separately.
+
+## Work through a feature that exceeds the asset budget
+
+A performance budget can include limits on page weight, requests, or timings. Size limits make feature tradeoffs visible, but two equally sized pages can render differently because of how their resources load. [Performance budgets 101](https://web.dev/articles/performance-budgets-101) supports using quantity limits alongside experience measurements. Its older example numbers are not the defaults used here.
+
+Consider a fictional service business adding online booking. It chooses an **800 kB transfer ceiling** for the initial service-page view. This is an arbitrary example constraint to demonstrate the method; your ceiling should come from your content, prototype measurements, audience, and agreed experience targets.
+
+For this example, count network bytes transferred during the first ten seconds after navigation, with the browser cache disabled, no service worker controlling the page, a fixed viewport and connection profile, optional tracking declined, and no user interaction. The ten-second window is a measurement boundary, not a ten-second loading target. Count the initial third-party requests too. Record later requests and the opened widget in a separate interaction test; delaying a request beyond the window does not remove its cost to the visitor.
+
+Use **decimal kB: 1 kB = 1,000 bytes**, with whole-kB estimates throughout this worksheet. Do not mix transferred size with uncompressed resource size or numbers from a different cache state. Chrome DevTools reports transferred and loaded resource totals separately, and only counts requests captured while its Network panel is recording. [The Network reference](https://developer.chrome.com/docs/devtools/network/reference#total-size) explains the distinction. Open the panel before navigation and clear the previous capture.
+
+<table tabIndex="0" aria-label="Fictional current page transfer estimates">
+  <thead>
+    <tr>
+      <th scope="col">Current resource group</th>
+      <th scope="col">Estimated transfer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">HTML and CSS</th>
+      <td>40 kB</td>
+    </tr>
+    <tr>
+      <th scope="row">Fonts</th>
+      <td>60 kB</td>
+    </tr>
+    <tr>
+      <th scope="row">Images</th>
+      <td>280 kB</td>
+    </tr>
+    <tr>
+      <th scope="row">JavaScript</th>
+      <td>180 kB</td>
+    </tr>
+    <tr>
+      <th scope="row">Other requests</th>
+      <td>80 kB</td>
+    </tr>
+    <tr>
+      <th scope="row">Current total</th>
+      <td>640 kB</td>
+    </tr>
+  </tbody>
+</table>
+
+Assume the proposed booking widget and all its additional initial dependencies add **240 kB** under those same conditions. With no other changes, the estimate becomes **640 + 240 = 880 kB**, which is **80 kB over** the chosen ceiling.
+
+The team then proposes smaller replacement images that reduce the existing image transfer by **140 kB net**. “Net” matters: count the old images removed minus the new images added, not the whole size of the old files. The revised estimate is **640 + 240 − 140 = 740 kB**, leaving **800 − 740 = 60 kB** of headroom.
+
+That revision fits the chosen transfer ceiling. It does not establish an LCP, INP, or CLS result. The developer still needs to verify the actual requests, test the widget's behavior, and check that the smaller images remain useful. If the feature is essential and the target cannot be met, discuss an alternative implementation or a documented change to the budget; do not quietly redefine the test.
+
+## Check your own proposed change
+
+Use this calculator to compare one proposed change with a ceiling you have already chosen. Enter estimates from the same page state and capture conditions. It performs arithmetic on your entries; it does not scan a website or recommend a ceiling.
+
+<PerformanceBudgetCalculator />
+
+The manual method is **proposed total = current transfer + additions − net removals**. Then **headroom = ceiling − proposed total**. Negative headroom means the estimate exceeds the ceiling. Zero means it exactly reaches the ceiling, with no allowance for further additions.
+
+If an integration has unknown dependencies, mark the estimate as incomplete and ask for a prototype measurement. Do not enter zero just to get a passing result. Resources loaded only after a click belong in the separate interaction check even when they fall outside this initial-view budget.
+
+## Give the budget an owner after launch
+
+A practical brief should say who approves a new embed, who checks a regression, and where the reports live. Repeat the agreed checks after changes to templates, imagery, fonts, tracking, or integrations. Set a review date for field evidence and record its collection period; a trailing window can contain both old and new releases.
+
+If traffic is too low for public field data, record “insufficient data” and continue the repeatable tests. Ask the developer whether appropriately configured real-user monitoring would answer the remaining questions for your site. Adding monitoring is a separate decision about data collection, not something this calculator performs.
+
+Before requesting estimates, <a href="/downloads/website-performance-brief.txt" download>download the performance brief worksheet</a> and fill in these decisions:
+
+- Which pages, visitor tasks, devices, locations, and consent states are in scope?
+- What are the field targets, and what will happen if field evidence is unavailable?
+- Which repeatable lab and interaction checks will decide prelaunch acceptance?
+- What does each asset ceiling measure, and what must happen if a proposal exceeds it?
+- Who owns fixes, budget exceptions, and the first post-launch review?
+
+For a small website, a short brief and saved reports may be sufficient. A frequently changing site may benefit from automated checks, but automation does not choose the right pages or resolve a feature tradeoff. Bring the completed brief to a [Techsouq website project discussion](/#services) so design, content, and engineering can work toward the same observable requirements.
+
+## Sources and further reading
+
+Sources checked on **2 November 2026**. The transfer figures, capture window, calculator rules, and suggested review process are original illustrative assumptions and recommendations, not requirements set by Google.
+
+- [web.dev: Web Vitals](https://web.dev/articles/vitals) — the current metrics, good thresholds, and 75th-percentile guidance.
+- [web.dev: Why lab and field data can be different](https://web.dev/articles/lab-and-field-data-differences) — what controlled tests and real visits measure.
+- [Google: About PageSpeed Insights](https://developers.google.com/speed/docs/insights/v5/about) — the 28-day field window, URL and origin data, and unavailable results.
+- [web.dev: Performance budgets 101](https://web.dev/articles/performance-budgets-101) — the budget concept and the limits of asset-size comparisons; its historical example targets are not adopted here.
+- [Chrome DevTools: Network features reference](https://developer.chrome.com/docs/devtools/network/reference) — capture behavior and transferred versus loaded resource size.
