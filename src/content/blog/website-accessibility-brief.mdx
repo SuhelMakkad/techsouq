@@ -1,0 +1,144 @@
+---
+title: 'Website Accessibility Brief: What to Agree Before You Build'
+description: 'Turn website accessibility expectations into a supplier brief with a worked scope, practical review questions, and a reusable worksheet for evidence and fixes.'
+pubDate: 2026-11-04
+category: 'Websites & search'
+heroImage: '../../assets/blog/website-accessibility-brief.svg'
+heroImageAlt: 'Scope the pages and journeys, agree checks and evidence, then assign owners and dates for fixes and retesting; repeat the checks if issues remain.'
+socialImage: '/images/blog/website-accessibility-brief.png'
+---
+
+If a website proposal promises “accessibility included,” ask what will be checked, who will check it, and what evidence you will receive. A homepage screenshot or a clean automated scan leaves those questions unanswered.
+
+Before you approve the build, agree a brief that names the accessibility standard, the pages and journeys in scope, the testing approach, and responsibility for fixing barriers. Include the content and third-party features your customers will actually use. This gives suppliers something concrete to price and gives you a basis for reviewing their work.
+
+This guide works through a fictional services website and provides a downloadable brief. It is a project-planning method, not a complete accessibility audit or a determination of your legal obligations.
+
+## Name the standard and the evidence separately
+
+The Web Content Accessibility Guidelines, or WCAG, provide testable requirements for web content. For a new website, **WCAG 2.2 Level AA** is a useful target to discuss with your supplier: W3C advises using WCAG 2.2, and Level AA includes the Level A and Level AA success criteria. Agree the exact version and level in writing. See the [WCAG 2.2 recommendation](https://www.w3.org/TR/WCAG22/) and its [conformance levels](https://www.w3.org/TR/WCAG22/#cc1).
+
+A target is not evidence that the finished website meets it. Ask who will evaluate the implementation, what methods they will use, which release they will examine, and how they will document findings. W3C explains that no tool alone can determine whether a site meets accessibility standards; knowledgeable human evaluation is necessary. [WAI's evaluation overview](https://www.w3.org/WAI/test-evaluate/) also recommends evaluating throughout development.
+
+Treat the standard as one part of the brief. Add the actual business task: “A visitor can find a service, understand the information, send an enquiry, correct an error, and identify the outcome.” Agree any applicable contractual or legal requirements separately with the people responsible for those decisions; this article does not prescribe a worldwide legal standard.
+
+## Scope complete journeys, including the awkward states
+
+A page list is a start. Add the navigation, consent choices, forms, dialogs, downloads, media, and embedded services encountered along the way. Record the states that only appear after interaction: an open mobile menu, a validation error, a waiting message, or a failed submission.
+
+WCAG conformance concerns full pages, including responsive variations. Where pages form a process, all pages in that process must conform at the specified level. An embedded component cannot simply be excluded from a full-page conformance claim. These boundaries come from [WCAG's full-page and complete-process requirements](https://www.w3.org/TR/WCAG22/#cc2).
+
+For buying purposes, separate **delivery responsibility** from **the visitor's experience**. Your developer might not control a booking vendor's code, but the customer still encounters its barriers. Ask who will assess the integration, raise defects with the vendor, and decide whether to replace it or provide an appropriate alternative. A vendor exclusion in a quote does not make that part of the journey disappear.
+
+Name your supported browsers, devices, and assistive-technology combinations with the evaluator. A screen reader, for example, presents interface information through speech or braille. “Screen reader tested” without a product, version, browser, and journey tells you little about the evidence. The choices should reflect the audience and technology, not a single universal combination copied from another project.
+
+## Work through an eight-page services website
+
+Assume a fictional consultancy is commissioning a public website. It has eight URLs built from four templates, one enquiry journey, and no customer login, checkout, PDF downloads, or video at launch. These are illustrative scope choices, not a recommended site size or a client result.
+
+<table tabIndex="0" aria-label="Fictional website scope inventory">
+  <thead>
+    <tr>
+      <th scope="col">Template</th>
+      <th scope="col">URLs</th>
+      <th scope="col">What the brief must identify</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Home</th>
+      <td>1</td>
+      <td>Service navigation and the shared header, footer, and consent controls</td>
+    </tr>
+    <tr>
+      <th scope="row">Service</th>
+      <td>3</td>
+      <td>Each service's content, meaningful images, and enquiry link</td>
+    </tr>
+    <tr>
+      <th scope="row">Article</th>
+      <td>3</td>
+      <td>Headings, links, and any content-specific tables or illustrations</td>
+    </tr>
+    <tr>
+      <th scope="row">Enquiry</th>
+      <td>1</td>
+      <td>Form fields, spam protection, feedback, and recovery from errors</td>
+    </tr>
+    <tr>
+      <th scope="row">Total</th>
+      <td>8</td>
+      <td>Four templates, with shared components reviewed in context</td>
+    </tr>
+  </tbody>
+</table>
+
+The count is **1 + 3 + 3 + 1 = 8 URLs**. Reviewing one instance of each template does not automatically cover the different content on all eight pages. An illustration might lack a useful text explanation on just one article; a service page might contain a unique comparison table. Inventory those differences before deciding the evaluation scope. [W3C's WCAG-EM overview](https://www.w3.org/WAI/test-evaluate/conformance/wcag-em/) describes a structured approach to defining scope, exploring a site, selecting a representative sample, evaluating, and reporting.
+
+The enquiry page also needs four named states in this example:
+
+1. **Initial form:** the visitor can identify each field and any required information.
+2. **Validation error:** an omitted email produces a clear explanation, and the visitor can locate and correct it.
+3. **Confirmed success:** the interface communicates completion after the system has confirmed receipt.
+4. **Service failure:** a simulated server failure explains that completion has not been confirmed and gives a usable next step.
+
+That is **four form states on one URL**, not four extra pages. Do not multiply the inventory into an “accessibility coverage” percentage or treat it as a fixed number of tests. Each state may require several checks; each check needs an appropriate method. Keep the full enquiry journey together, including any spam challenge or external confirmation step.
+
+For the fictional launch, the owner decides that a customer being unable to send or correct an enquiry blocks release. This is a project acceptance rule, not a substitute for evaluating the rest of the agreed WCAG scope. If a supplier discovers an inaccessible spam challenge, the next action is to fix or replace that part of the form and retest the journey, rather than remove it from the report.
+
+## Ask for demonstrations that expose barriers
+
+Use the following prompts in a prototype review. They are examples of observable behavior to discuss, not a complete list of WCAG success criteria.
+
+**Follow the journey with a keyboard.** Ask the reviewer to navigate from the service page to the form, operate each control, correct an error, and reach the result without a mouse. Watch where focus moves and whether it remains visible. WCAG's [keyboard guidance](https://www.w3.org/WAI/WCAG22/Understanding/keyboard.html) explains the requirement and its limited exception for functions that depend on the path of movement. A mouse-only demo does not test this route.
+
+**Try the error state, not just successful submission.** In this example, submit with the email blank. Ask how someone using a screen reader learns which field needs attention and what to do next. A red border alone is not an adequate explanation. WAI's [form notification guidance](https://www.w3.org/WAI/tutorials/forms/notifications/) covers clear feedback for success and failure, error summaries, and associating messages with controls. Preserving the visitor's other answers is an additional practical requirement to put in this brief.
+
+**Enlarge and narrow the content.** Ask to see the ordinary text and form at a width equivalent to 320 CSS pixels. Can the reader follow the content and operate controls without losing information or scrolling in two directions? WCAG's [reflow guidance](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html) explains this Level AA requirement and the exception for content that needs a two-dimensional layout, such as some data tables. A mobile screenshot alone does not establish the full result.
+
+**Inspect meaningful content.** Ask who writes and reviews image descriptions, heading structure, link wording, and any media alternatives. The developer can provide accessible components, while a content editor can still introduce a barrier through the material placed inside them. Assign both responsibilities before handover.
+
+WAI's [Easy Checks](https://www.w3.org/WAI/test-evaluate/preliminary/) are useful for an initial review, but W3C explicitly warns that a page can pass them and still contain significant barriers. Use these demonstrations to make the brief concrete, then commission the evaluation needed for the agreed scope.
+
+## Decide what a useful evaluation report contains
+
+Request evidence you can connect to the delivered website. For this project, the brief should ask for:
+
+- The standard and level, tested URLs and states, release identifier, date, and evaluator.
+- The methods, tools and versions, browsers, devices, and assistive technologies used, with untested areas stated explicitly.
+- Findings with the affected location, steps to reproduce, user impact, relevant criterion, and supporting evidence.
+- A named owner and agreed action for each finding, followed by the retest result on the corrected release.
+- A clear explanation of any remaining barriers and how they affect the agreed acceptance decision.
+
+An automated report is useful input to this record. It is not the whole record. Nor does “nothing found” mean “everything tested.” If a criterion or journey has not been evaluated, label it as an evidence gap instead of a pass.
+
+Include people with disabilities in the evaluation plan where possible, with a clear task, appropriate support, and compensation agreed for their time. Combine what they experience with standards evaluation. W3C cautions that results from a few participants cannot represent all people with disabilities; [its guidance on involving users](https://www.w3.org/WAI/test-evaluate/involving-users/) explains how to report those limits.
+
+Compare proposals on the work included. One may cover an automated scan of a few URLs; another may include manual evaluation of complete journeys, content review, and a round of fixes and retesting. Ask for those differences to be itemized before comparing the totals. This article supplies no universal audit price, number of hours, or guaranteed outcome.
+
+## Give the supplier a brief they can answer
+
+For the fictional consultancy, the opening brief could read:
+
+> Our target is WCAG 2.2 Level AA for the eight public URLs in the attached inventory. The scope includes responsive navigation, consent controls, and the complete enquiry journey with initial, validation-error, confirmed-success, and service-failure states. Please propose the evaluation methods and supported test environments, identify responsibility for third-party controls and content, and include findings, remediation, and retest evidence in your proposal. List exclusions and unresolved dependencies explicitly. We will agree the acceptance decision and owners before development starts.
+
+{/* prettier-ignore */}
+<p><a href="/downloads/website-accessibility-brief.txt" download>Download the accessibility brief worksheet</a> to adapt that request. It is a plain-text document you can edit locally or send with your project brief; it does not assess a website or calculate a compliance score. The article, example, and download work without JavaScript.</p>
+
+The worksheet asks for the page inventory, full journeys and states, the target standard, testing environments, evidence, owners, and ongoing checks. Use it alongside the [user acceptance testing guide](/blog/user-acceptance-testing-checklist/) for the business release decision and the [website performance budget](/blog/website-performance-budget/) for speed requirements. These are related but separate kinds of evidence.
+
+Finally, agree what happens after launch. Name who checks new content, reviews replacement widgets, responds to accessibility feedback, and requests another evaluation after meaningful changes. Keep a usable way for visitors to report a barrier. A report describes what was evaluated at a particular time; the website will continue to change. [WAI’s guidance on sustaining accessibility](https://www.w3.org/WAI/planning-and-managing/sustain/) recommends including checks in the publishing process and using feedback to guide improvements.
+
+Bring the completed scope to a [Techsouq website project discussion](/#services). It gives design, content, and engineering a shared set of questions to resolve before the build begins.
+
+## Sources and further reading
+
+Sources checked on **4 November 2026**. The consultancy, page counts, four form states, suggested brief, and release rule are original illustrative assumptions and recommendations. They are not W3C-prescribed project sizes or a complete conformance checklist.
+
+- [W3C: WCAG 2.2](https://www.w3.org/TR/WCAG22/) — the standard, conformance levels, full pages, and complete processes.
+- [WAI: Evaluating Web Accessibility](https://www.w3.org/WAI/test-evaluate/) and [WCAG-EM overview](https://www.w3.org/WAI/test-evaluate/conformance/wcag-em/) — evaluation methods and the limits of tools.
+- [WAI: Easy Checks](https://www.w3.org/WAI/test-evaluate/preliminary/) — initial review prompts and their limitations.
+- [WAI: Form user notifications](https://www.w3.org/WAI/tutorials/forms/notifications/) — communicating errors and successful outcomes.
+- [WAI: Understanding Keyboard](https://www.w3.org/WAI/WCAG22/Understanding/keyboard.html) and [Understanding Reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html) — explanations of the specific requirements used in the review examples.
+- [WAI: Involving Users in Evaluating Web Accessibility](https://www.w3.org/WAI/test-evaluate/involving-users/) — combining user experience with standards evaluation and reporting scope honestly.
+- [WAI: Sustaining accessibility](https://www.w3.org/WAI/planning-and-managing/sustain/) — monitoring changes, publishing checks, and responding to feedback.

@@ -1,0 +1,100 @@
+TECHSOUQ — WEBSITE ACCESSIBILITY BRIEF
+Source: https://www.techsouqhq.com/blog/website-accessibility-brief/
+Published: 4 November 2026
+
+Use this worksheet to agree project scope and evidence with your supplier. It is not an audit, a complete WCAG checklist, a compliance score, or a determination of legal obligations. Edit locally; this file does not submit your information anywhere. Avoid including customer data or credentials.
+
+1. PROJECT AND TARGET
+Business / website:
+Business owner and supplier contact:
+Target standard, exact version and level:
+Other applicable contractual / legal requirements and responsible adviser:
+Proposed release / test environment:
+Evaluation owner:
+
+2. PAGE AND CONTENT INVENTORY
+For each URL or defined group, record:
+URL(s):
+Template:
+Unique content or behavior:
+Downloads / media:
+Shared components encountered:
+Content author and reviewer:
+Evaluation coverage and rationale for any sampling:
+Untested areas / dependencies:
+
+Example inventory only: 1 home + 3 service + 3 article + 1 enquiry = 8 URLs, using four templates. Shared templates do not establish that every page's unique content has been evaluated.
+
+3. COMPLETE JOURNEYS AND STATES
+Visitor task:
+Starting point and completed outcome:
+Every step, including external services:
+Initial state:
+Open menus / dialogs / consent states:
+Validation error and correction:
+Waiting / progress state, if present:
+Confirmed success:
+Service failure and recovery:
+Other states / time limits / authentication, if present:
+Third-party components and who resolves their barriers:
+
+Example: an enquiry has initial, validation-error, confirmed-success and service-failure states on one URL. These four states are not four extra pages, a fixed test count, or a percentage of conformance.
+
+4. EVALUATION PLAN
+Methods and who performs each:
+Automated tools and versions:
+Manual standards evaluation:
+Keyboard journeys:
+Content and visual review:
+Browser / OS / device / viewport or zoom configurations:
+Assistive technology / version / browser combinations:
+User involvement, support and compensation:
+Prototype review milestone:
+Prelaunch evaluation milestone:
+Agreed remediation and retest arrangements:
+
+Automated scans and quick checks cannot establish conformance alone. A few user sessions do not represent every disability or replace standards evaluation. Ask a knowledgeable evaluator to propose appropriate coverage.
+
+5. EVIDENCE AND FINDINGS
+Repeat this record for each finding:
+Finding ID:
+Tested release and date:
+URL / journey / state:
+Method and environment:
+Steps to reproduce:
+Observed barrier and user impact:
+Relevant criterion and expected behavior:
+Evidence location:
+Owner:
+Agreed fix and due date:
+Retest release / date / evaluator:
+Retest result and evidence:
+Remaining limitation:
+
+Use “not evaluated” for an evidence gap. Do not record a pass without a completed check.
+
+6. ACCEPTANCE AND RESPONSIBILITY
+Agreed release-blocking conditions:
+Remaining barriers and their effect on the agreed target:
+Decision owner:
+Decision and rationale:
+Outstanding actions / owners / dates:
+
+Accepting a release with known barriers does not establish conformance. Excluding a vendor from delivery responsibility does not remove it from the customer's journey or a full-page conformance claim.
+
+7. AFTER LAUNCH
+Owner of new content checks:
+Owner of widget / template changes:
+Accessible feedback route and response owner:
+Events that trigger reevaluation:
+Next review and scope:
+Where evidence and decisions will be kept:
+
+NEXT STEP
+Ask each supplier to itemize scope, evaluation, remediation, retesting, dependencies and exclusions against the same brief before comparing proposals.
+
+Primary starting points:
+https://www.w3.org/TR/WCAG22/
+https://www.w3.org/WAI/test-evaluate/
+https://www.w3.org/WAI/test-evaluate/conformance/wcag-em/
+https://www.w3.org/WAI/test-evaluate/involving-users/
