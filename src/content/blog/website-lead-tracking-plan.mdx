@@ -1,0 +1,151 @@
+---
+title: 'Website Lead Tracking: Count Enquiries That Become Business'
+description: 'Agree what counts as a website lead, separate browser events from business outcomes, and use a worked example and worksheet to measure useful enquiries.'
+pubDate: 2026-11-10
+category: 'Websites & search'
+heroImage: '../../assets/blog/website-lead-tracking-plan.svg'
+heroImageAlt: 'An illustrative cohort progresses from 25 distinct enquiries to 10 qualified leads and four wins, measured at one review date.'
+socialImage: '/images/blog/website-lead-tracking-plan.png'
+---
+
+If your website report says “40 conversions,” ask what happened 40 times. Someone might have clicked a contact button, submitted a form, sent a duplicate request, or become a customer. Those events answer different business questions.
+
+For a service business, start with a small measurement plan: define a distinct enquiry, confirm where it is recorded, agree what makes it qualified, and follow that same group through to an outcome. Keep website activity available for diagnosing the journey, but use the business records to count enquiries and wins.
+
+This guide gives you a worked example and a downloadable worksheet to take to a website supplier. It covers one enquiry form and the sales follow-up. It does not calculate advertising returns, recommend a tracking platform, or install analytics on your website.
+
+## Define the outcome before choosing the event
+
+Write definitions your team can apply consistently. For our fictional consultancy, the stages are:
+
+- **Contact interaction:** a visitor opens the form or clicks a phone or email link. This shows an interaction, not a completed conversation.
+- **Recorded submission:** the receiving system confirms that it saved a form response. This may still be a test, spam, or a repeat request.
+- **Distinct enquiry:** a genuine business request retained once after review. Follow-up messages about the same request belong to that enquiry.
+- **Qualified lead:** a reviewed enquiry that matches a service offered, comes from a customer the business can serve, and has an agreed next sales step.
+- **Won work:** a signed engagement recorded against that enquiry. A booked discovery call alone does not count as a win in this example.
+
+These are project choices. A clinic, manufacturer, and software company may need different qualification and completion rules. Make the rule observable: “sales owner recorded a service match and agreed a scoping call” is easier to review than “high-quality lead.” Keep the date of each stage change and a current outcome.
+
+If you use Google Analytics 4, its recommended events include `generate_lead` for lead acquisition, `qualify_lead` for qualification, and `close_convert_lead` for a lead becoming a customer. Those names provide a vocabulary; your implementation still needs to send the appropriate events. See [Google's recommended lead events](https://developers.google.com/analytics/devguides/collection/ga4/reference/events?hl=en#generate_lead).
+
+You can start with a private enquiry register or an existing customer relationship management system, often called a CRM. Exporting qualification and sales events to an analytics platform is a separate integration decision. It is not necessary to answer the basic question in this article.
+
+## Separate browser activity from confirmed receipt
+
+Ask the developer to name the evidence behind each reported event. Is it a click, a form submission observed in the browser, a confirmed saved response, or a stage change made by the sales team?
+
+Google's enhanced measurement describes `form_start` and `form_submit` as form interactions. That description does not establish that your receiving system stored a usable enquiry. Our recommendation is to test that boundary explicitly instead of treating an automatically collected event as proof of receipt. See [Google's form-interaction measurement](https://support.google.com/analytics/answer/9216061?hl=en).
+
+For a custom form, agree that a confirmed-receipt signal follows the receiving system's successful save. For an embedded or third-party form, ask what confirmation the provider exposes and verify it against a stored test response. If you can only observe a click or an attempted hand-off, label it that way. Do not rename uncertainty as success.
+
+Choose one implementation path for each event. If both a page script and a tag-manager rule report the same successful submission, your event count can include both. Reloading a confirmation page also needs an explicit counting rule. Ask the supplier to demonstrate the result rather than assume the event name prevents duplicates.
+
+GA4 offers key-event counting once per event or once per session. Neither setting is a business rule for identifying the same enquiry across repeat visits: a session is not an enquiry. Record the chosen setting, then handle duplicate business requests in the enquiry register. [Google's counting-method documentation](https://support.google.com/analytics/answer/13366706?hl=en) explains the distinction between the two settings.
+
+Do not deduplicate solely by email address. One person can ask about two genuinely separate projects; two colleagues can discuss the same project. Assign an internal enquiry reference and keep the reason when you merge a follow-up into an existing request.
+
+## Work through one fixed group of enquiries
+
+Assume a fictional consultancy receives **40 stored form records from 1–31 October 2026**, using UTC for the reporting period. It reviews their outcomes at **09:00 UTC on 10 November 2026**. The numbers are illustrative, not Techsouq client results or a recommended conversion rate.
+
+This group is the **cohort**: enquiries grouped by when they first arrived. The example includes only website-form enquiries, excludes phone and direct-email enquiries, and assumes each distinct enquiry can produce at most one signed engagement. Older enquiries that win during November are outside this cohort.
+
+The owner classifies each stored record once: four are labelled tests, six are spam, and five are follow-up submissions for requests already represented in the group. The remaining **40 − 4 − 6 − 5 = 25 distinct enquiries** form the denominator for the enquiry-level measures. These exclusions are mutually exclusive; the same record is not subtracted twice.
+
+<table tabIndex="0" aria-label="Illustrative enquiry cohort at the review cutoff">
+  <thead>
+    <tr>
+      <th scope="col">Record group</th>
+      <th scope="col">Count</th>
+      <th scope="col">What it means at the cutoff</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Stored form records</th>
+      <td>40</td>
+      <td>All saved records received during October</td>
+    </tr>
+    <tr>
+      <th scope="row">Excluded records</th>
+      <td>15</td>
+      <td>4 tests + 6 spam + 5 duplicate follow-ups</td>
+    </tr>
+    <tr>
+      <th scope="row">Distinct enquiries</th>
+      <td>25</td>
+      <td>10 qualified + 8 not a fit + 7 awaiting review</td>
+    </tr>
+    <tr>
+      <th scope="row">Qualified leads</th>
+      <td>10</td>
+      <td>4 won + 3 lost + 3 still open</td>
+    </tr>
+    <tr>
+      <th scope="row">Won work</th>
+      <td>4</td>
+      <td>Four of the qualified leads have signed engagements</td>
+    </tr>
+  </tbody>
+</table>
+
+The rows describe nested groups, so do not add the column into a grand total. A win remains part of the qualified group and the original enquiry cohort. The qualification snapshot reconciles as **10 + 8 + 7 = 25**; the qualified outcomes reconcile as **4 + 3 + 3 = 10**.
+
+At the recorded cutoff:
+
+- **Qualified share of distinct enquiries:** 10 ÷ 25 × 100 = **40%**.
+- **Won share of distinct enquiries:** 4 ÷ 25 × 100 = **16%**.
+- **Won share of qualified leads:** 4 ÷ 10 × 100 = **40%**.
+
+Each percentage needs its label. Seven enquiries are still awaiting review, and three qualified leads are still open. They remain in the relevant denominators. Removing unresolved cases would answer a different question and make these snapshot rates look more conclusive than they are. If a denominator is zero, report “not applicable” rather than 0%.
+
+For this owner, the first action is to assign the seven unreviewed enquiries and update the three open opportunities. The figures do not yet justify a website redesign or a forecast of future sales. Review the same cohort later, keep the earlier snapshot, and compare cohorts at similar ages. A newly received group has had less time to progress than an older one.
+
+## Keep business records and analytics within their boundaries
+
+The enquiry register answers who needs a response and what happened to each request. Website analytics answers questions about observed journeys, such as which pages precede form activity. Keep the source and unit beside each measure: events, sessions, distinct enquiries, or signed engagements.
+
+Do not divide the 25 enquiries in our example by an unrelated analytics session total and call it a verified website conversion rate. To report that rate, first define the eligible audience, period, channels, tracking coverage, and counting rules for both sides. A form record does not by itself prove a particular campaign caused the sale. Leave an unknown source unknown rather than allocating it to the channel you hope performed best.
+
+Consent settings can change what analytics observes. Google's basic consent mode blocks Google tags until consent is granted; advanced mode can send cookieless pings when consent is denied. Ask which behavior is configured and what any modeled reporting represents. The modes are described in [Google's consent-mode overview](https://developers.google.com/tag-platform/security/concepts/consent-mode). Missing analytics activity is not proof that an enquiry never arrived, and a mismatch is not a reason to bypass a visitor's choices.
+
+Keep names, email addresses, phone numbers, and enquiry messages out of the ordinary analytics event payload. Google's [PII guidance](https://support.google.com/analytics/answer/6366371?hl=en) also highlights URLs, page titles, and user-entered text as possible leaks. For a small measurement plan, use approved labels such as a fixed form name and service category instead of copying field contents. Keep the internal enquiry reference in your business system unless a separately reviewed integration requires it.
+
+Ask to inspect the outgoing analytics request, including its page URL, after a fictional test submission. Data redaction can provide another safeguard, but Google's [redaction documentation](https://support.google.com/analytics/answer/13544947?hl=en) describes email detection as best effort and says it does not cover Measurement Protocol or Data Import. Decide access, retention, notices, and consent requirements with the people responsible for privacy in your markets; an event naming plan does not settle them.
+
+## Ask for evidence before trusting the report
+
+Use a test environment and labelled fictional data. Ask the supplier to show the receiving record and analytics output side by side, where tracking is permitted under the configured consent state.
+
+1. **Valid enquiry:** one saved record, one internal reference, and the agreed receipt signal. A subsequent qualification or win needs separate evidence from the business workflow.
+2. **Invalid form or failed save:** no confirmed-receipt event. An error or attempt event, if collected, has a different name and meaning.
+3. **Double click, retry, and confirmation-page reload:** the observed event counts follow the written rule, and the business register does not silently create extra distinct enquiries for the same request.
+4. **Two separate requests from one person:** the register can preserve both when they meet the agreed definition of separate enquiries.
+5. **Consent declined and JavaScript unavailable:** the enquiry route behaves as specified, and any tracking absence or limitation is recorded honestly. Do not require a browser analytics event as evidence that a stored response exists.
+6. **Qualification and sales update:** the original enquiry reference, stage date, owner, and outcome remain traceable. A retry of an integration must not manufacture another win.
+
+For each check, record the expected result, actual result, release tested, and evidence location. Our [user acceptance testing guide](/blog/user-acceptance-testing-checklist/) explains how to make those checks repeatable. If qualification updates move between systems automatically, use the [workflow automation checklist](/blog/workflow-automation-checklist/) to agree what happens after duplicate deliveries and uncertain failures.
+
+## Take a measurement worksheet to your supplier
+
+Start with one form, one named business owner, and a definition of what you will review each month. A private register and a consistent review may be sufficient; add a CRM-to-analytics integration when it answers a specific decision your current records cannot support.
+
+Give the supplier a request they can demonstrate:
+
+> Show how one genuine enquiry is saved, counted once in our business register, qualified, and closed. Name the evidence behind each website event, the data it sends, the cases it excludes, and the limitations we should expect in the report.
+
+{/* prettier-ignore */}
+<p><a href="/downloads/website-lead-tracking-plan.txt" download>Download the lead measurement worksheet</a> to adapt that request, define the cohort and cutoff, and record your acceptance evidence. It is a plain-text file that works without JavaScript; edit your own copy and keep customer information in your approved business systems.</p>
+
+The useful deliverable is a measurement plan the website developer and sales owner both understand. That belongs in the brief for a new website or an improvement to an existing enquiry journey, alongside the design and engineering work. Take the completed worksheet into your next supplier discussion before adding more dashboard charts.
+
+## Sources and further reading
+
+Sources checked **10 November 2026**. Product behavior below is documented for Google Analytics and the Google tag; the cohort method, fictional counts, qualification rules, and supplier worksheet are our planning example.
+
+- [Google Analytics recommended events](https://developers.google.com/analytics/devguides/collection/ga4/reference/events?hl=en#generate_lead) — lead acquisition and later lifecycle event definitions.
+- [Enhanced measurement events](https://support.google.com/analytics/answer/9216061?hl=en) — the documented scope of automatic form interactions.
+- [Key-event counting methods](https://support.google.com/analytics/answer/13366706?hl=en) — once per event and once per session.
+- [Consent mode overview](https://developers.google.com/tag-platform/security/concepts/consent-mode) — basic and advanced tag behavior.
+- [Avoid sending personally identifiable information](https://support.google.com/analytics/answer/6366371?hl=en) — fields, URLs, titles, and other data to review.
+- [Data redaction](https://support.google.com/analytics/answer/13544947?hl=en) — additional safeguards and their limitations.

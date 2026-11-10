@@ -1,0 +1,91 @@
+TECHSOUQ — WEBSITE LEAD MEASUREMENT WORKSHEET
+Companion: https://www.techsouqhq.com/blog/website-lead-tracking-plan/
+Published: 10 November 2026
+
+Edit a private copy. Keep customer details in approved business systems, not in analytics payloads. This is a planning worksheet, not a tracking installation, privacy assessment, attribution model, or performance benchmark.
+
+BUSINESS QUESTION AND SCOPE
+Decision this report will support:
+Website/form in scope:
+Included channels:
+Excluded channels:
+Business owner and review frequency:
+System holding the authoritative enquiry record:
+
+STAGE DEFINITIONS
+Contact interaction — exact observed action:
+Recorded submission — evidence of successful save:
+Distinct enquiry — genuine request definition:
+Duplicate follow-up — merge rule and reason retained:
+Separate requests from the same person — rule:
+Qualified lead — criteria, evidence and responsible owner:
+Won work — completion evidence and responsible owner:
+Can one enquiry produce multiple wins? If yes, define a separate outcome model:
+How stage dates and prior snapshots are retained:
+
+EVENT MEASUREMENT PLAN — REPEAT FOR EACH EVENT
+Business meaning:
+Event name and exact trigger:
+Source system and evidence of occurrence:
+Implementation path and technical owner:
+Reporting unit (event, session, enquiry or engagement):
+Counting method and repeat-event rule:
+Allowed fields and fixed labels:
+Fields, URL parameters and titles that must not be sent:
+Consent behavior and known coverage limitations:
+Whether later business events are exported; reason if needed:
+Acceptance test and evidence location:
+
+COHORT AND REVIEW CUTOFF
+Arrival period, timezone and included form:
+Outcome review date, time and timezone:
+Same enquiry group used for all outcome measures:
+Stored records:
+Excluded tests:
+Excluded spam:
+Excluded duplicate follow-ups:
+Confirm exclusions are mutually exclusive:
+Distinct enquiries = stored records - tests - spam - duplicates:
+Qualified:
+Not a fit:
+Awaiting review:
+Confirm qualified + not a fit + awaiting review = distinct enquiries:
+Of qualified: won / lost / still open:
+Confirm won + lost + still open = qualified:
+
+SNAPSHOT MEASURES
+Qualified share = qualified / distinct enquiries x 100:
+Won share of enquiries = won / distinct enquiries x 100:
+Won share of qualified = won / qualified x 100:
+Use not applicable when denominator is zero. Keep unresolved cases in the stated denominator. Record raw counts beside percentages. Do not add nested stages into a grand total.
+Pending cases and next owner/action:
+Next review date and comparison with cohorts of similar age:
+Unknown sources, tracking gaps and other limitations:
+
+ACCEPTANCE EVIDENCE — REPEAT FOR EACH CASE
+Cases: valid enquiry; invalid input; failed save; double click; retry; confirmation reload; separate requests from one person; consent declined; JavaScript unavailable; qualification update; sales update; integration retry.
+Case and fictional test reference:
+Expected receiving-system result:
+Expected analytics result under this consent state:
+Actual results and evidence location:
+Release tested, date, tester:
+Issue owner, correction and retest result:
+
+PRIVACY AND OWNERSHIP
+Approved analytics fields, including URLs/titles, reviewed by:
+Outgoing payload inspected with fictional data by:
+Consent configuration and limitations documented by:
+Business-record access and retention owner:
+Analytics access and retention owner:
+Person responsible for updating this plan after form or CRM changes:
+
+ILLUSTRATIVE EXAMPLE — NOT CLIENT RESULTS OR A BENCHMARK
+Arrival cohort: stored website-form records received 1–31 October 2026, UTC.
+Outcome cutoff: 10 November 2026, 09:00 UTC.
+40 stored records - 4 tests - 6 spam - 5 duplicate follow-ups = 25 distinct enquiries.
+25 distinct enquiries = 10 qualified + 8 not a fit + 7 awaiting review.
+10 qualified = 4 won + 3 lost + 3 still open.
+Qualified share: 10 / 25 x 100 = 40%.
+Won share of enquiries: 4 / 25 x 100 = 16%.
+Won share of qualified: 4 / 10 x 100 = 40%.
+Assumes at most one signed engagement per enquiry. Older enquiries won in November, phone enquiries and direct-email enquiries are excluded. Pending cases remain visible; these rates are snapshots, not forecasts.
