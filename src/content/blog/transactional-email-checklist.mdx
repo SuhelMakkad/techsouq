@@ -1,0 +1,135 @@
+---
+title: 'Transactional Email Checklist: What to Verify Before Launch'
+description: 'Turn customer confirmations into a testable supplier brief: verify sender identity, delivery evidence, failure follow-up, and the customer’s next step.'
+pubDate: 2026-11-12
+category: 'Business systems'
+heroImage: '../../assets/blog/transactional-email-checklist.svg'
+heroImageAlt: 'Email evidence progresses from an app record to provider acceptance to recipient-server acceptance. Delays and failures need an owner; inbox placement and customer action need separate evidence.'
+socialImage: '/images/blog/transactional-email-checklist.png'
+---
+
+Before launching a booking website or customer application, ask your supplier to demonstrate what happens after it says an email was sent. A saved booking, an accepted email request, a message in the customer's inbox, and a completed customer action are different outcomes.
+
+Agree four things before sign-off: who controls the sending identity, what each delivery status proves, who handles failures, and how the customer continues when the email is missing. A successful test to the developer's own inbox is useful evidence for that test, but it does not answer all four questions.
+
+This checklist covers transactional messages such as booking confirmations and account invitations. It gives you a fictional rehearsal and a downloadable supplier worksheet. Marketing campaigns, provider comparisons, and legal notice requirements are outside its scope.
+
+## Start with the business event and the customer's next step
+
+Choose one message that matters. For a booking confirmation, write down what must already be true before the message is created: the booking exists, its time and location are saved, and the recipient address belongs to that booking. Then specify what the customer needs from the message: a reference, unambiguous date and time zone, current details, and a route to ask for help.
+
+Decide whether email is a notification of a completed action or a required step in completing it. In our booking example, the booking is confirmed before sending. A failed email must not silently cancel it. An account invitation is different: the recipient may still need to accept it before gaining access. Give those states different names in the application.
+
+Record the visible sender name, From address, Reply-To address, template owner, and support destination. If customers reply to a confirmation, who reads it? If replies are not supported, make the alternative obvious in the message. Ask for the current booking details to remain available through an appropriate authenticated page or support process; possession of a booking reference alone should not grant access to private details.
+
+## Ask what each email status proves
+
+Your supplier should map the chosen provider's actual events to labels the business understands. For example, Resend defines `email.sent` as a successful API request followed by an attempt to deliver; `email.delivered` means delivery to the recipient's mail server. Its documentation separately identifies temporary delays, permanent bounces, sending failures, and suppressions. Those distinctions come from [Resend's event definitions](https://resend.com/docs/webhooks/event-types), not from the wording on your application's button.
+
+Use this evidence ladder in the brief:
+
+1. **Application recorded:** the business event and the intended notification exist in your system.
+2. **Provider accepted:** the sending service accepted the request; retain its message reference where available.
+3. **Recipient server accepted:** the provider recorded acceptance by the receiving mail server.
+4. **Mailbox observed:** an authorized tester found the message in a particular mailbox and folder.
+5. **Customer action completed:** the application recorded the intended action, such as accepting an invitation.
+
+The last two require separate evidence. Postmark explicitly explains that a delivery event establishes receiving-server acceptance, not inbox placement, and that delivery events are specific to individual recipients. Ask your supplier to preserve that distinction even if its provider uses different names. See [Postmark's delivery webhook documentation](https://postmarkapp.com/developer/webhooks/delivery-webhook).
+
+An “opened” flag is also insufficient to prove that a person read or accepted a message. Apple says Mail Privacy Protection prevents senders from seeing whether a message was opened. Our planning recommendation is to use the recorded business action when completion matters, rather than making an open-tracking event the acceptance criterion. See [Apple's Mail Privacy Protection guide](https://support.apple.com/en-gb/guide/iphone/iphf084865c7/ios).
+
+## Verify the sender the customer will actually see
+
+Ask who owns the domain, who can change its DNS settings, and who manages the email provider account. DNS is the domain configuration used, among other things, to publish email authentication records. Keep business-controlled access and a named maintainer for these settings; include them in your [software handover](/blog/software-handover-checklist/).
+
+Have the supplier explain the authentication setup for the actual production sender. SPF identifies permitted sending systems, DKIM adds a verifiable signature, and DMARC connects authentication to the visible From domain through alignment and publishes handling policy. Google recommends SPF, DKIM, and DMARC; its minimum requirements differ between all senders and bulk senders to personal Gmail accounts. These are provider requirements, not a universal legal checklist. See [Google's email sender guidelines](https://support.google.com/a/answer/81126?hl=en).
+
+Request evidence from a newly received test message, including the visible sender and authentication results, alongside the provider's domain-verification screen. Google describes checking authentication in the message details or headers and warns that authentication alone cannot guarantee delivery. Use [Google's authentication-check guidance](https://support.google.com/mail/answer/180707?hl=en) as one concrete example of the evidence to inspect.
+
+Ask the person responsible for DNS to review existing senders before changing records or tightening policy. Your application's settings must coexist with the business's ordinary email and other authorized services. Keep promotional content out of the confirmation template; Google's sender guidance also advises against mixing promotions into receipts. The goal here is a clear operational message with a maintained sending identity.
+
+## Work through a rehearsal that says all twelve were sent
+
+Assume a fictional appointment business creates **12 separate test bookings**, each with one recipient and one initial confirmation. All bookings are saved and confirmed at 09:00 UTC. At **09:10 UTC on 12 November 2026**, the team reviews the evidence. The counts and timing are invented for this example, not client results, provider benchmarks, or a recommended delivery deadline.
+
+The rehearsal combines controlled test mailboxes with the provider's supported failure simulations. At the cutoff, all 12 requests have provider acceptance records. Their recorded delivery outcomes are mutually exclusive in this example:
+
+<table tabIndex="0" aria-label="Fictional booking email rehearsal at the review cutoff">
+  <thead>
+    <tr>
+      <th scope="col">Evidence at 09:10 UTC</th>
+      <th scope="col">Messages</th>
+      <th scope="col">Next action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Recipient server accepted</th>
+      <td>9</td>
+      <td>Inspect the controlled mailboxes and message contents.</td>
+    </tr>
+    <tr>
+      <th scope="row">Temporary delivery delay</th>
+      <td>2</td>
+      <td>Check the provider's retry state and the agreed escalation time.</td>
+    </tr>
+    <tr>
+      <th scope="row">Permanent delivery failure</th>
+      <td>1</td>
+      <td>Assign the address or delivery issue for review; do not blindly resend.</td>
+    </tr>
+  </tbody>
+</table>
+
+The initial-message count reconciles as **9 + 2 + 1 = 12**. The tester then inspects all nine mailboxes with recorded server acceptance: **eight messages are in the inbox and one is in junk**. Those folder observations subdivide the nine; they are not another nine messages to add to the total.
+
+The owner has **four cases to investigate: two delays, one permanent failure, and one junk placement**. All 12 bookings remain confirmed. Retrying a notification must not create another booking, and a support resend should remain traceable to the original booking and its earlier attempts. Our [workflow automation checklist](/blog/workflow-automation-checklist/) covers the wider problem of duplicate actions and uncertain retries.
+
+The decision is to resolve the observed issues and repeat the affected checks before sign-off. A later delivery event updates the message history; it does not rewrite what the team knew at 09:10. Keep the cutoff and the provider's precise outcome beside each observation. This small, deliberately constructed rehearsal cannot estimate future inbox placement or establish a universal success rate.
+
+## Give every exception an owner and a safe next action
+
+Agree what happens when a message is delayed beyond the time that matters for its purpose. A confirmation for an appointment next month and a time-sensitive invitation may need different follow-up rules. State the time zone, coverage hours, responsible person, and fallback; do not promise round-the-clock monitoring unless somebody is providing it.
+
+A missing event is an unknown outcome, not a permanent failure. Ask support to be able to look up the business reference, intended recipient, template version, attempt time, provider reference, and available events. Limit access and retention, and avoid copying message bodies, invitation secrets, or customer details into general analytics or public logs.
+
+A suppression means the sending system intentionally blocks a send. Resend, for example, documents automatic suppression-list additions after hard bounces or spam complaints. Ask how your chosen provider handles these cases and how staff will learn that a critical notification was blocked. Do not remove a suppression simply to make a dashboard green; resolve the underlying issue and follow the provider's rules. The relevant distinctions are in [Resend's suppression and email events](https://resend.com/docs/webhooks/event-types).
+
+For the fictional booking business, the fallback is an assigned support task against the existing booking. An address correction requires an appropriate identity check and a logged change. If another contact channel is available and appropriate, staff can use it under the business's agreed process. If it is unavailable, retain the unresolved task instead of marking the customer as contacted.
+
+## Rehearse the message and the journey together
+
+Ask the supplier to demonstrate these cases with labelled fictional records and mailboxes controlled by the test team:
+
+- **Normal confirmation:** the saved booking, provider reference, received message, dates, time zone, reply route, and linked booking details agree.
+- **Rendering and accessibility:** the message remains understandable on a small screen, with images blocked, and in its plain-text version. Link text explains the destination, and essential instructions are not embedded only in an image.
+- **Delay and permanent failure:** use supported provider simulations or controlled integration tests; show the resulting status and the assigned follow-up. Distinguish a simulated event from a real mailbox delivery.
+- **Suppressed recipient and unavailable event feed:** neither becomes an unexplained “sent successfully” message; support can identify the block or unknown outcome and investigate.
+- **Repeat send and changed booking:** a resend does not duplicate the booking. A link from an older message shows current authorized details, including a cancellation, rather than presenting an obsolete appointment as current.
+- **Customer action:** where an invitation requires acceptance, show that viewing or tracking the email alone does not activate the account. Test expired and already-used invitations against the agreed behavior.
+
+For example, Amazon SES offers a mailbox simulator for delivery, bounce, and complaint scenarios without affecting its bounce or complaint rates. That supports testing failure handling; it does not show where a real customer's mailbox would place a message. Use the equivalent supported facility for your provider. See [Amazon SES mailbox simulator guidance](https://docs.aws.amazon.com/ses/latest/dg/send-an-email-from-console.html).
+
+Keep real-mailbox checks separate from simulations and cover the mailbox services and devices relevant to your customers. Record the build, template, sending domain, test time, expected result, actual result, and evidence. A small test set has limited coverage; record that limitation instead of calling it a delivery guarantee. Our [user acceptance testing guide](/blog/user-acceptance-testing-checklist/) explains how to turn these demonstrations into a release decision.
+
+## Take an email acceptance brief to your supplier
+
+Start with one critical message and complete the worksheet with both the business owner and the developer. An existing booking or commerce platform's built-in notifications may already provide the necessary controls and evidence. Verify those capabilities before commissioning a custom sending pipeline.
+
+> Demonstrate the message from its saved business event through provider acceptance, recipient-server evidence, mailbox inspection, and the customer's next action. Show who follows up when any of those steps is missing, and keep the original business record intact.
+
+{/* prettier-ignore */}
+<p><a href="/downloads/transactional-email-checklist.txt" download>Download the transactional email acceptance worksheet</a> to record the sender, evidence, failure owner, and release checks. It is an editable plain-text file and works without JavaScript. Keep real customer information in your approved systems.</p>
+
+For a new website or business application, include this brief alongside the screens and workflow requirements. It gives your supplier something concrete to build and your operations team something concrete to accept. Techsouq's website and custom software work can include that integration and handover as part of the agreed project scope.
+
+## Sources and further reading
+
+Sources checked **12 November 2026**. Provider documentation supports the named product behaviors; the rehearsal counts, operational choices, and worksheet are our illustrative planning method.
+
+- [Resend webhook event types](https://resend.com/docs/webhooks/event-types) — sending, delivery, delays, failures, and suppression events.
+- [Postmark delivery webhook](https://postmarkapp.com/developer/webhooks/delivery-webhook) — recipient-specific server acceptance and the inbox boundary.
+- [Apple Mail Privacy Protection](https://support.apple.com/en-gb/guide/iphone/iphf084865c7/ios) — limitations on observing opens.
+- [Google email sender guidelines](https://support.google.com/a/answer/81126?hl=en) — personal-Gmail authentication requirements and sending practices.
+- [Google message authentication checks](https://support.google.com/mail/answer/180707?hl=en) — evidence in message details and headers.
+- [Amazon SES mailbox simulator](https://docs.aws.amazon.com/ses/latest/dg/send-an-email-from-console.html) — controlled sending scenarios and their limits.

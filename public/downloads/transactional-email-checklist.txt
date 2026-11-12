@@ -1,0 +1,66 @@
+TECHSOUQ — TRANSACTIONAL EMAIL ACCEPTANCE WORKSHEET
+Source: https://www.techsouqhq.com/blog/transactional-email-checklist/
+Planning worksheet, 12 November 2026. Edit your own copy; store real customer data only in approved business systems. This does not guarantee inbox placement or replace a provider's rules.
+
+1. BUSINESS PURPOSE
+Message type and business owner:
+Trigger and saved business reference:
+What must already be true before sending:
+Does the email notify a completed action or enable a required next action?
+Customer's next step and evidence of completion:
+How the customer accesses current details if email is missing:
+
+2. SENDER AND OWNERSHIP
+Visible sender name / From address / Reply-To:
+Who monitors replies, or the stated alternative:
+Domain owner / DNS maintainer / provider account owner:
+Template owner and version:
+Production sender authentication setup (SPF, DKIM, DMARC and alignment):
+Received test message authentication evidence and date:
+Existing authorized senders considered before DNS changes:
+Provider limits, retry behavior and support access verified on:
+
+3. EVIDENCE AND STATUS
+Application record / provider acceptance / recipient-server acceptance:
+Provider's exact event names and their meanings:
+Mailbox and folder observation (separate from server acceptance):
+Customer action evidence (separate from opens or clicks):
+Business reference / recipient / attempt time / provider message reference:
+How resends remain linked to the original event and attempts:
+Access and retention rules for evidence (exclude invitation secrets):
+
+4. FAILURE FOLLOW-UP
+For each case, specify owner, next action, escalation time, coverage hours and time zone:
+Temporary delay:
+Permanent failure:
+Suppressed recipient:
+Missing event or unavailable event feed (unknown outcome):
+Server acceptance but message reported missing or in junk:
+How address corrections are authorized and recorded:
+Alternative contact route, when available and appropriate:
+What remains unresolved if no alternative is available:
+How the original business record stays intact after email failure:
+
+5. REHEARSAL AND RELEASE
+Build / template / domain / test time and time zone:
+Controlled test mailboxes, services and devices:
+Provider-supported failure simulations (label as simulations):
+For each check record expected result, actual result, evidence and owner:
+- Saved record, received content, date, time zone, reply route and link agree.
+- Small-screen, images-blocked and plain-text content remains useful.
+- Delay, permanent failure and suppression produce the agreed follow-up.
+- Missing delivery events remain unknown until investigated.
+- Resend does not recreate the booking or other business action.
+- Older message links show current authorized details after changes/cancellation.
+- Where applicable, invitations handle acceptance, expiry and repeated use.
+
+Outstanding issues / resolution owner / retest evidence:
+Release decision and person responsible:
+Coverage limits and post-launch monitoring owner:
+
+FICTIONAL WORKED EXAMPLE
+12 saved bookings; one recipient and one initial confirmation each. All requests accepted by the provider at the review cutoff, 09:10 UTC on 12 November 2026.
+9 recipient-server acceptances + 2 temporary delays + 1 permanent failure = 12 initial messages.
+Of the 9 accepted messages, controlled mailbox inspection finds 8 in the inbox + 1 in junk = 9. Folder observations are a subset, not extra messages.
+2 delays + 1 failure + 1 junk placement = 4 cases to investigate. All 12 bookings remain confirmed. Resolve issues and repeat affected checks before sign-off.
+These invented counts and times are neither client results nor delivery benchmarks. Retain the cutoff; later events add to the history. No future inbox-placement rate is inferred.
