@@ -1,0 +1,132 @@
+---
+title: 'CSV Import Requirements: Agree What Happens Before You Build'
+description: 'Specify bulk uploads before commissioning business software: preview changes, choose failure rules, correct rejected rows, and prevent unsafe repeat imports.'
+pubDate: 2026-11-14
+category: 'Business systems'
+heroImage: '../../assets/blog/csv-import-requirements.svg'
+heroImageAlt: 'A CSV import moves from upload to preview to confirmation and a saved row report. Rows needing correction loop back through a new preview; a preview does not save records.'
+socialImage: '/images/blog/csv-import-requirements.png'
+---
+
+Before paying for a CSV import feature, agree what an uploaded file is allowed to change, what happens when a row fails, and how staff correct or repeat the operation. A button labelled “Import customers” leaves those decisions open.
+
+Ask your supplier for a preview that separates proposed new records, changes to existing records, and rejected rows. Then choose whether an error blocks the whole batch or whether an authorized user can explicitly accept the valid rows. Require a saved result that accounts for every submitted data record.
+
+This guide helps founders scope **recurring bulk uploads** in a customer portal or internal business application. It includes an original worked example and a downloadable supplier brief. Moving between entire systems, database implementation details, and specialist financial or regulated imports are outside its scope; use our [data migration checklist](/blog/business-data-migration-checklist/) for a system cutover.
+
+## Define the file and the changes it can make
+
+Start with one business task: “An operations manager uploads customer records for their own company.” Decide whether the first release creates records, updates them, or permits both. Deletion should be a separate, explicit decision; absence from a file must not silently mean delete.
+
+Write a small field contract: column name, meaning, required status, example, allowed values, and update behavior. For example, `customer_ref` identifies a customer within the importing company, `name` is required, and `status` accepts only `active` or `inactive`. State that references such as `00042` remain text and keep their leading zeros. Choose an unambiguous date format if dates are included; do not guess the meaning of `03/04/2026`.
+
+Agree supported encoding, delimiter, headers, and limits for file size, parsed records, and field length. A CSV field can contain a quoted comma or even a newline; quotation marks inside quoted fields can be doubled. The informational [RFC 4180 description of CSV](https://www.rfc-editor.org/rfc/rfc4180.html) documents these cases. It does not mean every application's CSV dialect is identical. Ask for a downloadable template and examples your importer actually accepts, and count **parsed data records**, excluding the header, rather than physical text lines.
+
+For updates, decide separately what an omitted column, an empty cell, and an explicit instruction to clear a value mean. These choices vary by product. For example, with Shopify's product overwrite option, a blank included non-required column can clear a value, while an omitted non-required column preserves it, subject to documented dependencies. See [Shopify's product CSV overwrite rules](https://help.shopify.com/en/manual/products/import-export/using-csv). For our proposed customer importer, an omitted optional column preserves the existing value; an empty optional value also preserves it. Clearing values is excluded from this first release. Put that rule beside the template.
+
+## Make the preview describe the actual operation
+
+For each parsed record, show its source record number, business reference, proposed action, and any field-level reasons it cannot proceed. Label the counts “proposed” until the save has completed. A valid file is not evidence that its changes have been saved.
+
+Use the business reference to match an existing record within the current company; do not use a name as a unique identifier. Decide what happens when a reference appears twice in one file. Our recommended first-release rule is to reject every row in that duplicate group and explain the conflict, rather than silently choosing a winner. The preview should make changed fields visible without exposing another company's records.
+
+Permissions apply to the import route as well as ordinary edit screens. A user who cannot change a customer's status manually should not gain that ability by uploading a spreadsheet. Agree who can upload, preview, confirm, see reports, and retrieve retained files. Our [permissions matrix guide](/blog/user-permissions-matrix/) helps record those decisions.
+
+Also ask what happens if a colleague edits a customer between preview and confirmation. Our proposed behavior is to recheck permissions and the affected record versions at confirmation; if the preview is stale, save nothing and require a refreshed preview. That avoids approving one set of changes and saving a different set. This is a requirement to implement and test, not a capability every import product already provides.
+
+## Choose what an error is allowed to save
+
+There are two useful starting policies:
+
+- **Whole-batch acceptance:** any invalid row prevents the entire batch from saving. This fits a batch whose rows must be accepted together, provided the chosen system can enforce that behavior.
+- **Partial acceptance:** valid rows may save after explicit confirmation, while rejected rows remain unchanged. This can suit independent customer updates when staff can reconcile and correct the remainder.
+
+For partial acceptance, decide whether a row is indivisible. In this article's example, one invalid field rejects the entire row, so none of that row's other changes save. Do not assume that is how an existing platform behaves. [HubSpot's import error documentation](https://knowledge.hubspot.com/import-and-export/troubleshoot-import-errors) distinguishes errors that prevent a record import from errors where a record imports without particular values or associations. Ask a supplier to demonstrate the exact policy you are buying.
+
+Keep validation errors separate from execution failures. A database or service failure during saving is a different event from a preview rejecting an invalid status. Our example requires the approved valid subset to save together or remain unsaved on an execution failure. If your chosen platform instead commits chunks, its report must expose completed and unresolved chunks and provide a safe recovery process. Do not call that whole-batch acceptance.
+
+## Work through twelve customer records
+
+Assume a fictional service business has **20 customer records** before the upload. It submits **12 parsed data records**, plus one header. Each has a distinct reference within that company. The existing twenty include C201–C204 and exclude C101–C108. No other user changes records during the example, no rows are deleted, and no notifications or external actions are triggered. All counts and identifiers are invented for this planning exercise.
+
+The business chooses partial acceptance with whole-row rejection. The initial preview is below. On small screens, scroll the table sideways to read all columns; keyboard users can focus it and use the arrow keys.
+
+<table tabIndex="0" aria-label="Fictional customer import preview before confirmation">
+  <thead>
+    <tr>
+      <th scope="col">Proposed outcome</th>
+      <th scope="col">Data records</th>
+      <th scope="col">References and reason</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Create</th>
+      <td>7</td>
+      <td>C101–C107: new references with valid required fields.</td>
+    </tr>
+    <tr>
+      <th scope="row">Update</th>
+      <td>3</td>
+      <td>C201–C203: existing references with valid changes.</td>
+    </tr>
+    <tr>
+      <th scope="row">Reject whole row</th>
+      <td>2</td>
+      <td>C108: missing required name. C204: existing customer with an invalid status.</td>
+    </tr>
+  </tbody>
+</table>
+
+The preview accounts for **7 + 3 + 2 = 12** submitted data records. After the manager explicitly confirms the valid subset and saving succeeds, the report shows **7 created, 3 updated, and 2 rejected**. Ten submitted rows caused writes, but only seven added customers: **20 + 7 = 27 customer records**. C204's existing name and status remain unchanged, even if its uploaded name was valid.
+
+The manager downloads the rejected-row report, fixes C108's name and C204's status, and submits **only those two corrected records as a new batch**. A fresh preview shows one creation and one update. After confirmation, there are **27 + 1 = 28 customers**. Across the two batches, the twelve original customer rows have resulted in **eight creations and four updates**; the final count also reconciles as **20 + 8 = 28**. Updating an existing customer never adds another customer in this example.
+
+Keep both reports. The second does not erase the first batch's rejection history. The manager should be able to trace each corrected row back to its earlier result. These counts show how the proposed rules work; matching counts alone do not establish that every saved field is correct. Check the actual values and company ownership as well.
+
+## Distinguish a retry from a new import
+
+Suppose the browser loses its connection after confirmation. Staff should first look up the saved batch reference and its status. Repeating the same confirmation for that batch should return its existing result without applying changes again. If it is still processing, show that state; if its outcome is unresolved, make that uncertainty visible and provide a support route.
+
+That repeat-confirmation rule is different from uploading the original file as a **new** batch. Even if matching references prevent duplicate customers, an old file can overwrite edits made since the earlier import. In our example, correcting only the two rejected records limits the new operation; the refreshed preview still needs to check their current values. Specify any protection against re-uploading an already completed file, and avoid promising that identical bytes always represent an accidental duplicate.
+
+Ask whether imported changes trigger emails, invoices, jobs, or other integrations. If they do, the scope includes making those downstream actions safe to retry and reconciling them separately. Our [workflow automation checklist](/blog/workflow-automation-checklist/) covers that additional problem. The twelve-record example deliberately excludes those actions.
+
+Decide how mistaken changes are repaired. Removing newly created records and restoring earlier values on existing records are different operations. HubSpot explicitly notes that deleting imported records does not reverse updates to existing records; see its [past-import management guidance](https://knowledge.hubspot.com/import-and-export/view-and-analyze-previous-imports). Ask for before/after evidence and an agreed correction process, including how later legitimate edits are protected. Do not assume a “Delete import” button is an undo operation.
+
+## Include the file and error report in acceptance testing
+
+An import is also a file-handling feature. Ask for server-enforced authorization, size limits, file validation, and controlled storage and retention. A `.csv` filename or browser-supplied content type is insufficient evidence by itself. [OWASP's file upload guidance](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html) recommends layered checks and storage outside the webroot or on a separate host. Have the supplier explain the controls appropriate to the actual architecture; this checklist is not a security certification.
+
+The rejected-row report needs its own review. If a customer-controlled name is exported and then opened in a spreadsheet, spreadsheet software may interpret it as a formula. CSV quoting alone does not solve that problem. [OWASP's CSV injection guidance](https://owasp.org/www-community/attacks/CSV_Injection) explains the risk and the limitations of different mitigations. Ask for testing in the spreadsheet applications your team uses, with an agreed safe export approach; do not prescribe one universal prefix for every consumer. Keep an untouched source reference under controlled access when export transformations affect correction or audit work.
+
+Before sign-off, have the supplier demonstrate:
+
+- A normal upload, cancelled preview with no writes, confirmation, and a report whose outcomes account for every parsed record.
+- A quoted comma, an embedded newline, leading-zero references, unexpected headers, empty cells, and files at and above the agreed limits.
+- A duplicate reference within the file, an unauthorized field change, and an attempted reference match outside the importing company.
+- The agreed error policy, including whether a row with one invalid field changes anything at all.
+- An intervening edit or revoked permission after preview, a lost connection during confirmation, and the same confirmation requested twice.
+- A corrected-only batch, the original file submitted again as a new batch, an execution failure, and a report containing formula-like test text handled safely by the supported spreadsheet software.
+
+Use fictional records in a test environment, and record the build, inputs, expected result, actual result, and evidence. Include keyboard use, understandable errors, and progress or completion announcements in the interface checks. Tie the demonstration to your [user acceptance testing decision](/blog/user-acceptance-testing-checklist/).
+
+## Take a small import contract to your supplier
+
+Start with one record type and one operating task. An existing platform's importer may already be enough if its matching, update, and error rules fit your business. Compare those rules before commissioning a custom replacement.
+
+{/* prettier-ignore */}
+<p><a href="/downloads/csv-import-requirements.txt" download>Download the CSV import requirements worksheet</a> to record the field contract, preview, acceptance policy, repeat behavior, report, and demonstrations. It is an editable plain-text brief that works without JavaScript; this page does not process or validate uploaded files.</p>
+
+Bring a fictional sample file and the completed worksheet to your supplier. Ask them to show the proposed before/after result, price the missing behavior, and name any policy their platform cannot support. Techsouq's web application and custom software work can turn that agreed import contract into a usable workflow, with correction and support included in scope.
+
+## Sources and further reading
+
+Sources checked **14 November 2026**. Product documentation supports the named products' behavior; the customer importer, policies, identifiers, counts, and worksheet are our original illustrative requirements.
+
+- [RFC 4180: common CSV format](https://www.rfc-editor.org/rfc/rfc4180.html) — informational description of quoting, fields, headers, and records.
+- [Shopify: using product CSV files](https://help.shopify.com/en/manual/products/import-export/using-csv) — overwrite behavior for blank and omitted columns.
+- [HubSpot: troubleshoot import errors](https://knowledge.hubspot.com/import-and-export/troubleshoot-import-errors) — record, property, and association error distinctions.
+- [HubSpot: view and analyze past imports](https://knowledge.hubspot.com/import-and-export/view-and-analyze-previous-imports) — reports and limits of deleting imported records.
+- [OWASP: file upload cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html) — layered validation, authorization, limits, and storage.
+- [OWASP: CSV injection](https://owasp.org/www-community/attacks/CSV_Injection) — spreadsheet formula risks and mitigation limits.

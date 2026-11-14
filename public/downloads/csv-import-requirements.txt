@@ -1,0 +1,86 @@
+CSV IMPORT REQUIREMENTS WORKSHEET — TECHSOUQ
+Companion: https://www.techsouqhq.com/blog/csv-import-requirements/
+
+A manual supplier brief, not an automated file validator. Use fictional samples in an approved test environment. Keep real customer files in controlled systems.
+
+BUSINESS TASK AND SCOPE
+Business owner:
+Supplier and support owner:
+Record type and importing company boundary:
+Who may upload / preview / confirm / see reports:
+Create, update, or both:
+Deletion policy:
+Downstream actions (email, invoices, jobs) and whether excluded:
+
+FILE CONTRACT
+Encoding, delimiter, header, quoting rules:
+Maximum bytes / parsed data records (header excluded) / field length:
+Template and fictional valid/invalid sample locations:
+For each field, record name / meaning / type / required / allowed values / example:
+Dates and time zones:
+Leading-zero identifiers preserved as text:
+Matching reference and uniqueness within company:
+Duplicate-reference policy within the file:
+Omitted-column behavior:
+Empty-cell behavior:
+Explicit-clear behavior (or excluded):
+
+PREVIEW AND SAVE
+Per-record reference, source record number, proposed action, changed values, errors:
+Whole-batch or partial acceptance:
+If partial, whole-row or field-level rejection:
+Confirmation wording and proposed create/update/reject counts:
+Permission and record-version rechecks after preview:
+Stale-preview behavior:
+Execution failure: approved subset saved together, or documented chunk recovery:
+Cancel before confirmation: evidence no changes occurred:
+
+RESULTS, CORRECTIONS, AND REPEATS
+Saved batch reference and discoverable status:
+Report: submitted records / created / updated / rejected / any other outcomes:
+Per-record saved outcome, error reasons, and evidence location:
+How totals account for every parsed data record:
+Same batch confirmation requested twice:
+Lost connection / still processing / unresolved outcome and support route:
+Corrected-only records submitted as a new batch:
+How correction links to original report:
+Original whole file submitted again as a NEW batch:
+Protection against overwriting intervening changes:
+Repairing creations versus restoring updates, with later edits protected:
+
+FILE AND REPORT HANDLING
+Server authorization, limits, file checks, controlled storage:
+Source file / report access and retention:
+Error report format and supported spreadsheet applications:
+Formula-like untrusted text handled safely in those applications:
+Controlled original-source reference when exporting transformed values:
+
+DEMONSTRATIONS
+For every case record build / input / expected / actual / evidence / pass-fail-not checked / owner / date.
+Normal preview, cancel, confirmation and row report:
+Quoted commas and embedded newlines:
+Leading zeros, ambiguous dates, unexpected headers and empty cells:
+At-limit and above-limit inputs:
+Duplicate references, unauthorized fields and another company's reference:
+One invalid field and the agreed whole-row/field-level behavior:
+Intervening edit or revoked permission after preview:
+Lost connection and repeated confirmation:
+Corrected-only new batch and entire original file as new batch:
+Execution failure and safe recovery:
+Formula-like exported test text in supported spreadsheet software:
+Keyboard operation, errors and progress/completion announcements:
+
+ILLUSTRATIVE RECONCILIATION (NOT A PRODUCT GUARANTEE)
+Initially 20 customers. File has 12 data records plus a header.
+Preview: 7 creates (C101-C107), 3 updates (C201-C203), 2 rejected rows (C108 missing name; C204 invalid status).
+Partial acceptance confirmed: 7 created + 3 updated + 2 rejected = 12 accounted for.
+Customer total: 20 + 7 = 27; rejected existing row C204 unchanged in all fields.
+Corrected-only new batch: C108 created, C204 updated. Total: 27 + 1 = 28.
+Across batches: 8 creations + 4 updates cover the original twelve rows; 20 + 8 = 28 customers.
+Assume no deletions, concurrent edits or downstream actions; saves succeed after confirmation. Real saved values and ownership still need checking.
+
+DECISION
+Blockers and named owners:
+Agreed implementation scope and exclusions:
+Approve / hold / correct:
+Decision maker and date:
