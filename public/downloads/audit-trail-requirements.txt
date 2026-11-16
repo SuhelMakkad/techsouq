@@ -1,0 +1,77 @@
+TECHSOUQ — AUDIT TRAIL REQUIREMENTS WORKSHEET
+Companion: https://www.techsouqhq.com/blog/audit-trail-requirements/
+Planning aid; not a security certification or regulatory assessment.
+
+1. BUSINESS QUESTION AND SCOPE
+Workflow / record type:
+Owner and reviewer:
+Three questions the history must answer:
+Initial state and supported actions:
+Routes in scope (screens, API, imports, support tools, jobs):
+Explicit exclusions:
+
+2. EVENT CONTRACT — REPEAT FOR EACH ACTION
+Action:
+Possible committed, denied, failed, or uncertain outcomes:
+Company / record / submitted version references:
+Stable event ID and operation reference:
+Human, service, or delegated actor identity and resolution policy:
+Time source / time zone / event versus collection time / ordering:
+Required before-and-after fields:
+Reason code / bounded reason text:
+Document versions and retrieval throughout retention:
+Fields excluded, masked, or restricted (no credentials or secrets):
+Current state versus historical decision interpretation:
+
+3. SAVE, FAILURE, AND CORRECTION RULES
+When may the UI acknowledge completion?
+How are the business change and durable event kept consistent?
+What happens if audit storage fails?
+What happens if reporting delivery fails after local save?
+How are missing events / pending delivery detected?
+Named alert recipient, response and escalation:
+How does retry recover an already committed result?
+Which attempts count as distinct events, and which as one decision?
+Who may reopen, reverse, or correct; required reason and linked event:
+How do non-screen routes preserve history?
+
+4. ACCESS AND PROTECTION
+Who may view which record histories and which fields?
+Who may search across records and export?
+Direct event-ID / company-boundary checks:
+Application and support administrators' powers:
+Database and hosting administrators' powers:
+Protection and evidence of unauthorized change or deletion:
+Actor identity handling after rename, deactivation, or deletion:
+
+5. RETENTION, SEARCH, AND EXPORT
+Event categories and retention rationale (confirm with advisers):
+Referenced-evidence retention and retrieval:
+Default search window versus total available history:
+Archive location and retrieval owner:
+Approved deletion procedure / exceptions:
+Filters, range boundaries and time zone:
+Export fields, versions, filters shown, row limits and pagination:
+How completeness is demonstrated:
+Access, storage and retention of downloaded copies:
+
+6. DEMONSTRATION RECORD
+Build / environment / date:
+Fictional input and initial state:
+Expected events, outcomes and final state:
+Actual results and evidence links:
+Checks: denied action, reopen, revised version, correction, actor rename, restricted access, storage failure, reporting failure, lost response/retry, non-screen change, older event, complete multi-page export, keyboard use.
+Unresolved issues / owner / decision before release:
+
+PR42 REFERENCE TRACE FROM THE ARTICLE
+Existing draft v1 USD 1,200; creation outside trace. UTC, 16 November 2026.
+E01 09:00 Lee submits v1: committed, awaiting approval.
+E02 09:01 Lee self-approval attempt: denied, unchanged.
+E03 09:05 Maya approves v1 USD 1,200: committed, approved.
+E04 09:10 Maya reopens v1: committed, draft, no current approval; reason supplier quote changed.
+E05 09:12 Lee edits USD 1,200 to USD 1,350: committed, draft v2.
+E06 09:15 Lee submits v2: committed, awaiting approval.
+E07 09:20 Maya approves v2 USD 1,350: committed, approved.
+7 actions = 6 committed changes + 1 denied attempt.
+2 successful approval events; 1 current approval (v2 USD 1,350).
+USD 150 requested increase; no purchase/payment/spending inferred.

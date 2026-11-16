@@ -1,0 +1,201 @@
+---
+title: 'Audit Trail Requirements: Reconstruct a Business Decision'
+description: 'Specify an audit trail that explains approvals, revisions, and failed actions. Use a worked purchase request and a supplier worksheet before you build.'
+pubDate: 2026-11-16
+category: 'Business systems'
+heroImage: '../../assets/blog/audit-trail-requirements.svg'
+heroImageAlt: 'A request moves from requested to approved to reopened; its history preserves who acted, what changed, when it happened, and the outcome.'
+socialImage: '/images/blog/audit-trail-requirements.png'
+---
+
+Before asking a supplier to “add an audit log,” choose a business question the history must answer. For an approval system, that might be: **Who approved this version, what changed afterward, and is that approval still current?** A list saying “record updated” cannot answer it, even if every entry has a timestamp.
+
+Specify the events, the evidence each event carries, who may inspect it, and what happens when recording fails. Then ask the supplier to reconstruct one disputed decision from the history alone. That demonstration is more useful than checking whether the product has an Activity tab.
+
+This guide works through a fictional purchase request and gives you a supplier worksheet. It covers an internal business application's history, not accounting rules, electronic signatures, or certification against a security or regulatory standard. Your sector and contracts may require additional review.
+
+## Start with the decision you need to reconstruct
+
+Write three questions using a real workflow: who changed the agreed amount, which version received approval, and why the request returned to review. For a customer portal, your questions might instead concern who released a document or changed a delivery address.
+
+Separate the evidence you need from the product feature's name. A current record shows today's state. A version history may preserve earlier content. A decision history connects the action to the person, the version, the result, and any required reason. Ask what each available feature actually records.
+
+Hosting logs are a different source of evidence. For example, [AWS CloudTrail event history](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/view-cloudtrail-events.html) covers the past 90 days of management events in an AWS Region. That documented scope does not establish that your custom application's purchase approvals are recorded. Our recommendation is to demonstrate the business event itself, wherever the supplier stores its history.
+
+Choose the smallest complete journey that matters. Include submission, approval, refusal, reopening, revision, and final disposition where those actions exist. Decide whether reads, exports, permission changes, and administrative corrections need separate histories. Logging every screen visit is not a substitute for preserving the decision.
+
+## Agree what each event can explain
+
+Use a consistent event record, with detail chosen for the workflow. [OWASP's logging guidance](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#event-attributes) describes event attributes including time, actor, action, object, outcome, and an interaction identifier. The following is our proposed business brief, not a universal schema:
+
+<table tabIndex="0" aria-label="Proposed evidence fields for a purchase request audit trail">
+  <thead>
+    <tr>
+      <th scope="col">Evidence</th>
+      <th scope="col">Proposed requirement for a purchase request</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <th scope="row">Identity and scope</th>
+      <td>Stable event ID, company ID, request ID, and version being acted on.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Actor and route</th>
+      <td>Stable account or service ID; distinguish a person, automation, and administrator acting on another user's behalf.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Action and result</th>
+      <td>A named action such as approve or reopen, with committed, denied, or failed outcome and a useful reason code.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Relevant change</th>
+      <td>Previous and new status or amount; identify the exact submitted version and supporting document version.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Time and order</th>
+      <td>Server-recorded time with an explicit time zone; distinguish occurrence from collection time when delayed. Define ordering for events sharing a timestamp.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Connection</th>
+      <td>A request or operation reference that connects an attempt, its result, and any later processing.</td>
+    </tr>
+
+  </tbody>
+</table>
+
+Keep identifiers meaningful after someone changes their display name or leaves. Decide how authorized reviewers can resolve an account ID and what identity information may remain after account deletion. A named account records which account acted; it does not, by itself, prove who was physically using it.
+
+For approvals, specify the values being approved. A link to the latest quote can silently point at a different document later. Require a retained version or another agreed reference that lets a reviewer retrieve the approved evidence throughout the required retention period. If that evidence can expire earlier than the event, document the resulting limitation.
+
+Reasons should be narrow and useful: “reopened because supplier quote changed” explains an action. A free-text field containing a copied email thread can collect unrelated information. Decide which fields need before/after values and which need only a change marker or protected reference.
+
+## Work through a reopened purchase request
+
+Assume a fictional single-company office system. Request **PR42** already exists as a draft, version **v1**, for **USD 1,200**. Its creation is outside this trace. Lee is the requester; Maya is the designated approver. Requesters cannot approve their own requests. Maya may reopen an approved request, which removes its current approval. An amount edit after reopening creates v2; submission locks that version for review.
+
+These are illustrative business policies. No purchase order, supplier payment, tax, currency conversion, notification, or external integration is included. All seven actions below occur on 16 November 2026, and times are shown in **UTC**. The table abbreviates the event fields above; each row would also carry its company, request, and operation references.
+
+<table tabIndex="0" aria-label="Seven-event fictional PR42 approval and revision history, times in UTC">
+  <thead>
+    <tr>
+      <th scope="col">Event / time UTC</th>
+      <th scope="col">Actor and action</th>
+      <th scope="col">Recorded outcome</th>
+      <th scope="col">State after the action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <th scope="row">E01 / 09:00</th>
+      <td>Lee submits v1 at USD 1,200</td>
+      <td>Committed: draft → awaiting approval</td>
+      <td>Awaiting approval, v1</td>
+    </tr>
+
+    <tr>
+      <th scope="row">E02 / 09:01</th>
+      <td>Lee attempts to approve v1</td>
+      <td>Denied: requester cannot self-approve; no change</td>
+      <td>Awaiting approval, v1</td>
+    </tr>
+
+    <tr>
+      <th scope="row">E03 / 09:05</th>
+      <td>Maya approves v1 at USD 1,200</td>
+      <td>Committed: awaiting approval → approved</td>
+      <td>Approved, v1</td>
+    </tr>
+
+    <tr>
+      <th scope="row">E04 / 09:10</th>
+      <td>Maya reopens v1</td>
+      <td>Committed: approved → draft; reason: supplier quote changed</td>
+      <td>Draft, v1; no current approval</td>
+    </tr>
+
+    <tr>
+      <th scope="row">E05 / 09:12</th>
+      <td>Lee revises the amount</td>
+      <td>Committed: USD 1,200 → USD 1,350; creates v2</td>
+      <td>Draft, v2</td>
+    </tr>
+
+    <tr>
+      <th scope="row">E06 / 09:15</th>
+      <td>Lee submits v2 at USD 1,350</td>
+      <td>Committed: draft → awaiting approval</td>
+      <td>Awaiting approval, v2</td>
+    </tr>
+
+    <tr>
+      <th scope="row">E07 / 09:20</th>
+      <td>Maya approves v2 at USD 1,350</td>
+      <td>Committed: awaiting approval → approved</td>
+      <td>Approved, v2</td>
+    </tr>
+
+  </tbody>
+</table>
+
+There are **7 recorded actions: 6 committed changes and 1 denied attempt**. There are **2 successful approval events**, but only **1 current approval**, for v2 at USD 1,350. The amount increased by **USD 1,350 − USD 1,200 = USD 150**. That is a change in the requested amount, not evidence of money spent or saved.
+
+E03 remains part of the history after reopening. The interface must explain that its approval is historical; deleting E03 would hide a decision, while treating both approvals as current would misstate the record. E02 explains an attempted action and must not appear as a successful approval or a state change.
+
+A reader should be able to answer “Was USD 1,350 approved at 09:05?” with **no: E03 approved v1 at USD 1,200; v2 was approved at 09:20**. Test that question with the record screen, the history, and an exported report. On a narrow screen, the tables can be scrolled sideways; focus the table and use the arrow keys with a keyboard.
+
+## Define the awkward outcomes before launch
+
+A failed action and a missing history entry are different problems. Agree which outcome the user sees when the application rejects an action, encounters an error, or cannot determine whether a change completed. “Approve clicked” must not be presented as “approval committed.”
+
+For this example, propose that a successful approval is acknowledged only after both the business change and its durable audit event are saved. If an external reporting service is temporarily unavailable, the local event can remain saved while its delivery is pending. Ask the supplier to demonstrate how this policy is implemented and how gaps or delivery failures become visible. This is an application requirement, not a claim that every logging system should stop all business work when a collector is unavailable.
+
+If the response is lost after saving, a retry should recover the existing result under the agreed operation reference rather than create another approval. A history can contain multiple attempt records, but those must remain distinguishable from the one committed decision. Our [workflow automation checklist](/blog/workflow-automation-checklist/) explores this uncertainty in connected systems.
+
+Corrections need an explicit path too. Specify who can reverse a decision, what reason is required, and which earlier event the correction references. Keep the original decision visible to authorized reviewers. Ask what happens when someone changes a record through a bulk import, support tool, background job, or direct administrative maintenance; a complete screen history cannot simply assume those routes do not exist.
+
+## Protect the history and make it retrievable
+
+History is another place sensitive information can accumulate. [OWASP identifies passwords, access tokens, and sensitive personal or commercial data as information needing exclusion or special handling](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#data-to-exclude). Use an agreed allowlist of fields; avoid saving entire request bodies or attachments by default. Test both stored events and what the viewer or export reveals.
+
+Apply your [permissions matrix](/blog/user-permissions-matrix/) to the history itself. In our example, Lee may see PR42's business history, Maya may inspect requests she reviews, and a separately authorized reviewer may export the company's approval history. None of those permissions grants access to another company's records, security investigation logs, or hidden attachment contents. Require the same restrictions when someone requests an event directly by ID.
+
+An “append-only” label needs a boundary. Ask which application, support, database, and hosting administrators can alter or delete events; which controls restrict them; and what evidence would expose a change. [OWASP recommends protection against unauthorized access, modification, and deletion, as well as tamper detection](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#protection). A read-only interface alone does not establish those properties.
+
+Agree how long each event category and its referenced evidence remain available, where older history lives, and who owns retrieval and eventual deletion. Set periods from your business, contractual, and applicable legal needs with the responsible advisers. This guide proposes no universal number of months or years.
+
+A product's retention window and its default search window may differ. [GitHub's organization audit log documentation](https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/reviewing-the-audit-log-for-your-organization) describes events from the last 180 days, while its default view displays only the past three months. This is a scoped product example, not a retention recommendation. Ask your supplier to find an older event and export it using an explicit date range.
+
+Specify filters for company, record, actor, action, outcome, and time range. Define the export's time zone, included fields, version references, row limits, and pagination. A useful export states its filters and whether it is complete. Test that a report cannot quietly omit later pages or expose fields hidden in the history screen. Treat downloaded copies as controlled business records with their own access and retention decisions.
+
+## Turn the brief into a demonstration
+
+Ask the supplier to reproduce the seven-event trace in a test environment with fictional data. Record expected and actual outcomes alongside the tested build. Include these checks in your [user acceptance testing](/blog/user-acceptance-testing-checklist/):
+
+- Reconstruct the approved amount and version at both approval times, then identify the current approval without counting the denied attempt.
+- Change a display name, deactivate the requester, and confirm that the agreed actor references remain understandable to authorized reviewers.
+- Try a direct event link and an export as a person without permission; confirm neither reveals protected information.
+- Simulate audit storage failure and reporting delivery failure separately. Check the agreed acknowledgement, recovery evidence, and named alert recipient.
+- Lose the approval response, retry it, and show that the history distinguishes repeated attempts from one committed decision.
+- Reopen or correct a decision through every supported route, including administration and imports where present; preserve the earlier event and required reason.
+- Retrieve an event beyond the default view, export a multi-page range, and compare the complete report with the history. Test keyboard use, readable times, and access to version references.
+
+{/* prettier-ignore */}
+<p><a href="/downloads/audit-trail-requirements.txt" download>Download the audit trail requirements worksheet</a> and complete it for one workflow before requesting a quote. The editable plain-text file works without JavaScript. This page does not inspect your system or validate the completeness of its logs.</p>
+
+An existing platform may already preserve the events and evidence you need. Ask for this demonstration before commissioning a replacement. If important decisions still disappear between screens, Techsouq's web application and custom software work can turn the agreed history, permissions, and recovery behavior into part of the delivery scope.
+
+## Sources and further reading
+
+Sources checked **16 November 2026**. The PR42 policies, people, amounts, event sequence, acceptance checks, and worksheet are our original fictional example and proposed requirements. Named product documentation supports only the product behavior described.
+
+- [OWASP: Logging Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html) — event attributes, data exclusions, protection, and verification.
+- [AWS: working with CloudTrail event history](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/view-cloudtrail-events.html) — the scope of infrastructure management-event history.
+- [GitHub: reviewing your organization's audit log](https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-security-settings-for-your-organization/reviewing-the-audit-log-for-your-organization) — a concrete distinction between retention and default search views.
