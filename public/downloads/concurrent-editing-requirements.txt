@@ -1,0 +1,70 @@
+TECHSOUQ — CONCURRENT EDITING ACCEPTANCE WORKSHEET
+Companion: https://www.techsouqhq.com/blog/concurrent-editing-requirements/
+Example and proposed checks; adapt to your workflow. This file does not test software.
+Use a test environment with fictional data. No calculator or readiness score is implied.
+
+1. SCOPE
+Business workflow / record:
+Business owner / supplier:
+Test environment / application build / date / tester:
+Roles permitted to edit:
+Supported write routes (form, import, integration, admin, other):
+Chosen policy (later save wins / reject and review / editing reservation / other):
+Whole-record or field-level conflict boundary:
+Business rules that make fields depend on one another:
+Deliberate exceptions / authorized override role / evidence required:
+Out of scope:
+
+2. FICTIONAL Q17 REHEARSAL — REJECT AND REVIEW POLICY
+Draft quote Q17 has one line. Total = quantity x unit price.
+Assume no tax, discounts, shipping, rounding adjustments or currency conversion.
+No approval, customer send, payment or stock reservation takes place.
+Alex can edit quantity; Sam can edit unit price. For this rehearsal an authorized reviewer may combine these changes; there is no quantity-based pricing rule.
+Version labels below are illustrative names, not an API token specification.
+
+Step 1: Both independently open v7: 12 units x USD 50 = USD 600.
+Step 2: Alex saves 15 units against v7 -> v8: 15 x USD 50 = USD 750.
+Step 3: Sam tries USD 45 using old v7 form -> reject; saved v8 stays USD 750. Keep Sam's USD 45 edit available for review; do not report it saved.
+Step 4: Sam reviews original 12 units, current 15 units, proposed USD 45. Sam explicitly retains 15 units and proposes USD 45. No save yet.
+Step 5: Sam saves reviewed values against v8, with no intervening change -> v9: 15 x USD 45 = USD 675.
+
+Expected: 3 save attempts = 2 accepted changes + 1 rejected stale attempt.
+Unsafe whole-form alternative: 12 x USD 45 = USD 540, losing Alex's change.
+USD 675 - USD 540 = USD 135 difference in draft totals; no revenue claim.
+
+Session identities / independent session setup:
+Independent verification route for saved values:
+Actual values after each step / evidence reference:
+Difference from expectation / issue owner:
+Retest build / result:
+
+3. CONFLICT RECOVERY DECISIONS
+Message that clearly distinguishes unsaved proposal from committed change:
+How original, saved and proposed values are compared:
+How unsaved work is preserved, and for how long:
+Behavior after reload / sign-out / closing tab:
+Who may discard, reconcile, or override an edit:
+Check on a second save after review:
+Behavior if record is deleted, approved, or permission changes:
+Keyboard controls / focus / announcements / non-color cues:
+If editing is reserved: expiry, abandoned-session release, old-session behavior:
+
+4. ADDITIONAL ACCEPTANCE CASES
+For EACH case record starting values, action order, expected/actual saved values, user message, unsaved-work behavior, evidence, owner, and retest result.
+[ ] Both people change the same field.
+[ ] Another change occurs during conflict review; check version again on save.
+[ ] First change comes through each supported import/integration/admin route.
+[ ] Record is deleted before the old form saves; no unintended recreation.
+[ ] Editing permission is removed before the old form saves.
+[ ] Record enters a state that no longer allows this edit.
+[ ] Editing reservation holder disconnects; expiry/release and old save tested.
+[ ] Keyboard reaches comparison and choices; conflict status announced.
+[ ] Reload behavior matches the promised unsaved-work boundary.
+[ ] Save response is lost; establish committed outcome before retrying.
+
+5. SEPARATE RULES AND RELEASE DECISION
+Cross-record constraints requiring additional tests (e.g. booking capacity):
+Duplicate request / side-effect handling requiring additional tests:
+History and recovery requirements:
+Unresolved policy decisions / owner / next action:
+Evidence accepted by business owner / date:

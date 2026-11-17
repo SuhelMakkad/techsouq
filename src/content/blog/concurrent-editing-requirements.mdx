@@ -1,0 +1,165 @@
+---
+title: 'Concurrent Editing: Test What Happens When Two People Save'
+description: 'Prevent silent overwrites in business software. Use a worked quote, a two-user acceptance test, and a worksheet to specify concurrent editing behavior.'
+pubDate: 2026-11-17
+category: 'Business systems'
+heroImage: '../../assets/blog/concurrent-editing-requirements.svg'
+heroImageAlt: 'Two people open quote version v7. Alex saves v8, Sam’s stale save is blocked, and Sam reviews the latest values before saving v9.'
+socialImage: '/images/blog/concurrent-editing-requirements.png'
+---
+
+Two people can have permission to edit a quote and still overwrite each other's work. One opens the record, another saves a change, and the first saves an older copy afterward. The screen may report success even though a valid change has disappeared.
+
+Before buying or commissioning business software, agree **what happens when someone saves a record that changed after they opened it**. For an important shared record, a useful starting requirement is: reject the stale save, keep the person's unsaved work available for review, and let them reconcile it with the latest record before trying again. The supplier should demonstrate the result with two independent sessions.
+
+This guide gives you a worked quote and a downloadable acceptance worksheet. It covers ordinary forms in a CRM, customer portal, or internal application. Live document coauthoring, offline synchronization design, inventory reservations, and payment processing need additional rules beyond this example.
+
+## Specify the conflict policy before the technology
+
+A **stale edit** is based on information that is no longer current. The users do not need to press Save at exactly the same time: a form left open through lunch can create the same problem. Developers call an unnoticed overwrite a **lost update**.
+
+Start with one record and ask whether the business can tolerate the later save replacing an earlier change. The answer may differ between a disposable personal note and a shared draft quote. Choose a policy deliberately:
+
+<table tabIndex="0" aria-label="Concurrent editing policies and supplier demonstration questions">
+  <thead>
+    <tr>
+      <th scope="col">Policy</th>
+      <th scope="col">What the business agrees</th>
+      <th scope="col">What to demonstrate</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <th scope="row">Later save wins</th>
+      <td>Accept that a conflicting earlier value may be replaced.</td>
+      <td>Exactly which fields the later request replaces, and whether users can discover and recover the lost value.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Reject and review</th>
+      <td>Let people edit, but block a save based on an outdated version.</td>
+      <td>Preserved unsaved edits, current values, an explicit review step, and another version check on the next save.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">One editor at a time</th>
+      <td>Reserve editing for one person for an agreed period.</td>
+      <td>What others see, expiry, abandoned sessions, and who can release a reservation without enabling a stale save.</td>
+    </tr>
+
+  </tbody>
+</table>
+
+These are planning choices, not claims that every platform offers every policy. For a concrete product example, [AppSheet documents a last-writer-wins strategy for conflicting row updates](https://support.google.com/appsheet/answer/10104702?hl=en). That describes its documented behavior, not the behavior of every spreadsheet, CRM, or application built on a database. Ask about the actual screen and save route you will use.
+
+Our worked example chooses reject and review. A whole-record version check is deliberately conservative: it can reject edits to different fields as well as the same field. That interruption may be preferable to quietly combining changes whose business meaning has not been reviewed.
+
+## Work through two edits to one quote
+
+Assume a fictional company editing **draft quote Q17**. The starting record is **v7**, with **12 units at USD 50 per unit**, a line total of **USD 600**. Alex may change quantity and Sam may change unit price. For this rehearsal, an authorized reviewer may combine those changes after checking both values; there is no quantity-based pricing rule.
+
+The quote has one line. Total means quantity multiplied by unit price, with no tax, discount, shipping, rounding adjustment, currency conversion, or other charges. Nothing is sent to a customer, approved, paid, or reserved. The people, amounts, version labels, and sequence are illustrative. Version labels are simple names for this example; a real system's version token need not be a sequential number.
+
+<table tabIndex="0" aria-label="Five-step fictional Q17 concurrent editing and conflict resolution trace">
+  <thead>
+    <tr>
+      <th scope="col">Step</th>
+      <th scope="col">Action</th>
+      <th scope="col">Expected saved record</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <th scope="row">1. Open</th>
+      <td>Alex and Sam independently open v7: 12 units at USD 50.</td>
+      <td>v7: 12 × USD 50 = USD 600.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">2. First save</th>
+      <td>Alex changes quantity to 15 and saves against v7.</td>
+      <td>v8: 15 × USD 50 = USD 750.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">3. Stale save</th>
+      <td>Sam changes price to USD 45 in the still-open v7 form and tries to save. The application rejects it.</td>
+      <td>Unchanged v8: 15 × USD 50 = USD 750. Sam's USD 45 edit remains available for review.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">4. Review</th>
+      <td>Sam compares the original 12 units, the current 15 units, and the proposed USD 45 price. Sam chooses to retain 15 units and apply USD 45.</td>
+      <td>Still v8: review alone saves nothing.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">5. Save again</th>
+      <td>Sam submits the reviewed values against v8; no intervening change occurs.</td>
+      <td>v9: 15 × USD 45 = USD 675.</td>
+    </tr>
+
+  </tbody>
+</table>
+
+There are **3 save attempts, 2 accepted changes, and 1 rejected stale attempt**. Step 3 creates no new saved version. The final reviewed total is **15 × USD 45 = USD 675**. If an unprotected whole-form save instead restored Sam's original quantity of 12 with the new price, it would produce **12 × USD 45 = USD 540** and lose Alex's quantity change. That is **USD 135 below the reviewed draft total**, not a measured loss of revenue.
+
+Saving only Sam's changed price field could preserve the quantity in this particular example. It does not settle what should happen when both people change price, or when price depends on quantity. A merge must follow an agreed business rule; “different fields” alone does not prove the combined record is valid. [Microsoft's EF Core concurrency guidance](https://learn.microsoft.com/en-us/ef/core/saving/concurrency#resolving-concurrency-conflicts) describes comparing original, proposed, and database values and leaving merge decisions to application logic. Our review step applies that distinction to a supplier demonstration.
+
+On narrow screens, focus either table and use the arrow keys to scroll sideways. All steps and calculations remain available without JavaScript.
+
+## Ask where the version check is enforced
+
+The supplier may call the approach **optimistic concurrency**: people can edit without reserving the record, but saving checks whether the record changed since it was read. The important behavior is that the version condition and the write succeed or fail together at the authoritative save point. Checking the version in the browser and then sending an unconditional save leaves another opportunity for a change between those actions.
+
+[Microsoft's EF Core documentation shows a version condition included in the database update itself](https://learn.microsoft.com/en-us/ef/core/saving/concurrency#optimistic-concurrency). When the stored version differs, the update affects no matching row and the application must handle the conflict. This is one implementation example, not a requirement to use Microsoft's software.
+
+For an HTTP API, a supplier may use an entity tag, or **ETag**, with an **If-Match** request condition. [The HTTP standard defines If-Match as a way to prevent accidental overwrites](https://www.rfc-editor.org/rfc/rfc9110.html#section-13.1.1). A failed condition can produce **412 Precondition Failed**. Ask the supplier to translate that result into a useful message; the founder should not have to interpret an HTTP error to rescue an edit. The standard does not provide the review screen or choose your merge policy.
+
+Require the policy on every supported update route: the form, a second browser tab, an administrative tool, imports, and integrations where present. Name any deliberate exceptions and restrict who can use them. A warning that another person is viewing a record helps coordination, but the acceptance test still needs to prove what the save actually enforces. Permissions answer who may edit; the version condition answers whether this edit is still based on the agreed record.
+
+## Make recovery useful to the person editing
+
+Specify the conflict message as part of the workflow. For Q17, proposed wording is: **“This quote changed while you were editing. Your price change has not been saved. Review the current quote before saving again.”** Pair it with the preserved USD 45 entry and the current quantity of 15. Make status and comparison information readable with a keyboard and assistive technology, without relying on color alone.
+
+Show the original value, current saved value, and proposed value where they differ. Let the person discard their edit or explicitly prepare a revised submission. Do not silently fetch a fresh token and resend the same stale whole form: that can turn a blocked overwrite into an accepted one. If another change arrives during review, the next save must detect that conflict too.
+
+Agree how long unsaved work survives. Keeping it while the conflict screen is open does not promise recovery after closing the tab, signing out, or losing the device. If drafts persist, decide their access, expiry, and deletion behavior separately. Avoid asking staff to paste real customer records into an external troubleshooting tool.
+
+A deleted record needs a different explanation from a changed one. The application should follow an agreed policy rather than silently recreate it from a stale form. Changed permissions, a record entering an approved state, and validation failures also need their own outcomes; resolving a version conflict must not bypass those checks.
+
+History remains useful for investigation, but restoring a lost value afterward is a separate capability from preventing the overwrite. Our [audit trail requirements guide](/blog/audit-trail-requirements/) explains how to preserve the evidence of a business decision.
+
+## Run a two-session acceptance test
+
+Use a test environment and fictional data. Start two independent signed-in sessions with the intended roles; two windows sharing one live editing state may not reproduce an old form. Record the application build, record ID, starting values, and the exact save order. Refresh a third view or retrieve the record through an agreed independent route after each attempt to verify saved values, rather than trusting a success banner.
+
+Run the five-step Q17 sequence, then extend it:
+
+- **Same field:** have both people change the unit price. The later stale attempt must follow the chosen conflict policy; no automatic addition or averaging is implied.
+- **Second conflict:** change the record again while Sam is reviewing. Sam's next save must be checked against the version reviewed, and rejected if it is stale again.
+- **Other writer:** make the first change through each supported import, integration, or administrative route, then save the older form. Record any scoped exception explicitly.
+- **Deletion or access change:** delete the record or remove edit permission before the old form saves. Confirm the agreed message, no unauthorized write, and no unintended recreation.
+- **Abandoned editing reservation:** if using one-editor-at-a-time behavior, disconnect the holder and test expiry and release. Then try to save from that holder's old session.
+- **Keyboard and reload:** reach the comparison and decisions using a keyboard, confirm the message is announced appropriately, and check the promised boundary for unsaved work after reload.
+
+A timeout after pressing Save is a different uncertainty: the change might already have committed. Agree how the application establishes the outcome before retrying. The [workflow automation checklist](/blog/workflow-automation-checklist/) covers that problem; a version check by itself does not guarantee that repeated requests cannot repeat side effects.
+
+One-record conflict protection also does not establish a rule across multiple records. Two separately valid bookings could together exceed shared capacity. If that matters, include a separate simultaneous-booking test with the relevant capacity rule. This article does not specify a reservation engine.
+
+## Take the result into your software brief
+
+{/* prettier-ignore */}
+<p><a href="/downloads/concurrent-editing-requirements.txt" download>Download the concurrent editing acceptance worksheet</a> and complete it for one important record. The plain-text file includes the Q17 rehearsal, expected totals, conflict decisions, and space for actual evidence. It works without JavaScript; this page does not connect to or test your software.</p>
+
+Ask your existing supplier to demonstrate the chosen policy before planning a replacement. A satisfactory native feature may already cover the workflow. If a custom form or integration is needed, include conflict handling and recovery in the quote and in [user acceptance testing](/blog/user-acceptance-testing-checklist/). Techsouq's [web application and custom software services](/#services) can turn those observable outcomes into delivery scope.
+
+## Sources and further reading
+
+Sources checked **17 November 2026**. The Q17 scenario, amounts, version labels, message, policy recommendations, acceptance checks, and worksheet are our original example. Product documentation supports the specific behavior attributed to that product; it does not certify your application's implementation.
+
+- [IETF: HTTP Semantics, section 13.1.1](https://www.rfc-editor.org/rfc/rfc9110.html#section-13.1.1) — conditional writes using If-Match and failed preconditions.
+- [Microsoft: handling concurrency conflicts in EF Core](https://learn.microsoft.com/en-us/ef/core/saving/concurrency) — enforcing version conditions and comparing values during conflict resolution.
+- [Google: concurrent usage with multiple AppSheet users](https://support.google.com/appsheet/answer/10104702?hl=en) — a documented example of a last-writer-wins policy.
