@@ -1,0 +1,175 @@
+---
+title: 'Customer File Uploads: Define When a Document Is Ready'
+description: 'Specify customer file uploads with clear limits, checking states, private access, and recovery. Use a three-file example and a supplier acceptance worksheet.'
+pubDate: 2026-11-18
+category: 'Business systems'
+heroImage: '../../assets/blog/customer-file-upload-requirements.svg'
+heroImageAlt: 'Three files for fictional project P41: an 8 MB artwork file is available, a 2 MB brief is held after a delayed check, and a 12 MB logo exceeds the 10 MB per-file limit.'
+socialImage: '/images/blog/customer-file-upload-requirements.png'
+---
+
+A customer uploads the brief for a project. The progress bar reaches 100%, but staff cannot open the document. Is it still being checked, was it rejected, or did the upload disappear? A single “Upload successful” message leaves the customer and your team guessing.
+
+Before adding file uploads to a portal or business application, agree **when a received file becomes available, who may retrieve it, and what happens when a check cannot finish**. Ask the supplier to demonstrate each outcome with individual files and independent user sessions.
+
+This guide gives you a worked example and an acceptance worksheet for signed-in customers submitting project documents. It covers ordinary attachments, rather than bulk data imports, large video transfers, or specialist medical and financial records. Those uses need additional decisions about processing, infrastructure, and obligations.
+
+## Give receipt and availability separate meanings
+
+Start with a business rule: a document becomes available only after the application has received it completely, associated it with the correct project, and completed the checks required for that exact file. Availability lets an authorized person retrieve it; a separate business review decides whether its contents are suitable for the job.
+
+Use explicit states instead of one success flag. The labels below are our proposed vocabulary; the supplier can use different words if the distinctions remain visible.
+
+<table tabIndex="0" aria-label="Upload checkpoints and what each allows a customer or staff member to conclude">
+  <thead>
+    <tr>
+      <th scope="col">Checkpoint</th>
+      <th scope="col">What it establishes</th>
+      <th scope="col">What the person should see</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <th scope="row">Selected or transferring</th>
+      <td>The browser has a file or is sending it. Durable receipt is still unconfirmed.</td>
+      <td>The filename, progress where available, and an interruption or cancellation outcome.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Received, checking</th>
+      <td>The complete file is recorded against the project and awaits required checks.</td>
+      <td>A receipt reference and a pending state. Ordinary preview, download, and downstream use remain blocked.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Check delayed</th>
+      <td>A check has failed to complete; there is no passing result.</td>
+      <td>A held state, an owner for investigation, and a next action. No automatic release.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Available</th>
+      <td>The required checks passed for this stored file version.</td>
+      <td>A working retrieval action for permitted users. Business approval is still separate.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Rejected</th>
+      <td>The file cannot be accepted under the agreed rule.</td>
+      <td>A specific explanation and a useful correction, without marking other files as failed.</td>
+    </tr>
+
+  </tbody>
+</table>
+
+[Microsoft's ASP.NET Core upload guidance describes holding files in quarantine while a background scanner checks them](https://learn.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-10.0#content-validation), alongside a record of scanning status. That is a concrete implementation example for separating receipt from release. It does not require your supplier to use Microsoft's framework or prescribe your customer-facing labels.
+
+Agree which checks apply before anyone opens a preview, an email attachment is sent, or another system processes the content. A passing scan is a screening result, not a guarantee that every threat has been detected or that the customer sent the correct document.
+
+## Specify the smallest useful upload contract
+
+Name the documents you actually need: a project brief, artwork, or evidence for a service request. Then define supported formats, nonempty-file rules, the maximum bytes per file, the number of files, and any combined request or project quota. Define whether the maximum is inclusive. “10 MB” alone leaves room for different byte limits and boundary behavior.
+
+Give customers those rules before they choose a file. The browser's file picker can guide selection, but [MDN explains that the HTML accept attribute does not validate file types and needs server-side validation](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file#limiting_accepted_file_types). Ask what the server enforces when the browser's hints are bypassed.
+
+[OWASP recommends layered upload controls](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html#file-upload-protection), including allowed extensions, file-type checks, size limits, generated storage names, and controlled storage and access. It warns against trusting the supplied Content-Type header or relying on a single check. Ask the developer to explain the controls chosen for your formats and workflow; a filename ending in .pdf is insufficient evidence on its own.
+
+Keep a customer-readable filename, but give each stored attachment its own identity. Our recommended contract is that uploading another brief.pdf creates a separate attachment or an explicit replacement version. It must not silently overwrite a different customer's file or inherit a previous version's passing check. If replacement is supported, agree whether the previous available version stays accessible while its replacement is checked, and make the version being opened clear.
+
+## Work through three files for one project
+
+Assume a fictional design business receiving documents for **project P41**. Its illustrative policy accepts PDF, JPEG, and PNG files that are nonempty and **at most 10,000,000 bytes per file**. Here, **1 MB means 1,000,000 bytes**, so the inclusive maximum is 10 MB. This is an example policy, not a recommended limit for every business.
+
+Each file uses an independent upload request. The project's file-count and storage quotas have room for all three; no combined request limit is involved. Both PDFs pass the format and size rules. The first finishes all required screening successfully, while the second has a scanner timeout. The JPEG is rejected for size before any durable original is retained. No replacement, compression, or conversion occurs.
+
+<table tabIndex="0" aria-label="Fictional project P41 files, stored amounts, and availability at the end of the first attempt">
+  <thead>
+    <tr>
+      <th scope="col">File offered</th>
+      <th scope="col">Outcome at this snapshot</th>
+      <th scope="col">Retained original payload</th>
+      <th scope="col">Available to authorized staff</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <th scope="row">artwork.pdf · 8 MB</th>
+      <td>Received and required checks passed.</td>
+      <td>8 MB</td>
+      <td>Yes: 8 MB, with its file reference.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">brief.pdf · 2 MB</th>
+      <td>Received, but the scanner timed out. Held as Check delayed.</td>
+      <td>2 MB</td>
+      <td>No. Metadata can show the delay; the file remains inaccessible.</td>
+    </tr>
+
+    <tr>
+      <th scope="row">logo.jpg · 12 MB</th>
+      <td>Rejected for exceeding the 10 MB per-file maximum.</td>
+      <td>0 MB</td>
+      <td>No. The customer needs a smaller supported file.</td>
+    </tr>
+
+  </tbody>
+</table>
+
+At this point, **3 files offered = 1 available + 1 held + 1 rejected**. Offered payload is **8 + 2 + 12 = 22 MB**. Retained original payload is **8 + 2 = 10 MB**, of which **8 MB is available**. These figures exclude temporary buffers, logs, backups, replicas, and metadata. They describe this fictional snapshot, not network traffic, storage billing, or a performance benchmark.
+
+The customer sees three distinct outcomes. Suggested wording for brief.pdf is **“File received. Checking is delayed; your file is not available yet. Contact the project team with reference F2 if you need help.”** The team can find F2 in a held-files queue. The example reference is illustrative; it does not grant access to the document.
+
+The project owner decides whether work can start with the available artwork. If the brief is required, the project remains waiting for that document. Neither “two files received” nor “one file available” means all project inputs are ready. A later successful check of the same F2 file would make 2 files and 10 MB available; the 12 MB logo would still be rejected.
+
+On narrow screens, focus either table and use the arrow keys to scroll sideways. The full example and worksheet work without JavaScript.
+
+## Make recovery specific to the failed step
+
+A timeout needs a different response from an unsupported format or an oversized file. [The GOV.UK Design System gives separate file-upload error patterns for size, type, empty files, and failed uploads](https://design-system.service.gov.uk/components/file-upload/#error-messages). Its guidance is for government teams; the useful design lesson here is to name the actual problem and the correction your customer can make.
+
+For P41, the team investigates brief.pdf and retries its check through an authorized support action. The customer does not need to upload it again merely because screening is delayed. Agree who owns held files, how they learn of the problem, what happens after repeated failures, and how long held content can remain before cleanup. Avoid an undocumented “release anyway” button.
+
+An interrupted transfer is different. If receipt is uncertain, the application should look up the upload attempt before creating another attachment. If no complete file exists, ask the customer to retry that file and preserve other completed uploads. Specify cancellation, partial-file cleanup, and whether resuming is supported. Our [workflow automation guide](/blog/workflow-automation-checklist/) explains the wider distinction between a failed operation and an unknown outcome.
+
+Keep feedback usable with a keyboard and assistive technology: file selection must not require dragging, each file needs a readable status, and errors should identify the affected control. For updates shown without moving focus, [W3C's status-message guidance explains how assistive technology can be informed of progress, waiting states, and results](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html). Ask for a demonstration of those states, including the delayed check.
+
+## Test the file's access and lifecycle
+
+Agree access for the uploader, colleagues in the same customer account, your project staff, and support. Use the [permissions matrix method](/blog/user-permissions-matrix/) to specify each action. For this example, ordinary users cannot preview or download held content; authorized support can investigate its status and retry checks without opening it.
+
+Test the actual download route with a second customer account and a signed-out session, not just the visibility of the button. Include thumbnails, preview services, exports, and notifications if present. For private documents, a hidden button or a difficult-to-guess address is insufficient as the access policy. Ask the supplier how copied links and any time-limited download links behave after sharing, expiry, or access removal, and record the actual limits.
+
+Decide what deletion means for the attachment record, original file, derived previews, and later recovery from backups. Agree cleanup of abandoned partial uploads and rejected or expired held content. Set retention with the appropriate business or legal owner; this article supplies no universal retention period. The upload worksheet is a planning aid, not a security certification or a complete regulatory assessment.
+
+An existing managed document service may already meet these needs. Ask it to demonstrate the same journey before commissioning a custom feature. If large files, unreliable connections, public submissions, or automated document extraction are central to the service, expand the brief and test those paths separately.
+
+## Take a three-file rehearsal to your supplier
+
+Use fictional documents in a test environment. Record the application build, project and file references, actors, policy, and observed result. Have the supplier reproduce P41, including a safely simulated scanner timeout, then verify saved status and retrieval from an independent staff session. An on-screen banner alone does not prove the stored file's state.
+
+Extend the rehearsal with these cases:
+
+- **Boundaries:** test empty files, exactly 10,000,000 bytes, and 10,000,001 bytes under the example policy. Other required checks still apply to a file at the size limit.
+- **Misleading format:** use supplier-prepared harmless test files to check that changing a filename does not bypass validation. For scanner rejection, use an approved harmless test fixture or a simulated result; never introduce live malware.
+- **Interrupted and uncertain receipt:** disconnect during transfer and after receipt but before acknowledgement. Confirm cleanup, lookup, and retry behavior without duplicating completed attachments.
+- **Delayed and stale results:** delay a check, then replace or remove the file. A late passing result must refer to the exact stored version checked and must not release a replacement or recreate a deleted attachment.
+- **Access and removal:** attempt direct retrieval as another customer, while signed out, and after permission removal. Check every supported retrieval path and record any documented link-expiry window.
+- **Mixed outcomes:** reject one file while another succeeds. Confirm per-file messages, preserved successful uploads, keyboard access, and a visible owner for the held file.
+
+{/* prettier-ignore */}
+<p><a href="/downloads/customer-file-upload-requirements.txt" download>Download the file-upload acceptance worksheet (.txt)</a> and replace the example policy with your own. It is a plain-text planning document; this article does not accept or scan your files.</p>
+
+Bring the completed worksheet into your [customer portal scope](/blog/customer-portal-mvp-scope/) and [acceptance review](/blog/user-acceptance-testing-checklist/). If you need help building that journey, Techsouq's [web application and custom software services](/#services) can turn the agreed outcomes into an implementation brief.
+
+## Sources and further reading
+
+Sources checked **18 November 2026**. P41, its filenames and references, sizes, arithmetic, messages, states, policy, and worksheet are our original illustrative example. The cited implementation guidance supports the specific principles described; it does not verify your supplier's application.
+
+- [MDN: file inputs and limiting accepted file types](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file#limiting_accepted_file_types) — selection hints and server-side validation.
+- [OWASP: File Upload Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html) — layered validation, file identity, storage, and access controls.
+- [Microsoft: upload content validation in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-10.0#content-validation) — an example of quarantine and recorded scanning status.
+- [GOV.UK Design System: file-upload errors](https://design-system.service.gov.uk/components/file-upload/#error-messages) — distinct, actionable error states.
+- [W3C: understanding status messages](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html) — informing assistive technology about status updates.

@@ -1,0 +1,76 @@
+TECHSOUQ — CUSTOMER FILE UPLOAD ACCEPTANCE WORKSHEET
+Article: https://www.techsouqhq.com/blog/customer-file-upload-requirements/
+Published: 18 November 2026
+
+Use fictional files in a test environment. This is a planning worksheet, not a file scanner, security certification, or legal retention policy.
+
+1. BUSINESS OUTCOME AND POLICY
+
+Business / workflow:
+Project or record receiving the attachment:
+Documents actually required before work can start:
+Who decides that document contents are suitable for the job:
+
+Allowed formats and content checks:
+Empty-file policy:
+Maximum bytes per file (inclusive or exclusive):
+Displayed units (decimal MB or binary MiB):
+Number of files / combined request limit / project quota:
+Replacement policy and availability of previous versions:
+
+2. STATES, ACCESS AND OWNERSHIP
+
+For each state, record: what it establishes, customer message, staff view, permitted actions, next action, and owner.
+
+Selected / transferring:
+Received, checking (complete durable receipt reference):
+Check delayed (no passing result; held):
+Available (checks passed for exact stored version):
+Rejected (specific rule and useful correction):
+Cancelled / incomplete / deleted:
+
+Who may upload, view metadata, preview, download, replace, delete, investigate status, and retry screening:
+How copied or time-limited links behave after sharing, expiry and access removal:
+How scan results refer to exact stored versions:
+Held-file alert, owner, escalation and cleanup policy:
+Uncertain-receipt lookup and duplicate prevention:
+Partial-file cleanup and retry/resume policy:
+Retention/deletion owner; originals, previews, backups and restoration:
+
+3. ORIGINAL EXAMPLE — REPLACE WITH YOUR POLICY
+
+Fictional project P41 accepts nonempty PDF/JPEG/PNG files up to and including 10,000,000 bytes each. 1 MB = 1,000,000 bytes. Independent single-file requests; project count/storage quotas not reached; no combined request cap involved. No replacements, compression or conversion. Both PDFs pass format and size checks. The JPEG is rejected before a durable original is retained.
+
+artwork.pdf | 8 MB | all required checks pass | 8 MB retained original | available
+brief.pdf   | 2 MB | scanner times out        | 2 MB retained original | held, inaccessible
+logo.jpg    | 12 MB | exceeds per-file limit  | 0 MB retained original | rejected
+
+At the snapshot: 3 offered = 1 available + 1 held + 1 rejected.
+Offered payload: 8 + 2 + 12 = 22 MB.
+Retained original payload: 8 + 2 = 10 MB; available payload: 8 MB.
+Exclude buffers, logs, backups, replicas and metadata; these are not billing or traffic figures.
+If the same held brief later passes: 2 files / 10 MB available; logo remains rejected.
+Business readiness is a separate decision if a required document is still missing.
+
+4. REPEATABLE SUPPLIER DEMONSTRATION
+
+Application build / environment:
+Date / reviewer:
+Test accounts and roles:
+Starting project and file references / versions:
+Exact policy / fixture bytes / format:
+
+Case | action | expected stored state | expected access/message | observed evidence | result / owner / retest
+
+A. Mixed outcomes: reproduce P41; independently verify all three file outcomes and project readiness.
+B. Boundaries: 0 bytes, exactly 10,000,000 bytes, and 10,000,001 bytes under the example policy. Passing size alone does not pass other checks.
+C. Wrong format: supplier-prepared harmless fixture with a misleading filename; verify server-side rejection under the agreed content rules.
+D. Scanner rejection: approved harmless scanner test fixture or safely simulated result; no live malware.
+E. Delayed check: held and inaccessible, with an owner; retry screening without demanding another customer upload.
+F. Interrupted transfer: check cleanup and per-file retry; preserve successful files.
+G. Lost acknowledgement: complete receipt but disconnect before the browser learns it; look up the attempt before retrying, without duplicate attachments.
+H. Replacement/removal: a late check result cannot release different bytes or recreate a deleted file.
+I. Access: direct download, preview and other retrieval routes as another customer, signed out, and after access removal. Record actual time-limited-link behavior.
+J. Keyboard/status: choose without dragging, reach every action, identify affected file/control, and demonstrate assistive-technology status feedback.
+
+For each case record an independent stored-state/retrieval check, not only a banner. Agree support escalation, open defects, release decision and retest evidence with the responsible owner.
