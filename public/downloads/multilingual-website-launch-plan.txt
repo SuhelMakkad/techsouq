@@ -1,0 +1,42 @@
+Techsouq multilingual website launch worksheet
+
+Scope
+Existing language and intended new language:
+Language or market differences in service, terms, and availability:
+Customer task and what marks it complete:
+Direct entry page and supported follow-up channel:
+Owner who can answer in the new language:
+
+Page inventory
+Repeat for each relevant page.
+English URL:
+New-language URL, or reason to defer:
+Link from each language and how it is labelled:
+Required asset or notice:
+Translation reviewer and approval:
+Expected document language and search alternates for published pairs:
+
+Message inventory
+List the actual text or template location, language source, reviewer, and test evidence for each.
+Form labels and instructions:
+Required field or invalid input:
+Submission unavailable and alternative contact:
+On-page success and next step:
+Receipt email, reply route, and record reference:
+Other customer-facing handoff:
+
+Acceptance rehearsal
+Open the new-language entry URL in a fresh session with the browser in the existing language. Verify the requested page language.
+Switch each way on a paired page. Verify the equivalent destination.
+Follow a labelled link to a deliberately untranslated page and verify the way back.
+Submit invalid input, correct it, and verify the rest of the input is still available.
+In a test environment, simulate a failure before saving and verify the alternative contact route.
+Submit a labelled enquiry. Match the on-page confirmation and receipt against the saved record and confirm who will respond.
+Repeat the route at a narrow viewport and using a keyboard. Review the copy in context with a fluent reviewer.
+
+Release decision
+Test URL, date, and evidence:
+Release blocker and owner:
+Retest result:
+Approved by:
+Who flags and reviews later source changes:

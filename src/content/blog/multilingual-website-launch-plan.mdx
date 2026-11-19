@@ -1,0 +1,121 @@
+---
+title: 'Multilingual Website Launch: Translate the Whole Enquiry Journey'
+description: 'Decide what to translate first, what can stay in English, and how to test a second-language enquiry from a service page through the receipt email.'
+pubDate: 2026-11-19
+category: 'Websites & search'
+heroImage: '../../assets/blog/multilingual-website-launch-plan.svg'
+heroImageAlt: 'A service page, an enquiry form, and a confirmation are connected in one journey that stays in French.'
+socialImage: '/images/blog/multilingual-website-launch-plan.png'
+---
+
+For a first multilingual website launch, translate the smallest set of pages and messages that lets a visitor complete one important task in the new language. On a service website, that means the service page, enquiry form, error messages, confirmation, and any promised email or follow-up. An archive can wait if it is optional. If customers need an English-only page or an English-only reply to finish the task, fix that handoff or narrow the offer before announcing the launch.
+
+## Choose what must be ready in the new language
+
+Start with the page someone might land on directly and finish the map at the next step your business promises. Ask your supplier to include navigation, instructions, field labels, any required notices, and the messages that only appear when something goes wrong. Give a fluent reviewer the actual page or email so they can judge whether the wording fits the action and whether the offer is still accurate.
+
+Put optional material in a separate group. A case study can stay in English if the visitor can understand the offer and enquire without it. If a downloadable document contains instructions the visitor needs to complete the form, include those instructions in the release. Decide separately whether the new language also means a new market with a different service area, offer, or terms. The example below adds French to an existing offer.
+
+## Work through a three-page French launch
+
+Alder Workshop Co. is a fictional business with eight public pages in English. Its team can answer enquiries in French for its team workshops, under the same offer and service area it already supports in English. It starts with the homepage, team workshop page, and enquiry form. The second service and four articles are optional for this enquiry and stay in English.
+
+<table tabIndex="0" aria-label="English and French public URLs for the illustrative launch">
+  <thead>
+    <tr>
+      <th scope="col">Page</th>
+      <th scope="col">Existing English path</th>
+      <th scope="col">French launch decision</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Home</th>
+      <td>
+        <code>/</code>
+      </td>
+      <td>
+        Publish <code>/fr/</code> and link to the French workshop page.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Team workshops</th>
+      <td>
+        <code>/workshops/</code>
+      </td>
+      <td>
+        Publish <code>/fr/ateliers/</code> and link to the French enquiry form.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Enquiry form</th>
+      <td>
+        <code>/enquire/</code>
+      </td>
+      <td>
+        Publish <code>/fr/contact/</code> and review the form in its normal, error, and success
+        states.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Facilitation and four articles</th>
+      <td>
+        <code>/facilitation/</code> and four article paths
+      </td>
+      <td>
+        Defer all five. Where the French site links to facilitation, identify it as an English page
+        before the visitor follows the link.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+Three of the eight English pages get French counterparts, leaving five deferred. The enquiry flow also adds four French message groups without adding public page URLs:
+
+1. **Validation.** A missing or invalid field gets a French message that names the field and explains what to enter.
+2. **Service outage.** A submission that cannot be saved shows a French failure message, keeps the inputs available, and offers a French-speaking contact route.
+3. **On-page confirmation.** A saved enquiry shows a French receipt reference and explains what happens next.
+4. **Receipt email.** The email uses the saved enquiry's language, repeats the same reference, and gives a reply route the team can handle in French.
+
+List the messages separately in the supplier brief. Each group can hold several strings or states, so the inventory describes what to review before release. For the form, use text to identify errors and verify the message after submission in both the failure and success cases. [W3C guidance on form feedback](https://www.w3.org/WAI/tutorials/forms/notifications/#overall-feedback).
+
+## Decide where language links lead
+
+Give each published language version a stable URL. On paired pages, use visible links to the equivalent page and let visitors make the choice. A visitor opening the French workshop URL in an English-configured browser should still get the French workshop page. For a site with two languages, links labelled English and <span lang="fr">Français</span> make the choice visible without requiring a menu. [Google's guidance on language-specific URLs and switching](https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites#multilingual) and [W3C guidance on choosing a language control](https://www.w3.org/International/questions/qa-navigation-select).
+
+For a page without an equivalent, explain where the link will go. On the English facilitation page, Alder can offer a French workshop link labelled as a different service. When the French site links to the English facilitation page, it can say <span lang="fr">« Facilitation (page en anglais) »</span>. Keep each equivalent-page switch distinct from those cross-links. A guessed French facilitation URL should get the site's missing-page response, with a useful way back to the French offer.
+
+Ask your supplier to check two different signals on each published pair:
+
+- **Page language.** Declare the actual language in HTML with `lang="en"` or `lang="fr"`. Mark passages in a different language where appropriate so tools such as screen readers can use the right pronunciation. [W3C guidance on declaring language in HTML](https://www.w3.org/International/questions/qa-html-language-declarations.en).
+- **Search alternates.** If both public pages are meant to be discoverable in Google, use `hreflang` to declare the equivalent versions. For HTML annotations, put the same two entries in the head of both pages, one for each full URL, including the page itself. The English workshop and French workshop are a pair. The English facilitation page has no French alternate. [Google's HTML alternate-page guidance](https://developers.google.com/search/docs/specialty/international/localized-versions#html).
+
+## Rehearse the handoff before opening the new route
+
+Start the acceptance test from the French service URL in a new session with the browser set to English. Use a phone-sized screen and a keyboard in separate passes. A fluent reviewer should see the copy in context and follow the same customer path.
+
+1. **Open and switch.** Open `/fr/ateliers/` directly. Switch to the English workshop and back. Follow the French enquiry link and check that it opens `/fr/contact/`.
+2. **Fail, then recover.** Leave a required field empty and check the actual French error, including any message the browser or a form provider supplies. Correct the field without losing the rest of the enquiry. In a test environment, simulate an outage before saving and check the error and alternative contact route.
+3. **Submit and trace the receipt.** Send a labelled test enquiry. Match the reference in the French confirmation and the receipt email against the saved staff record. For Alder’s example, all three show the same reference, `AW-104`. Confirm a French-speaking colleague can pick it up. In Alder’s first rehearsal, `AW-104` saves with language `fr`, but the email still comes out in English because the mail system uses its default template. The release stays on hold until the recorded language selects the French template and the same journey passes again.
+4. **Exercise the deferred page.** Open the labelled English-only facilitation link from the French site. Verify that the destination describes the second service in English and still gives visitors a clear route to the French workshop. Check the guessed French facilitation URL and the actual language switch on the workshop pair as separate cases.
+
+A form that renders correctly can still lose the language when it hands the enquiry to a separate mail or customer management system. Include the language in the handoff your team tests, and use the [transactional email checklist](/blog/transactional-email-checklist/) to verify what the recipient receives.
+
+## Keep the translations aligned after launch
+
+Assign the person who publishes source changes a way to flag affected translations. If Alder changes what its workshop includes, the owner checks the French workshop page, form options, and any receipt text that repeats the offer. Have a fluent reviewer approve the changed content in context. If a change makes a published translation misleading, correct or temporarily withdraw the affected claim while it is being reviewed.
+
+{/* prettier-ignore */}
+<p><a href="/downloads/multilingual-website-launch-plan.txt" download>Download the multilingual launch worksheet (.txt)</a> to record your first route, its paired URLs, the intentionally deferred pages, and who signs off on each customer-facing message.</p>
+
+Use the filled worksheet to ask your website supplier for a demonstration from a direct link through a saved enquiry and its receipt. Agree what blocks release and who repeats the test after a fix.
+
+## Sources and further reading
+
+Sources checked 19 November 2026.
+
+- [Google Search Central on managing multilingual and multi-regional sites](https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites)
+- [Google Search Central on declaring localized versions](https://developers.google.com/search/docs/specialty/international/localized-versions)
+- [W3C on declaring language in HTML](https://www.w3.org/International/questions/qa-html-language-declarations.en)
+- [W3C on links and controls for localized content](https://www.w3.org/International/questions/qa-navigation-select)
+- [W3C Web Accessibility Initiative on form notifications](https://www.w3.org/WAI/tutorials/forms/notifications/)
