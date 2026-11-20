@@ -1,0 +1,430 @@
+---
+import {
+  BOOKING_SLOT_EXAMPLE,
+  calculateBookingSlots,
+  formatBookingSlotCount,
+  formatBookingTime,
+  SLOT_MINUTE_FIELDS,
+} from '@/modules/blog/utils/booking-slot-planner';
+
+const openingFields = [
+  { key: 'opens', label: 'Opens' },
+  { key: 'closes', label: 'Closes' },
+] as const;
+
+const busyFields = [
+  {
+    name: 'Staff busy block',
+    fields: [
+      { key: 'staffStart', label: 'Staff busy from' },
+      { key: 'staffEnd', label: 'Staff busy until' },
+    ],
+  },
+  {
+    name: 'Room busy block',
+    fields: [
+      { key: 'roomStart', label: 'Room busy from' },
+      { key: 'roomEnd', label: 'Room busy until' },
+    ],
+  },
+] as const;
+
+const exampleSlots = calculateBookingSlots(BOOKING_SLOT_EXAMPLE);
+---
+
+<section class="slot-tool" data-booking-slot-planner aria-label="Booking slot planner">
+  <h3>Booking slot planner</h3>
+  <p>
+    Try one appointment type with one staff member and one room, using the venue’s local time. The
+    opening time sets the pattern for possible starts. Enter a whole number of minutes for the
+    appointment, cleanup, and start interval.
+  </p>
+
+  <form data-slot-form autocomplete="off" novalidate hidden>
+    <fieldset>
+      <legend>Opening and service</legend>
+
+      <div class="slot-fields">
+        {openingFields.map(({ key, label }) => (
+          <div class="slot-field">
+            <label>
+              <span>{label}</span>
+              <input name={key} type="time" value={BOOKING_SLOT_EXAMPLE[key]} required />
+            </label>
+            <span class="field-error" data-slot-error={key} hidden></span>
+          </div>
+        ))}
+
+        {Object.entries(SLOT_MINUTE_FIELDS).map(([key, { label, min, max }]) => (
+          <div class="slot-field">
+            <label>
+              <span>{label} (minutes)</span>
+              <input
+                name={key}
+                type="number"
+                inputmode="numeric"
+                min={min}
+                max={max}
+                step="1"
+                value={BOOKING_SLOT_EXAMPLE[key as keyof typeof SLOT_MINUTE_FIELDS]}
+                required
+              />
+            </label>
+            <span class="field-hint" data-slot-hint={key}>
+              {min}–{max} minutes
+            </span>
+            <span class="field-error" data-slot-error={key} hidden></span>
+          </div>
+        ))}
+      </div>
+    </fieldset>
+
+    {busyFields.map(({ name, fields }) => (
+      <fieldset>
+        <legend>{name} (optional)</legend>
+        <p class="slot-note">Leave both times blank if there is no busy block.</p>
+
+        <div class="slot-fields">
+          {fields.map(({ key, label }) => (
+            <div class="slot-field">
+              <label>
+                <span>{label}</span>
+                <input name={key} type="time" value={BOOKING_SLOT_EXAMPLE[key]} />
+              </label>
+              <span class="field-error" data-slot-error={key} hidden></span>
+            </div>
+          ))}
+        </div>
+      </fieldset>
+    ))}
+
+    <div class="slot-actions">
+      <button class="slot-submit" type="submit">
+        Check available starts
+      </button>
+      <button class="slot-reset" type="reset">
+        Reset example
+      </button>
+    </div>
+  </form>
+
+  <noscript>
+    <p class="slot-note">
+      The worked result is below. Enable JavaScript to check a different schedule.
+    </p>
+  </noscript>
+
+  <div class="slot-results">
+    <p class="slot-status" data-slot-status role="status">
+      {formatBookingSlotCount(exampleSlots.length)}
+    </p>
+
+    <div data-slot-results>
+      <table>
+        <caption>Alternative starts in venue local time</caption>
+        <thead>
+          <tr>
+            <th scope="col">Starts</th>
+            <th scope="col">Service ends</th>
+            <th scope="col">Held until</th>
+          </tr>
+        </thead>
+        <tbody data-slot-rows>
+          {exampleSlots.map(({ start, appointmentEnd, release }) => (
+            <tr>
+              <td>{formatBookingTime(start)}</td>
+              <td>{formatBookingTime(appointmentEnd)}</td>
+              <td>{formatBookingTime(release)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <p class="slot-note">
+        Cleanup holds the staff member and room until the time in the last column. Overlapping
+        starts are alternatives for the same resources.
+      </p>
+    </div>
+  </div>
+
+  <p class="slot-note">
+    This planner checks one same-day window and one busy block per resource. It leaves out booking
+    notice rules, overnight schedules, and time zone changes. The planner runs locally on this page
+    and has no calendar connection.
+  </p>
+</section>
+
+<script>
+  import {
+    BookingSlotInputError,
+    calculateBookingSlots,
+    formatBookingSlotCount,
+    formatBookingTime,
+    type BookingSlotInputs,
+  } from '@/modules/blog/utils/booking-slot-planner';
+
+  document.querySelectorAll<HTMLElement>('[data-booking-slot-planner]').forEach((tool, index) => {
+    const form = tool.querySelector<HTMLFormElement>('[data-slot-form]')!;
+    const status = tool.querySelector<HTMLElement>('[data-slot-status]')!;
+    const results = tool.querySelector<HTMLElement>('[data-slot-results]')!;
+    const rows = tool.querySelector<HTMLTableSectionElement>('[data-slot-rows]')!;
+    const fields = [...form.querySelectorAll('input')];
+
+    const errorFor = (field: HTMLInputElement) =>
+      form.querySelector<HTMLElement>(`[data-slot-error="${field.name}"]`)!;
+
+    for (const field of fields) {
+      const prefix = `booking-slot-${index}-${field.name}`;
+      const error = errorFor(field);
+      const hint = form.querySelector<HTMLElement>(`[data-slot-hint="${field.name}"]`);
+
+      error.id = `${prefix}-error`;
+      field.setAttribute('aria-describedby', error.id);
+
+      if (hint) {
+        hint.id = `${prefix}-hint`;
+        field.setAttribute('aria-describedby', `${hint.id} ${error.id}`);
+      }
+    }
+
+    const clearErrors = () => {
+      for (const field of fields) {
+        const error = errorFor(field);
+
+        field.removeAttribute('aria-invalid');
+        error.textContent = '';
+        error.hidden = true;
+      }
+    };
+
+    const calculate = (reset = false) => {
+      clearErrors();
+      rows.replaceChildren();
+
+      try {
+        const incomplete = fields.find((field) => field.type === 'time' && field.validity.badInput);
+
+        if (incomplete) {
+          throw new BookingSlotInputError(
+            incomplete.name as keyof BookingSlotInputs,
+            'Enter a complete time.',
+          );
+        }
+
+        const inputs = Object.fromEntries(new FormData(form)) as BookingSlotInputs;
+        const slots = calculateBookingSlots(inputs);
+
+        for (const slot of slots) {
+          const row = rows.insertRow();
+
+          for (const time of [slot.start, slot.appointmentEnd, slot.release]) {
+            row.insertCell().textContent = formatBookingTime(time);
+          }
+        }
+
+        results.hidden = slots.length === 0;
+        status.textContent = `${reset ? 'Example reset. ' : ''}${formatBookingSlotCount(slots.length)}`;
+      } catch (cause) {
+        if (!(cause instanceof BookingSlotInputError)) throw cause;
+
+        const field = form.elements.namedItem(cause.field) as HTMLInputElement;
+        const error = errorFor(field);
+
+        status.textContent = 'Correct the highlighted input, then check again.';
+        results.hidden = true;
+
+        error.textContent = cause.message;
+        error.hidden = false;
+        field.setAttribute('aria-invalid', 'true');
+        field.focus();
+      }
+    };
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      calculate();
+    });
+
+    form.addEventListener('input', () => {
+      clearErrors();
+      results.hidden = true;
+
+      const message = 'Inputs changed. Check available starts to update the result.';
+      if (status.textContent !== message) status.textContent = message;
+    });
+
+    form.addEventListener('reset', () => {
+      requestAnimationFrame(() => calculate(true));
+    });
+
+    form.hidden = false;
+  });
+</script>
+
+<style>
+  .slot-tool {
+    display: grid;
+    gap: 0.9rem;
+
+    margin-block: 2rem;
+    border: 1px solid #dce3ee;
+    border-radius: 1.25rem;
+
+    background: #f7f8fb;
+    padding: clamp(1rem, 4vw, 1.75rem);
+    color: #18202f;
+
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  h3 {
+    font-size: clamp(1.25rem, 3vw, 1.55rem);
+    font-weight: 700;
+  }
+
+  form,
+  .slot-field,
+  .slot-field label {
+    display: grid;
+    align-content: start;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  form {
+    gap: 0.9rem;
+  }
+
+  fieldset {
+    min-width: 0;
+    border: 1px solid #dce3ee;
+    border-radius: 0.75rem;
+
+    background: #fff;
+    padding: 0.8rem;
+  }
+
+  legend {
+    padding: 0 0.25rem;
+    color: #164dd0;
+    font-weight: 700;
+  }
+
+  .slot-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11.5rem), 1fr));
+    gap: 0.75rem;
+  }
+
+  .slot-note + .slot-fields {
+    margin-top: 0.65rem;
+  }
+
+  label {
+    font-weight: 650;
+  }
+
+  input {
+    width: 100%;
+    min-width: 0;
+    min-height: 2.75rem;
+
+    border: 1px solid #7b879b;
+    border-radius: 0.45rem;
+    background: #fff;
+
+    padding: 0.45rem 0.55rem;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  input[aria-invalid='true'] {
+    border-color: #a01a24;
+  }
+
+  .slot-note,
+  .field-hint,
+  .field-error {
+    font-size: 0.8rem;
+  }
+
+  .slot-note,
+  .field-hint {
+    color: #4a566b;
+  }
+
+  .field-error {
+    color: #a01a24;
+  }
+
+  .slot-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  button {
+    min-height: 2.75rem;
+    border: 1px solid #164dd0;
+    border-radius: 0.45rem;
+
+    padding: 0.5rem 0.75rem;
+    font-weight: 700;
+  }
+
+  .slot-submit {
+    background: #164dd0;
+    color: #fff;
+  }
+
+  .slot-reset {
+    background: #fff;
+    color: #164dd0;
+  }
+
+  .slot-results {
+    display: grid;
+    gap: 0.5rem;
+
+    border: 1px solid #dce3ee;
+    border-radius: 0.75rem;
+    background: #fff;
+
+    padding: 0.8rem;
+  }
+
+  .slot-status {
+    font-weight: 700;
+  }
+
+  table {
+    width: 100%;
+    margin-block-end: 0.65rem;
+  }
+
+  caption {
+    padding-block-end: 0.3rem;
+    text-align: left;
+  }
+
+  th,
+  tbody :global(td) {
+    border-bottom: 1px solid #dce3ee;
+    padding: 0.4rem 0.2rem;
+    text-align: left;
+  }
+
+  th:first-child,
+  tbody :global(td) {
+    white-space: nowrap;
+  }
+
+  tbody :global(td) {
+    font-variant-numeric: tabular-nums;
+  }
+</style>

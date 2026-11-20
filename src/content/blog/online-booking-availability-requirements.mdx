@@ -1,0 +1,203 @@
+---
+title: 'What Makes an Appointment Slot Available for Online Booking?'
+description: 'Use staff hours, shared rooms, and cleanup time to decide which appointments to show. Includes a worked example, slot planner, and launch tests.'
+pubDate: 2026-11-20
+category: 'Business systems'
+heroImage: '../../assets/blog/online-booking-availability-requirements.svg'
+heroImageAlt: 'A 09:00 appointment and its cleanup fit before the room becomes busy at 09:50. Starting at 09:15 overlaps the room reservation.'
+socialImage: '/images/blog/online-booking-availability-requirements.png'
+---
+
+import BookingSlotPlanner from '@/modules/blog/components/booking-slot-planner.astro';
+
+Offer an appointment start only when the entire service fits inside your customer-facing hours and every required person, room, and piece of equipment is free for the time it is needed, including setup and cleanup. Apply your notice rules before showing the slot and check availability again when the customer confirms. A free technician cannot take a booking that also needs an occupied room.
+
+This is a rule you can bring to a booking software demo or give to a developer. Start with one service and one representative morning. Write down the times you'd expect the customer to see, then ask the supplier to reproduce them on a test booking page.
+
+## What should the booking system check?
+
+Separate **appointment duration**, **buffer**, and **start interval**. Duration is the time the customer books. A buffer reserves extra time before or after it. The start interval controls which clock times the system considers. A 15-minute interval can offer 09:00, 09:15, and 09:30 as alternative starts for a 40-minute service. Microsoft Bookings documents separate settings for start increments and service length and counts configured buffers when checking staff availability. [Microsoft Bookings scheduling policies](https://learn.microsoft.com/en-us/microsoft-365/bookings/set-scheduling-policies?view=o365-worldwide#types-of-scheduling-policies), [Microsoft Bookings buffer settings](https://learn.microsoft.com/en-us/microsoft-365/bookings/configure-service-availability?view=o365-worldwide#buffer-time-and-availability)
+
+<table tabIndex="0" aria-label="Rules for booking availability">
+  <thead>
+    <tr>
+      <th scope="col">Rule to agree</th>
+      <th scope="col">What to write in the booking brief</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Bookable hours</th>
+      <td>
+        List the service's hours at the location and which closures override them. Agree whether the
+        start grid begins at opening or follows fixed clock times, even after a break.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Staff and rooms</th>
+      <td>
+        Name the roles and equipment needed. Say whether any qualified staff member can take the job
+        and which rooms can be substituted.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Setup and cleanup</th>
+      <td>
+        State how many minutes each person or resource is occupied and whether those minutes must
+        fit before closing. The room may need longer than the technician.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Busy time</th>
+      <td>
+        Name which calendars and channels can block a slot and which statuses count as busy. Include
+        phone bookings, breaks, and staff-entered holds where they affect capacity.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Booking notice</th>
+      <td>
+        Set how soon and how far ahead customers can book. Write a test for the exact cutoff and
+        agree which clock determines it.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+Give a shared resource its own capacity rule if two services use it. Acuity Scheduling, for example, lets several staff calendars in the same time zone draw from the same limited pool of rooms and treats resources as occupied during configured padding. A supplier demo should show that a room booking for another service can still block yours. [Acuity's guide to limiting bookings by resource](https://help.acuityscheduling.com/hc/en-us/articles/16676949567757-Use-resources-to-limit-bookings)
+
+## Which starts fit in a repair studio's morning?
+
+Imagine a fictional bicycle repair studio with one technician and one work bay shared across services. Both are available during the same 09:00–12:30 local window except for the busy blocks below. A customer fitting takes **40 minutes**, followed by **10 minutes of cleanup** using both the technician and the bay. There is no setup buffer. The studio considers starts every 15 minutes from 09:00, and the sample day already meets the booking notice policy.
+
+- The bay is already reserved from **09:50 to 10:20** for another task.
+- The technician is unavailable from **11:15 to 11:30**.
+- The fitting and cleanup need **50 uninterrupted minutes** with both resources. Cleanup must end by closing.
+
+For each start, calculate the customer end as **start + 40 minutes**, then the release time as **customer end + 10 minutes**. A busy block conflicts when the start is earlier than the busy block's end **and** the release is later than the busy block's start. A release at 09:50 can touch a reservation starting at 09:50. This example uses the same boundary convention as Google Calendar's free/busy API, which includes the start and excludes the end of a busy block. [Google Calendar free/busy response](https://developers.google.com/workspace/calendar/api/v3/reference/freebusy/query#response)
+
+<table tabIndex="0" aria-label="Repair studio starts on a 15-minute grid">
+  <thead>
+    <tr>
+      <th scope="col">Candidate start</th>
+      <th scope="col">Customer ends</th>
+      <th scope="col">Both resources needed until</th>
+      <th scope="col">Show this time?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">09:00</th>
+      <td>09:40</td>
+      <td>09:50</td>
+      <td>Yes. Cleanup ends as the bay reservation begins.</td>
+    </tr>
+    <tr>
+      <th scope="row">09:15</th>
+      <td>09:55</td>
+      <td>10:05</td>
+      <td>No. The bay becomes busy before the fitting ends.</td>
+    </tr>
+    <tr>
+      <th scope="row">10:15</th>
+      <td>10:55</td>
+      <td>11:05</td>
+      <td>No. The bay is occupied for the first five minutes.</td>
+    </tr>
+    <tr>
+      <th scope="row">10:30</th>
+      <td>11:10</td>
+      <td>11:20</td>
+      <td>No. The technician's break starts during cleanup.</td>
+    </tr>
+    <tr>
+      <th scope="row">11:30</th>
+      <td>12:10</td>
+      <td>12:20</td>
+      <td>Yes. The technician's break has ended and there is time for cleanup.</td>
+    </tr>
+    <tr>
+      <th scope="row">11:45</th>
+      <td>12:25</td>
+      <td>12:35</td>
+      <td>No. Cleanup would end after closing.</td>
+    </tr>
+  </tbody>
+</table>
+
+The only continuous windows when both are free are 09:00–09:50, 10:20–11:15, and 11:30–12:30. The middle window is 55 minutes long, but its first 15-minute grid start is 10:30, leaving 45 minutes before the technician's break. So the page should offer **09:00 and 11:30**.
+
+## Try a different start interval
+
+Change the example's start interval to **10 minutes** and keep the same fitting, cleanup, and busy blocks. The starts become **09:00, 10:20, 11:30, and 11:40**. At 10:20 the bay has just become free and cleanup ends at 11:10, before the technician's break. The 11:40 fitting uses the last 50 minutes through closing. The 11:30 and 11:40 options overlap, so booking one removes the other.
+
+Use the planner to try your own same-day opening window, service duration, cleanup, and start interval. Enter at most one busy block for each resource in the same local clock time. The planner assumes the technician and room are both required through cleanup. It estimates which alternatives fit those inputs and leaves live calendar checks, setup time, notice, and time zone conversion to the booking system.
+
+<BookingSlotPlanner />
+
+## What happens when a customer confirms?
+
+Use one authoritative booking record for each reservation and confirm only after it has reserved all the required capacity. A time can be taken between the availability search and the customer's final click. Square's Bookings API, for example, documents searching for available times and creating a booking as separate operations. Ask the supplier to demonstrate this gap using two customer sessions, with one successful reservation and a clear prompt to find another time in the other session. [Square's availability and booking workflow](https://developer.squareup.com/docs/bookings-api/use-the-api#search-for-available-slots)
+
+If a required calendar is unavailable, treat capacity as unknown until it can be verified. Google's free/busy response can return an error for an individual calendar. Agree whether to pause instant booking for the affected service or accept a separately labelled request for staff to confirm. Pending requests need a clear policy on whether they hold capacity and when that hold expires. [Google Calendar free/busy errors](https://developers.google.com/workspace/calendar/api/v3/reference/freebusy/query#response)
+
+For a service delivered at a physical venue, use that location's time zone to define recurring hours and show the zone with the date and time on the booking page and confirmation. Test a customer viewing from another zone. For locations that change their clocks seasonally, test a date on either side of the change and decide how to handle any repeated or skipped local times that fall within service hours. The IANA database tracks changes to UTC offsets and daylight-saving rules by location. [IANA Time Zone Database](https://www.iana.org/time-zones)
+
+## What should a supplier demonstrate before launch?
+
+Give the supplier your worked morning and expected starts. Then ask them to use the normal booking page and staff calendar to rehearse the cases that can change availability.
+
+<table tabIndex="0" aria-label="Supplier booking rehearsal">
+  <thead>
+    <tr>
+      <th scope="col">Rehearsal</th>
+      <th scope="col">Pass condition</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Add a phone booking for the shared room</th>
+      <td>
+        The online page removes conflicting starts, including any whose cleanup would run into the
+        room booking.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Confirm the same last slot from two sessions</th>
+      <td>One reservation claims capacity. The other customer receives a clear next action.</td>
+    </tr>
+    <tr>
+      <th scope="row">Cancel or move the confirmed booking</th>
+      <td>
+        The old time returns only when its capacity is clear and it still meets notice rules. If a
+        move fails, the original booking stays in place.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Interrupt a required calendar connection</th>
+      <td>
+        The affected time follows the agreed unknown-capacity policy and the team can see what needs
+        review.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Open the page from a different time zone</th>
+      <td>
+        The customer confirmation and staff calendar show the same appointment instant, even if the
+        displayed local times differ.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+If a hosted scheduler can demonstrate those results for your actual resources and channels, it may be enough to connect it to your website. If separate systems own staff, rooms, and bookings, establish which one can reserve the final slot before deciding whether you need an integration or a custom application. Use the same scenario to [compare hosted and custom software costs](/blog/custom-software-vs-off-the-shelf-cost/) and turn the rehearsals into [user acceptance tests](/blog/user-acceptance-testing-checklist/).
+
+## Sources and further reading
+
+Checked 20 November 2026.
+
+- [Microsoft Bookings service availability and buffers](https://learn.microsoft.com/en-us/microsoft-365/bookings/configure-service-availability?view=o365-worldwide#buffer-time-and-availability) and [scheduling policies](https://learn.microsoft.com/en-us/microsoft-365/bookings/set-scheduling-policies?view=o365-worldwide#types-of-scheduling-policies) for the relationship between appointment length, buffers, notice, and start intervals.
+- [Acuity resource limits](https://help.acuityscheduling.com/hc/en-us/articles/16676949567757-Use-resources-to-limit-bookings) for restrictions across shared rooms and equipment.
+- [Google Calendar free/busy response](https://developers.google.com/workspace/calendar/api/v3/reference/freebusy/query#response) for interval boundaries and per-calendar errors.
+- [Square Bookings workflow](https://developer.squareup.com/docs/bookings-api/use-the-api#search-for-available-slots) for a concrete example of separate availability and booking operations.
+- [IANA Time Zone Database](https://www.iana.org/time-zones) for location-based time zone rules.
