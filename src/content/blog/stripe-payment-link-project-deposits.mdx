@@ -1,0 +1,130 @@
+---
+title: 'Can You Reuse One Stripe Payment Link for Project Deposits?'
+description: 'Compare a shared Stripe Payment Link, a link per job, and a hosted invoice. See what to verify when the same customer owes two equal deposits.'
+pubDate: 2026-11-21
+category: 'Business systems'
+heroImage: '../../assets/blog/stripe-payment-link-project-deposits.svg'
+heroImageAlt: 'Hold both jobs when the shared link leaves a USD 500 payment unassigned. A paid invoice recorded against J-105 identifies that job for kickoff if it is active.'
+socialImage: '/images/blog/stripe-payment-link-project-deposits.png'
+---
+
+One customer owes two $500 deposits. One payment comes in. Which job can start? Use a separate hosted invoice for each project, or a dedicated Stripe Payment Link per job if you invoice elsewhere. Both let you record which job the request belongs to before the customer pays. Reuse one link only if your team can independently confirm which job each payment covers before starting work. [Stripe's comparison of invoices and Payment Links](https://docs.stripe.com/payment-links#compare-invoicing-payment-links)
+
+## Why two equal payments are still ambiguous
+
+In this fictional example, Northline has approved projects J-104 and J-105. Both are waiting on a single USD 500 deposit. Both requests went to the same billing contact on the same day. The person scheduling work sees only the evidence shown below.
+
+<table role="table" tabIndex={0} aria-label="Project release decisions for two equal deposits">
+  <thead>
+    <tr>
+      <th scope="col">Evidence available to staff</th>
+      <th scope="col">Which job can start?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">One successful USD 500 payment on the bare shared link</th>
+      <td>Hold both jobs. The payment could cover either.</td>
+    </tr>
+    <tr>
+      <th scope="row">Two successful USD 500 payments on the bare shared link</th>
+      <td>Hold both jobs. The customer could have paid for both or repeated a payment for one.</td>
+    </tr>
+    <tr>
+      <th scope="row">
+        One successful payment independently matched to J-105, plus a second USD 500 payment on the
+        bare shared link
+      </th>
+      <td>
+        Start J-105 if it is still active. Hold J-104 and ask the billing contact which job the
+        second payment covers. It could be a second payment for J-105.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">
+        One successful USD 500 payment against the invoice or dedicated link recorded for J-105
+      </th>
+      <td>
+        Start J-105 if it is still active. J-104 stays on hold until its own deposit is verified.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+A payment ID tells you which transaction happened. To see why that still leaves the bare link ambiguous, list where each payment could go. With two unassigned payments, the first and second could cover J-104 then J-105, J-105 then J-104, or the same job twice. All four assignments fit the visible evidence. Allocating an unidentified payment to the only unpaid job assumes the buyer never pays twice for the same work.
+
+## Use one hosted payment record per project
+
+Stripe documents how to [check an invoice and its status](https://docs.stripe.com/invoicing/dashboard/manage-invoices) and where to find [individual payments for a one-off link](https://docs.stripe.com/payment-links/customize#limit-payments). Choose a setup based on which record the billing lead can match to the job.
+
+<table role="table" tabIndex={0} aria-label="Hosted Stripe payment setups and evidence per project">
+  <thead>
+    <tr>
+      <th scope="col">Setup</th>
+      <th scope="col">How staff match a payment</th>
+      <th scope="col">When to choose it</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Hosted invoice per job</th>
+      <td>
+        Record the invoice number on the project before sending. Open that exact invoice in Stripe
+        and check its payment.
+      </td>
+      <td>
+        Use this when Stripe should issue the invoice. Stripe gives each invoice its own payment
+        page.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Dedicated Payment Link per job</th>
+      <td>
+        Record the exact link on the project before sending. Open its details and check the
+        individual payment under Recent payments.
+      </td>
+      <td>
+        Use this when you invoice elsewhere or have no need for a separate Stripe invoice. Create a
+        fresh link for the next job.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Shared Payment Link with a job reference</th>
+      <td>
+        Read a required project field on the payment details page, or read the link's reference from
+        the Checkout Session if your integration receives it. Verify the reference against
+        independent evidence, such as a confirmation from the customer's billing contact that
+        identifies the transaction and job.
+      </td>
+      <td>
+        Reuse the link if staff can resolve an unreadable, missing, or incorrect reference before
+        work is due to start.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+Stripe lets you create [one-off invoices in the Dashboard](https://docs.stripe.com/invoicing/dashboard) and assigns each invoice a [unique hosted payment page](https://docs.stripe.com/invoicing/hosted-invoice-page). In the fictional jobs, the billing lead could record invoice INV-104 for J-104 and INV-105 for J-105. When INV-105 is paid first, the billing lead can identify J-105 even if the customer pays from a shared accounts email.
+
+For a [dedicated Payment Link](https://docs.stripe.com/payment-links/customize#limit-payments), set the usage limit to one if you intend one checkout. Stripe counts completed Checkout Sessions toward the limit, so check the individual payment's success separately before releasing the job. A completed checkout can still be waiting for payment on a delayed method. [Stripe's guidance on delayed payments](https://docs.stripe.com/checkout/fulfillment?ui=full-page#immediate-versus-delayed-payment-methods)
+
+A [required project field](https://docs.stripe.com/payment-links/customize#add-custom-fields) gives staff a value to check in the Dashboard. If Northline enters J-104 while intending to pay J-105, the reference exists and the customer, amount, and currency all match. That check would send the wrong crew. Stripe also supports a [reference in the link URL](https://docs.stripe.com/payment-links/url-parameters#streamline-reconciliation-with-a-url-parameter) that appears in the Checkout Session data. Copying only the base URL leaves the reference behind. If a reference has an invalid format, Stripe drops it and the checkout page still works. Use a per-job record if staff need to assign the payment without a follow-up.
+
+## Run the kickoff check before buying checkout software
+
+You can collect a fixed deposit for an already accepted project without building checkout. First see whether a hosted invoice or dedicated link gives staff the evidence to start the right job on time.
+
+In your [Stripe test environment](https://docs.stripe.com/testing), have the billing lead set up two jobs for the same test customer with the same fixed amount. Record the invoice number or exact link against each job and pay for the second job first. Give the person who starts work the job list and the Stripe view they will use on shift. They should be able to point to the successful payment, the expected amount and currency, and the exact job it covers. Give them the third row above as a separate exercise. They should keep J-104 on hold and hand the second payment to billing for confirmation. If you are testing a shared link with a project field, run one more case with both jobs unpaid. Have the test payer complete a successful payment intended for J-105 using the valid code J-104. Keep that intent from the person scheduling work. Staff should hold both jobs until billing independently confirms the intended job.
+
+If a payment is pending, or if the job match, amount, or currency is unclear, keep that job on hold until billing resolves it. If your invoice workflow permits staff to mark invoices paid outside Stripe, check the recorded payment source before using the Paid badge as evidence of a Stripe card payment. [Stripe's invoice lifecycle](https://docs.stripe.com/invoicing/overview#paid)
+
+Keep the hosted setup if staff can run that check within your kickoff deadline. If they cannot, try an integration between the hosted payment record and the project list before paying for a new checkout. Ask the supplier to show the job identifier and confirmed payment reaching the project record together, using the same two-job case. Use our [workflow automation checklist](/blog/workflow-automation-checklist/) to test what happens when the project update times out or the event arrives twice.
+
+## Sources and further reading
+
+Stripe features were checked on 21 November 2026. The payment records above are a fictional example derived from the documented features.
+
+- [Stripe's Payment Links and Invoicing comparison](https://docs.stripe.com/payment-links#compare-invoicing-payment-links)
+- [Stripe's Payment Link settings and reference fields](https://docs.stripe.com/payment-links/customize)
+- [Stripe's Checkout Session reference](https://docs.stripe.com/api/checkout/sessions/object)
+- [Stripe's hosted invoice page and payment status](https://docs.stripe.com/invoicing/hosted-invoice-page)

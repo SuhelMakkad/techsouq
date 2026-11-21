@@ -20,7 +20,7 @@ Start with a sentence that includes the trigger, the work, and the evidence of c
 
 > For each eligible paid booking, create one project linked to that booking and its customer, then record the project reference where the operations team can find it.
 
-In this example, the payment system is the authority for payment status, the booking system owns the booking and customer reference, and the project system owns the project. “Eligible” means the booking has the required deposit and has not been cancelled. A notification starts a check; it does not replace those business rules.
+In this example, the payment system is the authority for payment status, the booking system owns the booking and customer reference, and the project system owns the project. “Eligible” means the booking has the [required deposit](/blog/stripe-payment-link-project-deposits/) and has not been cancelled. A notification starts a check; it does not replace those business rules.
 
 Name a stable reference for the business job, such as a booking ID. Keep the source event reference and the resulting project ID alongside it. These answer different questions: which notification arrived, which job it concerns, and what work resulted. A customer email address alone is a poor job reference when the same customer can make several bookings.
 
