@@ -36,7 +36,7 @@ Ask the developer to name the evidence behind each reported event. Is it a click
 
 Google's enhanced measurement describes `form_start` and `form_submit` as form interactions. That description does not establish that your receiving system stored a usable enquiry. Our recommendation is to test that boundary explicitly instead of treating an automatically collected event as proof of receipt. See [Google's form-interaction measurement](https://support.google.com/analytics/answer/9216061?hl=en).
 
-For a custom form, agree that a confirmed-receipt signal follows the receiving system's successful save. For an embedded or third-party form, ask what confirmation the provider exposes and verify it against a stored test response. If you can only observe a click or an attempted hand-off, label it that way. Do not rename uncertainty as success.
+For a custom form, agree that a confirmed-receipt signal follows the receiving system's successful save. For an embedded or third-party form, ask what confirmation the provider exposes and verify it against a stored test response. If you can only observe a click or an attempted hand-off, label it that way. Do not rename uncertainty as success. See [what a Google Forms iframe load can tell you](/blog/google-forms-iframe-conversion-tracking/) for a browser test of one such signal.
 
 Choose one implementation path for each event. If both a page script and a tag-manager rule report the same successful submission, your event count can include both. Reloading a confirmation page also needs an explicit counting rule. Ask the supplier to demonstrate the result rather than assume the event name prevents duplicates.
 

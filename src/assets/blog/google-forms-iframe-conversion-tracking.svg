@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="frame-title frame-description">
+  <title id="frame-title">An iframe load can’t confirm a save</title>
+  <desc id="frame-description">A local test recorded two iframe loads after a successful save and after a failed save. The receiver stored one response in the first case and zero in the second.</desc>
+  <rect width="1200" height="630" fill="#f7f8fb" />
+
+  <g font-family="Manrope, Arial, sans-serif" fill="#18202f">
+    <text x="72" y="89" font-size="25" font-weight="700" letter-spacing="2" fill="#174dbd">LOCAL BROWSER TEST</text>
+    <text x="70" y="158" font-size="61" font-weight="700" letter-spacing="-2">An iframe load can’t confirm a save</text>
+
+    <g transform="translate(72 214)">
+      <rect width="510" height="286" rx="28" fill="#fff" stroke="#b9cff9" stroke-width="2" />
+      <path d="M1 78h508" stroke="#dae5f8" stroke-width="2" />
+      <circle cx="50" cy="39" r="19" fill="#e6efff" />
+      <path d="m42 39 6 6 10-12" fill="none" stroke="#174dbd" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+      <text x="82" y="51" font-size="34" font-weight="700">Successful save</text>
+      <text x="36" y="155" font-size="45" font-weight="700" fill="#174dbd">2 iframe loads</text>
+      <text x="36" y="230" font-size="39" font-weight="700">1 saved response</text>
+    </g>
+
+    <g transform="translate(618 214)">
+      <rect width="510" height="286" rx="28" fill="#fff" stroke="#cbd3e0" stroke-width="2" />
+      <path d="M1 78h508" stroke="#e0e5ed" stroke-width="2" />
+      <circle cx="50" cy="39" r="19" fill="#eff2f7" />
+      <path d="m44 33 12 12m0-12-12 12" stroke="#40506a" stroke-linecap="round" stroke-width="3.5" />
+      <text x="82" y="51" font-size="34" font-weight="700">Failed save</text>
+      <text x="36" y="155" font-size="45" font-weight="700" fill="#174dbd">2 iframe loads</text>
+      <text x="36" y="230" font-size="39" font-weight="700">0 saved responses</text>
+    </g>
+
+    <text x="72" y="566" font-size="29" fill="#40506a">The load counter reported one provisional lead in each case.</text>
+  </g>
+</svg>

@@ -1,0 +1,86 @@
+---
+title: 'Can a Google Forms Iframe Load Tell You a Response Was Saved?'
+description: 'A browser test shows why an iframe load can overcount leads. Use saved Google Forms responses for totals and verify session matches before relying on GA4.'
+pubDate: 2026-11-22
+category: 'Websites & search'
+heroImage: '../../assets/blog/google-forms-iframe-conversion-tracking.svg'
+heroImageAlt: 'A local test recorded two iframe loads after a successful save and after a failed save. The receiver stored one response in the first case and zero in the second.'
+socialImage: '/images/blog/google-forms-iframe-conversion-tracking.png'
+---
+
+Do not count the second load of a Google Forms iframe as a saved enquiry in Google Analytics 4 (GA4). In our local one-page form test, a successful save and a failed save both produced the same second load. If you only need the number of responses your Google Form saved, keep the form and count its records. If you need to match a saved response to a specific tracked website session, keep the setup only if you can demonstrate that match within your analytics consent settings. [Google Forms response records](https://support.google.com/docs/answer/139706?hl=en)
+
+## What the second load tells you
+
+An iframe displays a page inside your website. When the form page is on a different origin, the website can listen for the iframe's `load` event while browser rules prevent the website from reading the embedded document directly. To find out whether an enquiry exists, you need evidence from the system that received it. [HTML Standard on iframe load events](https://html.spec.whatwg.org/multipage/iframe-embed-object.html#iframe-load-event-steps), [HTML Standard on access to the embedded document](https://html.spec.whatwg.org/multipage/document-sequences.html#concept-bcc-content-document)
+
+A published Google Tag Manager recipe increments a counter each time the iframe loads and fires a lead signal at every count above one. It warns that a multipage form could fire a signal when a visitor clicks Next. We tested the counting rule with a single page and checked the receiver's records alongside it. [Datametrik’s embedded Google Forms method](https://datametrik.com/track-google-form-submission-in-ga4/)
+
+## One page, four different outcomes
+
+We ran the test on 22 November 2026 using Chromium 149.0.7827.55 and Node.js 24.18.0 on macOS. Two local HTTP servers on different ports acted as the website and the form receiver. The website defined its handler before loading the iframe and attached it with the frame’s `onload` attribute. It counted each load after the first as one provisional lead. The one-field form posted the test code `SYNTHETIC-01`. The receiver wrote the code to an in-memory list for successful submissions and returned a confirmation. Failed submissions returned an error page without a write. Each row below starts with a fresh parent page. The retry in the last row stays on the same page.
+
+<table role="table" tabIndex={0} aria-label="Results of four local iframe load tests">
+  <thead>
+    <tr>
+      <th scope="col">Action after the first load</th>
+      <th scope="col">Form receiver</th>
+      <th scope="col">Total iframe loads</th>
+      <th scope="col">Provisional leads</th>
+      <th scope="col">New saved responses</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Submit and save</th>
+      <td>POST returned a confirmation (HTTP 200)</td>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th scope="row">Submit and fail to save</th>
+      <td>POST returned an HTML error page (HTTP 500)</td>
+      <td>2</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th scope="row">Open the same form URL again inside the iframe without submitting</th>
+      <td>GET returned the form (HTTP 200)</td>
+      <td>2</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th scope="row">Fail, then retry successfully</th>
+      <td>First POST returned the error page, second POST saved the response</td>
+      <td>3</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+
+In the retry case, the failed save counted as a lead before a record existed. The successful retry raised the count to two with one response saved. Capping the count at one per session would still leave a false lead in the case where the failed attempt was the only one. The local test reproduced the counting rule without a live Google Form, Tag Manager container or GA4 property. [GA4’s key event counting options](https://support.google.com/analytics/answer/13366706?hl=en)
+
+## Keep the form when you only need receipt totals
+
+Have the form owner open **Responses** in Google Forms. Use the response records, or the linked spreadsheet, to count what that form received in the reporting period. If the same form also circulates by direct link, the total includes responses from people who never loaded your website. If the business wants a count of distinct enquiries, use the [website lead tracking guide](/blog/website-lead-tracking-plan/) to handle test records, spam and repeat requests. [Google Forms help on viewing and exporting responses](https://support.google.com/docs/answer/139706?hl=en)
+
+## Change the setup when you need a match to a GA4 session
+
+A Google Forms submit trigger supplies a form response to Apps Script. The documented trigger payload gives you the response and form, but no identifier for the session on your website. For a server-side GA4 integration that uses Measurement Protocol to match an event to a specific web session, the request needs the corresponding client and session identifiers and must meet Google's timing rules. [Google Forms submit event fields](https://developers.google.com/apps-script/guides/triggers/events#form-submit_1), [GA4 web event requirements](https://developers.google.com/analytics/devguides/collection/protocol/ga4/sending-events?client_type=gtag), [GA4 session attribution requirements](https://developers.google.com/analytics/devguides/collection/protocol/ga4/use-cases#session_attribution)
+
+On a staging copy, ask your developer to open two separate tracked browser sessions with different campaign labels and submit one fictional enquiry from each. For each saved response, ask them to show one confirmed-receipt event linked to the session that submitted it. Then have them reload the iframe without submitting and cause a save to fail in the test setup. Check the receiving records as well as the event output. Both controls should yield zero new saved responses and zero confirmed-receipt events. Repeat a valid submit with analytics consent declined. The response should still arrive, and any analytics output should follow your site's consent settings. Keep form answers and contact details out of the analytics payload. [Google's consent overview](https://developers.google.com/tag-platform/security/concepts/consent-mode), [Google Analytics privacy guidance](https://support.google.com/analytics/answer/6366371?hl=en)
+
+If you need session attribution and the pairing test fails, change the setup. Keep the existing form if an integration can demonstrate the match. Otherwise, choose a form that passes the same test. Until then, keep counting saved responses and leave those without a verified session match unattributed.
+
+## Sources and further reading
+
+Sources checked **22 November 2026**.
+
+- [HTML Standard on the iframe element](https://html.spec.whatwg.org/multipage/iframe-embed-object.html) covers browser load events.
+- [Google Forms response management](https://support.google.com/docs/answer/139706?hl=en) covers viewing and exporting responses.
+- [Google Apps Script trigger objects](https://developers.google.com/apps-script/guides/triggers/events#form-submit_1) documents what a Forms submit event contains.
+- [GA4 Measurement Protocol use cases](https://developers.google.com/analytics/devguides/collection/protocol/ga4/use-cases#session_attribution) gives the requirements for matching an event to a session.
