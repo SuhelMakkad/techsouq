@@ -1,0 +1,89 @@
+---
+title: 'How Many AppSheet User Passes Do You Need for External Customers?'
+description: 'Forecast AppSheet User Pass usage for external customers. Calculate when one app for intake and status fits your pool and when you still need more passes.'
+pubDate: 2026-11-23
+category: 'Business systems'
+heroImage: '../../assets/blog/appsheet-user-pass-budget.svg'
+heroImageAlt: 'In the busy-month example, two apps use 140 passes. One app uses 125 when 15 customers use both workflows and 100 when 40 do. The pool contains 120 passes.'
+socialImage: '/images/blog/appsheet-user-pass-budget.png'
+---
+
+Budget Google AppSheet User Passes for the highest credible monthly pass total. Count one pass per eligible, signed-in external customer account for each distinct app it opens in a calendar month, then add the passes other apps draw from the same pool. If customers need both intake and status, start with one app if it can serve both jobs under the required access rules. Each customer who would use both separate apps that month saves one pass in the combined app. A combined app can still exceed the pool. [AppSheet User Pass rules](https://support.google.com/appsheet/answer/15657053?hl=en)
+
+## Count passes for a calendar month
+
+This forecast covers signed-in customers of Google Workspace-managed AppSheet Core or Enterprise Plus apps whose access is covered by User Pass. Ask your Workspace admin to confirm which customer accounts would draw from the pool under your configuration before you count them. A customer can open the same app again that month on the same account using the same pass. Opening a second app uses a second pass. The pool resets after each calendar month, and unused passes do not carry forward. [Google’s licensing rules for organizations](https://support.google.com/appsheet/answer/16563370?hl=en), [Google’s User Pass guide](https://support.google.com/appsheet/answer/15657053?hl=en)
+
+## Find the month that breaks your plan
+
+A fictional repair business wants customers to submit jobs and look up their progress. It has a pool of 120 passes, with ten expected to be used by other apps each month. Every counted customer would use the same signed-in account for both jobs. The forecast assumes the same customers do the same jobs whether the developer builds one app or two.
+
+Count distinct eligible customers for each job for that month. If you plan two apps, add the two counts and the passes drawn by other apps. For one app, subtract one pass for each customer account on both lists. That gives each shared customer one pass for the combined app. If no customers use both in the same month, combining saves zero passes.
+
+<table role="table" tabIndex={0} aria-label="Monthly AppSheet User Pass forecast">
+  <thead>
+    <tr>
+      <th scope="col">Forecast month</th>
+      <th scope="col">Intake customers</th>
+      <th scope="col">Status customers</th>
+      <th scope="col">Customers using both</th>
+      <th scope="col">Passes with two apps</th>
+      <th scope="col">Passes with one app</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Typical month</th>
+      <td>90</td>
+      <td>10</td>
+      <td>10</td>
+      <td>110</td>
+      <td>100</td>
+    </tr>
+    <tr>
+      <th scope="row">Busy month, mostly current jobs</th>
+      <td>90</td>
+      <td>40</td>
+      <td>40</td>
+      <td>140</td>
+      <td>100</td>
+    </tr>
+    <tr>
+      <th scope="row">Busy month, older jobs still open</th>
+      <td>90</td>
+      <td>40</td>
+      <td>15</td>
+      <td>140</td>
+      <td>125</td>
+    </tr>
+  </tbody>
+</table>
+
+With 90 intake customers, 40 status customers and ten passes for other apps, the split setup needs 140 passes. Combining intake and status fits a 120-pass pool only if **at least 20 of those customers use both in the same month**. The calculation is 90 + 40 + 10 − 120. If just 15 customers use both, a combined app needs 125 passes and comes up five short. Two apps come up 20 short. Keep the purchase on hold until the quote covers the shortfall or the scope changes.
+
+To repeat the calculation, take one row per expected customer account and mark the jobs they will use in each month. If you have separate intake and status lists, match accounts that appear in both lists for the same calendar month. Repeat the calculation for each credible monthly scenario and use the highest pass total. When the two-app estimate exceeds the pool, the excess is the number of shared customers you need for one app to fit. If that number exceeds the smaller customer count, even full overlap leaves a shortfall. If you cannot estimate overlap, price the combined app with zero overlap. A backlog can bring back people who are only checking status, even when the two app counts stay the same.
+
+## Decide whether customers need a status app
+
+If customers only need a progress update and can get it through a channel you already operate, trial that channel before commissioning a status view. Use the older-jobs forecast above. If the service team can deliver all required updates without customers opening AppSheet for status, the business needs 90 passes for intake plus ten for other apps, or **100 total**. The same month would need 125 passes with a combined self-service app or 140 with separate apps.
+
+Have the service lead send a representative update through the existing channel and check that a customer can tell what happens next. Include a delayed job and a missed update so the team can verify who follows up. If customers need to sign in and see their own current status or history on demand, keep that requirement. Ask the supplier to demo two separate customer accounts. Each should be able to submit a request and see its own job status. If either can see the other's job, hold the combined design. Keep two apps if separation meets a real operating need, the access checks pass, and the revised pass quote fits your budget. If neither design meets the requirements at a price you can commit to, compare another platform or a separate customer-facing build. [Techsouq’s guide to transactional updates](/blog/transactional-email-checklist/), [Techsouq’s user permissions matrix](/blog/user-permissions-matrix/)
+
+## Check the forecast before committing
+
+Ask your AppSheet admin to confirm how many User Passes your organization has purchased. Check the AppSheet Admin Console's Licenses page and reconcile the purchase figures with your subscription or reseller order. For existing demand, use the **Used** total from a comparable calendar month before the proposed apps went live. If either proposed workflow is already included in that total, ask the admin to establish a separate baseline before adding a forecast for them. [Reading the AppSheet license report](https://support.google.com/appsheet/answer/14960110?hl=en)
+
+Run a small pilot only if your licensing terms allow it. Within one calendar month, have two eligible external test accounts each open intake twice and have one open status. Use a fresh pair for each design and give those accounts access only to the pilot apps. On the Licenses page, select the pilot month. The report refreshes every 24 hours. After the refresh, check the two accounts' User Pass license counts on the **Used** tab. Expect User Pass counts of two and one in the split pilot, or one each if both jobs run inside the same app. [AppSheet’s account-level license counts](https://support.google.com/appsheet/answer/14960110?hl=en)
+
+If the report differs, have the admin check the selected month, report refresh time, accounts, app identities and license type. Recalculate with the verified setup before widening sharing. Give the buyer or supplier the highest credible monthly pass count, the existing pool demand, and the design that passed the job and access checks. Ask for the total committed quantity, unit rate, and commitment term, then carry those into your [software cost comparison](/blog/custom-software-vs-off-the-shelf-cost/).
+
+Google bills for the quantity purchased and documents a minimum one-year commitment for additional passes. Excess use can trigger admin warnings. Google says it does not incur automatic overage charges, and access may be restricted after consecutive months over the purchased quantity. [Buying User Pass licenses](https://support.google.com/appsheet/answer/15657053?hl=en), [Google’s licensing rules for organizations](https://support.google.com/appsheet/answer/16563370?hl=en), [AppSheet license warnings](https://support.google.com/appsheet/answer/16003327?hl=en)
+
+## Sources and further reading
+
+- [Google AppSheet Help on User Pass eligibility, consumption and purchasing](https://support.google.com/appsheet/answer/15657053?hl=en)
+- [Google AppSheet Help on licensing for organizations](https://support.google.com/appsheet/answer/16563370?hl=en)
+- [Google AppSheet Help on license warnings](https://support.google.com/appsheet/answer/16003327?hl=en)
+- [Google AppSheet Help on purchased and used license counts](https://support.google.com/appsheet/answer/14960110?hl=en)
+
+Sources checked on 23 November 2026. The repair business and its forecast are illustrative. The pass totals are calculated from Google’s documented rules.
