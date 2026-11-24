@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="pdf-dispatch-title pdf-dispatch-description">
+  <title id="pdf-dispatch-title">Which PDF can go out?</title>
+  <desc id="pdf-dispatch-description">V1 is approved and queued. When V2 is pending, hold dispatch. After V2 is approved, send only V2.</desc>
+
+  <rect width="1200" height="630" fill="#f7f8fb" />
+  <path d="M912 0h288v180" fill="none" stroke="#e8eefc" stroke-width="64" />
+  <rect x="64" y="60" width="66" height="8" rx="4" fill="#2061ef" />
+
+  <g font-family="Manrope, Arial, sans-serif" fill="#18202f">
+    <text x="62" y="159" font-size="78" font-weight="800" letter-spacing="-2.8">Which PDF can go out?</text>
+
+    <g transform="translate(64 216)">
+      <rect width="320" height="340" rx="28" fill="#fff" stroke="#c8d4e8" stroke-width="2" />
+      <circle cx="160" cy="81" r="47" fill="#eaf0fe" />
+      <g fill="none" stroke="#1549bc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M144 58h24l12 12v31h-36z M168 58v12h12" />
+        <path d="m152 85 6 6 12-13" />
+      </g>
+
+      <text x="160" y="191" font-size="39" font-weight="700" text-anchor="middle">V1 approved</text>
+      <path d="M24 222h272" stroke="#dbe4f3" stroke-width="2" />
+      <text x="160" y="286" font-size="42" font-weight="800" text-anchor="middle" fill="#1549bc">V1 queued</text>
+    </g>
+
+    <g transform="translate(440 216)">
+      <rect width="320" height="340" rx="28" fill="#fff3d8" stroke="#dcbc75" stroke-width="2" />
+      <circle cx="160" cy="81" r="47" fill="#ffe3a3" />
+      <path d="M151 65v32m18-32v32" fill="none" stroke="#6e4600" stroke-width="7" stroke-linecap="round" />
+
+      <text x="160" y="191" font-size="39" font-weight="700" text-anchor="middle">V2 pending</text>
+      <path d="M24 222h272" stroke="#e9cf99" stroke-width="2" />
+      <text x="160" y="286" font-size="42" font-weight="800" text-anchor="middle" fill="#6e4600">Hold dispatch</text>
+    </g>
+
+    <g transform="translate(816 216)">
+      <rect width="320" height="340" rx="28" fill="#1549bc" />
+      <circle cx="160" cy="81" r="47" fill="#fff" />
+      <g fill="none" stroke="#1549bc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M141 84h37m-14-14 14 14-14 14" />
+        <path d="M141 70v28" />
+      </g>
+
+      <text x="160" y="191" font-size="39" font-weight="700" text-anchor="middle" fill="#fff">V2 approved</text>
+      <path d="M24 222h272" stroke="#7297ed" stroke-width="2" />
+      <text x="160" y="286" font-size="42" font-weight="800" text-anchor="middle" fill="#fff">Send V2 only</text>
+    </g>
+  </g>
+
+  <path d="M393 386h35m-11-11 11 11-11 11 M769 386h35m-11-11 11 11-11 11" fill="none" stroke="#405372" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

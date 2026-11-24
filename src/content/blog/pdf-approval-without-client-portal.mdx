@@ -1,0 +1,78 @@
+---
+title: 'Do You Need a Client Portal for PDF Approvals?'
+description: 'Test whether email or a proofing tool can replace a client portal for PDF approvals. Rehearse a revision while the previously approved PDF is still in the dispatch queue.'
+pubDate: 2026-11-24
+category: 'Product planning'
+heroImage: '../../assets/blog/pdf-approval-without-client-portal.svg'
+heroImageAlt: 'V1 is approved and queued. When V2 is pending, hold dispatch. After V2 is approved, send only V2.'
+socialImage: '/images/blog/pdf-approval-without-client-portal.png'
+---
+
+The revised PDF is waiting for sign-off. The dispatch queue still says Ready because the client approved yesterday’s file. You can skip building a client portal for PDF approvals if email or a proofing tool records the decision on a specific revision and your team can hold dispatch until the current revision, the client’s approval and the outgoing PDF all agree.
+
+Before you rely on a proofing tool, run two tests with your existing job tracker. First try to approve an older PDF that was left open during a replacement. Then replace a PDF whose approval has already put it in the dispatch queue. A stale Ready badge is a reason to check. The deciding observation is whether any PDF goes out while V2 still awaits approval.
+
+## One approval can become two different records
+
+The proofing tool records which revision the client approved. The queue records work waiting to be sent. In this example, dispatch means sending the exact PDF the client saw to the next team. If your process generates a separate production file, establish how it maps to the approved proof before adapting the test.
+
+A latest-version link tells you what a reviewer sees on a fresh visit. Filestage documents one from its project overview, alongside exact-version links from the file view. Ziflow documents a prompt that tells a reviewer in an already-open proof that the old version is locked. The queue still needs its own check. [Filestage review links](https://help.filestage.io/en/articles/1459683-manage-review-links-for-files-and-versions), [Ziflow proof version instructions](https://help.ziflow.com/hc/en-us/articles/30721904383252-Create-a-new-proof-version)
+
+A file may also leave the proofing tool when approval is recorded. PageProof documents a SharePoint integration, on Teams Plus and Enterprise, that delivers the final approved file to a configured folder when the proof has the matching delivery tag. PageProof records the delivery. The SharePoint copy arrives without proof metadata. If staff treat a file’s presence in a folder as permission to send it, ask them what they would check there after a revision. A file delivered at approval time establishes what was delivered then. Current approval needs a separate check. [PageProof’s SharePoint delivery documentation](https://help.pageproof.com/en/articles/17591276-pageproof-sharepoint)
+
+## Run the old-tab and queued-file tests
+
+Make two single-page PDFs for a fictional job, R-42. Put “R-42 V1 · 120 copies” on one and “R-42 V2 · 240 copies” on the other. Save both as separate files and keep their contents fixed. Assign a designated client approver, a proof owner and a release operator. Use the review permissions and send routes the real job uses, with an empty test inbox or folder as the final destination. If the workflow stages files elsewhere before sending, keep that staging folder separate from the test destination.
+
+1. **Old tab.** The approver opens V1 and leaves it on screen. The proof owner publishes V2. Without refreshing, the approver attempts to approve V1. With email, reply from the old thread with explicit approval for V1. Pass if the action is blocked or the decision is visibly attached to V1, V2 stays pending and the test destination stays empty. If V2 becomes approved without the approver seeing and approving it, stop and fix approval capture.
+2. **Queued file.** Start a fresh test job with the same PDFs and roles. The approver approves V1 while it is current. Let that decision put V1 in the dispatch queue and pause before anything is sent. The proof owner replaces it with V2 through the normal revision process, including any required reopening or withdrawal. Now try releasing the queued work while V2 is pending. If an automation copies approvals into the tracker, run the sequence again in staging. Pause the V1 approval update before it reaches the tracker, publish V2 and then resume the update. Neither attempt should put a file in the test destination. If either attempt sends a file, the dispatch handoff needs a fix.
+3. **Positive check.** Have the approver open and approve V2. Leave V1 selected in the queue and try releasing it. The old PDF must still be held. Select the approved V2 file and try again. The test destination should receive one copy of the V2 PDF. A queue that holds every file also fails the rehearsal.
+
+For this one-approver workflow, check the current revision and the designated client’s decision on that job at dispatch. Verify the outgoing PDF against the stored file for that revision, using its fixed file record or a file fingerprint. Hold if any evidence is missing or the checks disagree. Keep the old decision as history.
+
+<table role="table" tabIndex={0} aria-label="PDF dispatch decisions by revision">
+  <thead>
+    <tr>
+      <th scope="col">Current revision</th>
+      <th scope="col">Client approval on record</th>
+      <th scope="col">Candidate outgoing PDF</th>
+      <th scope="col">Expected action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>V2</td>
+      <td>V1</td>
+      <td>V1</td>
+      <td>Hold. A valid V1 approval cannot release a superseded file.</td>
+    </tr>
+    <tr>
+      <td>V2</td>
+      <td>V2</td>
+      <td>V1</td>
+      <td>Hold. The current approval cannot release the wrong PDF.</td>
+    </tr>
+    <tr>
+      <td>V2</td>
+      <td>V2</td>
+      <td>V2</td>
+      <td>Release V2 if the job's other release checks also pass.</td>
+    </tr>
+  </tbody>
+</table>
+
+## Buy or change the part that failed
+
+**Keep email and the tracker** if one named client can approve each fixed PDF by replying with the job and revision, and one operator can control every send route for that job. For example, ask for “I approve R-42 V2 for dispatch”, keep that reply with the exact PDF and verify the sender and version before sending. When a correction arrives, put queued work on hold before preparing or publishing the replacement. Have the same operator control when a revision takes effect and when the job is sent, so a replacement cannot slip between the check and the send. Run the test again with the staff who would do this under deadline.
+
+**Buy dedicated proofing** if your team needs comments on the PDF and a record of who approved which file and when, and the tool plus your dispatch step passes both tests and the positive check. If review works and dispatch fails, choose a manual handoff if one operator can stop every send route. If release has to run unattended, ask the supplier to make the current revision, the designated client’s approval and the exact outgoing PDF agree before dispatch. Require the same control to govern when the revision takes effect and when the job is sent. Show the supplier which file landed in the test destination and rerun the rehearsal before enabling automated release.
+
+**Scope a portal** when the broader customer workflow warrants it. If clients also need private project status and past deliverables in one place, and an existing product cannot cover that work, start with the [worked customer portal approval brief](/blog/customer-portal-mvp-scope/).
+
+## Sources and further reading
+
+Sources checked 24 November 2026. The rehearsal uses fictional files and expected outcomes. The named tools are documentation examples.
+
+- [Aproova’s proofing software evaluation checklist](https://aproova.co/en/blog/how-to-choose-online-proofing-software) tests an external reviewer and a second revision during a trial.
+- [AutomatePrint’s artwork version documentation](https://automateprint.com/docs/approvals/versions/) explains when historical links stop accepting decisions and how older approvals are preserved.
+- [Printing Beetle’s revised-proof guide](https://printingbeetle.com/guides/review-a-revised-print-proof) checks that the approved version is still current before production release.
