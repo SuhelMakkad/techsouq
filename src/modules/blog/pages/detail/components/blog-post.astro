@@ -147,12 +147,12 @@ const structuredData = JSON.stringify(schema).replace(/</g, '\\u003c');
                 <summary class="cursor-pointer text-xs font-bold tracking-[0.1em] uppercase">
                   In this guide
                 </summary>
-                <ol class="mt-5 space-y-3 border-l border-line pl-4 text-xs leading-6">
+                <ol class="mt-5 space-y-3 border-l border-line text-xs leading-6">
                   {contents.map(({ slug, text }) => (
                     <li>
                       <a
                         href={`#${slug}`}
-                        class="block text-muted transition-colors hover:text-brand"
+                        class="-ml-px block border-l-2 border-transparent pl-4 text-muted transition-colors hover:text-brand aria-[current=location]:border-brand aria-[current=location]:text-brand-dark"
                       >
                         {text}
                       </a>
@@ -200,6 +200,74 @@ const structuredData = JSON.stringify(schema).replace(/</g, '\\u003c');
     <Footer />
   </body>
 </html>
+
+<script>
+  const guide = document.querySelector<HTMLElement>('.contents-nav');
+
+  if (guide) {
+    const sections = [...guide.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')].flatMap(
+      (link) => {
+        const heading = document.getElementById(link.getAttribute('href')?.slice(1) ?? '');
+        return heading ? [{ heading, link }] : [];
+      },
+    );
+
+    if (sections.length > 0) {
+      const article = guide.closest('article');
+      let activeLink: HTMLAnchorElement | undefined;
+      let frame: number | undefined;
+
+      const revealActiveLink = () => {
+        if (!activeLink || guide.scrollHeight <= guide.clientHeight) return;
+
+        const linkBounds = activeLink.getBoundingClientRect();
+        const guideBounds = guide.getBoundingClientRect();
+
+        if (linkBounds.top < guideBounds.top) {
+          guide.scrollTop += linkBounds.top - guideBounds.top;
+        } else if (linkBounds.bottom > guideBounds.bottom) {
+          guide.scrollTop += linkBounds.bottom - guideBounds.bottom;
+        }
+      };
+
+      const updateActiveSection = () => {
+        frame = undefined;
+
+        // Match fragment navigation and allow for fractional scroll positions.
+        const scrollPadding = getComputedStyle(document.documentElement).scrollPaddingTop;
+        const readingLine = (parseFloat(scrollPadding) || 0) + 1;
+        let nextLink: HTMLAnchorElement | undefined;
+
+        for (const { heading, link } of sections) {
+          if (heading.getBoundingClientRect().top > readingLine) break;
+
+          nextLink = link;
+        }
+
+        if (nextLink === activeLink) return;
+
+        activeLink?.removeAttribute('aria-current');
+        activeLink = nextLink;
+        activeLink?.setAttribute('aria-current', 'location');
+
+        revealActiveLink();
+      };
+
+      const scheduleUpdate = () => {
+        frame ??= requestAnimationFrame(updateActiveSection);
+      };
+
+      window.addEventListener('scroll', scheduleUpdate, { passive: true });
+      window.addEventListener('resize', scheduleUpdate);
+      window.addEventListener('pageshow', scheduleUpdate);
+
+      new ResizeObserver(revealActiveLink).observe(guide);
+      if (article) new ResizeObserver(scheduleUpdate).observe(article);
+
+      scheduleUpdate();
+    }
+  }
+</script>
 
 <style>
   @media (min-width: 64rem) {
