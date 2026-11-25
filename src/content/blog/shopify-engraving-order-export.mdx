@@ -1,0 +1,84 @@
+---
+title: 'Do You Need an Export App for Shopify Engraving Orders?'
+description: 'Find out when you need an export app for Shopify engraving orders and when the fix belongs in the workshop import. Try two orders with the same SKU.'
+pubDate: 2026-11-25
+category: 'Business systems'
+heroImage: '../../assets/blog/shopify-engraving-order-export.svg'
+heroImageAlt: 'For order #1207, the export contains two AVA mugs and one LEO mug. Grouping by order and SKU gives the workshop three AVA mugs and no LEO mug.'
+socialImage: '/images/blog/shopify-engraving-order-export.png'
+---
+
+An export app is worth trying when your workshop needs a batch file and your existing export options leave out the engraving on each item. Keep working from Shopify’s order details if your team can handle orders one at a time. If your current CSV already carries each engraving and its correct quantity, check the imported workshop jobs before you pay for another exporter. A correct file can still produce the wrong mugs.
+
+## Find out where Shopify stores the engraving
+
+Open a placed order in Shopify admin and check which product line carries the engraving. Shopify calls text saved on the product line a line item property. Its cart documentation shows how two lines can share a variant but carry different properties, so two mugs can have the same SKU and different text. For a machine-readable handoff, Shopify’s Admin API lets integrations read these details as custom attributes on each line item. [Shopify’s guide to line item properties](https://help.shopify.com/en/manual/products/variants/add-variants#line-item-properties), [Shopify’s cart reference](https://shopify.dev/docs/api/ajax/reference/cart), [Shopify’s order line item reference](https://shopify.dev/docs/api/admin-graphql/2026-10/objects/LineItem#field-LineItem.fields.customAttributes)
+
+Shopify’s documented standard order CSV includes the line item SKU and quantity, with no dedicated field for the engraving saved as a line item property. Its `Notes` and `Note Attributes` columns are for the order as a whole. For a file the workshop imports, use an exporter or existing connector that can carry the text on its matching item. Check the actual file against the order details. [Shopify’s standard order CSV fields](https://help.shopify.com/en/manual/fulfillment/managing-orders/exporting-orders#order-export-csv-structure)
+
+## Use two orders that can pass the wrong check
+
+In this fictional batch, the workshop gets five mugs to engrave across two orders. Each mug has the same stock code, `MUG-01`, and one required engraving. Compare the placed orders with what you entered at checkout, then write down the expected quantities before opening any export. Use the order numbers your test store assigns in place of #1207 and #1208. Leave both orders unedited and unfulfilled while you check the job list.
+
+<table
+  role="table"
+  tabIndex={0}
+  aria-label="Expected engraving quantities for the fictional Shopify orders"
+>
+  <thead>
+    <tr>
+      <th scope="col">Shopify order</th>
+      <th scope="col">SKU</th>
+      <th scope="col">Exact engraving</th>
+      <th scope="col">Expected units</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>#1207</td>
+      <td>MUG-01</td>
+      <td>AVA</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>#1207</td>
+      <td>MUG-01</td>
+      <td>LEO</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>#1208</td>
+      <td>MUG-01</td>
+      <td>LEO</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>#1208</td>
+      <td>MUG-01</td>
+      <td>MAYA</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+
+Add up the quantity for each exact combination of order, SKU and engraving. Do it first in the exported CSV, then in the job list the engraver actually uses. Two separate `AVA` rows with one unit each are equivalent to one row with two units for order #1207 in this test. Row order can change. A missing combination, an extra combination, or a different quantity means the stage fails. If your workshop also needs a particular font or placement, include those instructions in the comparison.
+
+Techsouq ran the batch locally on 25 November 2026 using Python 3.14.6 to write and reread CSV files. A projection onto the relevant standard export columns carried both orders and all five units with no engraving text. A simulated exporter preserved all four exact combinations. When a simulated importer grouped that file by order and SKU and kept the first engraving, its queue asked for three `AVA` mugs on #1207 and two `LEO` mugs on #1208. A queue with the original quantities split into five one-unit rows and reordered passed. The test used synthetic data with no Shopify store or export app connected.
+
+Counting engravings across the whole batch still misses a swap between orders. Move one `AVA` on #1207 to #1208 and move the `LEO` on #1208 to #1207. There are still three mugs on #1207 and two on #1208. The workshop still sees two `AVA`, two `LEO` and one `MAYA` overall. Checking each order against the four expected rows catches the mistake before the mugs reach the bench.
+
+## Fix the first point where quantities differ
+
+1. **Shopify order.** If a name is missing or wrong in the recorded order, have your store operator check how the product page or app saves the engraving. Repeat the checkout before changing the export.
+2. **Raw export.** If the recorded order and export disagree, have your store operator enable item-level properties in an existing exporter or connector, if available. If the workshop requires a batch file and the existing route cannot preserve the details, trial an exporter that reads item-level properties. For a small queue, a person can check each engraving in Shopify and record the exact quantities on the workshop job sheet. Have the engraver compare the finished list with the order before starting work.
+3. **Workshop job list.** If the file agrees with the order and the imported jobs disagree, take the passing CSV and failing job list to the workshop software's owner. Ask them to preserve the engraving per item and stop any grouping that collapses distinct names. Keep the failing batch off the production queue and rerun both orders after the fix.
+
+Have your operations lead place the two fictional orders through the storefront path you plan to use, in a test store with workshop dispatch disabled. Save the order details, exported file and actual test job list side by side. Sign off on this handoff when the engraver sees all four combinations with their exact quantities and no extras. To specify how the workshop handles rejected rows and retries, use our [CSV import requirements guide](/blog/csv-import-requirements/). [Shopify’s test-order instructions](https://help.shopify.com/en/manual/checkout-settings/test-orders/processing-test-order)
+
+## Sources and further reading
+
+Sources checked 25 November 2026.
+
+- [Shopify Help Center on collecting customization details](https://help.shopify.com/en/manual/products/variants/add-variants#line-item-properties)
+- [Shopify Help Center on the standard order CSV](https://help.shopify.com/en/manual/fulfillment/managing-orders/exporting-orders#order-export-csv-structure)
+- [Shopify developer reference for order line items](https://shopify.dev/docs/api/admin-graphql/2026-10/objects/LineItem#field-LineItem.fields.customAttributes)
