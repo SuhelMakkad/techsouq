@@ -1,0 +1,141 @@
+---
+title: 'Will Changing Your Website’s A Record Break Business Email?'
+description: 'Check the incoming mail destination and the current sender’s SPF result before changing the A record for a website move. See how one edit can affect both.'
+pubDate: 2026-11-27
+category: 'Websites & search'
+heroImage: '../../assets/blog/website-a-record-business-email.svg'
+heroImageAlt: 'In the test, changing only the website A record moves the incoming mail lookup from the old mail server to the new web server and changes the existing sender’s SPF result from pass to fail.'
+socialImage: '/images/blog/website-a-record-business-email.png'
+---
+
+Changing your website’s A record can break business email even when the mail records stay the same. Incoming mail and sender checks can both look up the website address. Keep your current DNS and email services if your new web host supports that setup. Before approving the website-only edit, have the DNS administrator verify where incoming mail will go and the mail provider verify that services relying on SPF will still pass. If either check fails or remains unverified, hold the switch.
+
+## Follow the two lookups
+
+**Incoming mail.** Ask your DNS administrator to show where each MX record for the domain after the `@` in your email address actually leads. An MX record names a receiving server. Its A and AAAA records give the network addresses for IPv4 and IPv6. If the MX target is your bare website domain, changing its A record replaces the advertised IPv4 mail destination too. A successful lookup with no MX records can also fall back to the domain’s addresses. An explicit null MX declares that the domain accepts no mail. [SMTP destination rules](https://www.rfc-editor.org/rfc/rfc5321.html#section-5.1), [Null MX rules](https://www.rfc-editor.org/rfc/rfc7505.html#section-3)
+
+**Outgoing mail.** Ask your mail provider which sending IPs and envelope sender domains your current services use. The envelope sender is the return address used by mail servers. Sender Policy Framework (SPF) checks the connecting IP against the policy for that identity. In a policy with a bare `a`, the evaluator looks up the checked domain’s address. If that’s the web address you plan to move, an unchanged SPF text record can give a different result for the same sender. Ask the provider to follow any other lookups the policy uses, including `mx`, `include` and `redirect`. The SPF verdict is one input the recipient server can use when handling the message. [SPF check inputs](https://www.rfc-editor.org/rfc/rfc7208.html#section-4.1), [SPF lookup mechanisms](https://www.rfc-editor.org/rfc/rfc7208.html#section-5), [SPF redirect](https://www.rfc-editor.org/rfc/rfc7208.html#section-6.1), [How receivers interpret SPF](https://www.rfc-editor.org/rfc/rfc7208.html#section-8)
+
+## One address change, two different failures
+
+The fictional business at `example.com` wants to keep the server at `192.0.2.10` for incoming and outgoing mail. Its website will move to `198.51.100.20`. All five versions of the DNS records below have a `mail.example.com` A record pointing directly to `192.0.2.10` and a single MX with priority 10. At the start, the MX still points to `example.com` and the outgoing server sends with the envelope address `billing@example.com`. The domain and addresses are illustrative. [IPv4 addresses reserved for documentation](https://www.rfc-editor.org/rfc/rfc5737.html#section-3)
+
+We served each version of the records from a local DNS server and used fresh lookups to check the incoming destination and sender’s SPF result. To work it out by hand, read the MX target’s A record for the incoming address. For SPF, look up the address used by `a` or `a:mail.example.com` and compare it to the sending IP `192.0.2.10`. A match passes. Otherwise the example policy reaches `-all` and returns fail. [SPF a mechanism](https://www.rfc-editor.org/rfc/rfc7208.html#section-5.3), [SPF policy outcomes](https://www.rfc-editor.org/rfc/rfc7208.html#section-4.6.2)
+
+<table
+  role="table"
+  tabIndex={0}
+  aria-label="DNS test results for the website move"
+  className="[&_code]:[overflow-wrap:normal] [&_td:not(:nth-child(4))_code]:whitespace-nowrap"
+>
+  <thead>
+    <tr>
+      <th scope="col">Version</th>
+      <th scope="col">Website A</th>
+      <th scope="col">MX target</th>
+      <th scope="col">SPF TXT at example.com</th>
+      <th scope="col">Incoming target IP</th>
+      <th scope="col">SPF for 192.0.2.10</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1. Before any edit</th>
+      <td>
+        <code>192.0.2.10</code>
+      </td>
+      <td>
+        <code>example.com</code>
+      </td>
+      <td>
+        <code>v=spf1 a -all</code>
+      </td>
+      <td>
+        <code>192.0.2.10</code>
+      </td>
+      <td>Pass</td>
+    </tr>
+    <tr>
+      <th scope="row">2. Website A changed alone</th>
+      <td>
+        <code>198.51.100.20</code>
+      </td>
+      <td>
+        <code>example.com</code>
+      </td>
+      <td>
+        <code>v=spf1 a -all</code>
+      </td>
+      <td>
+        <code>198.51.100.20</code>
+      </td>
+      <td>Fail</td>
+    </tr>
+    <tr>
+      <th scope="row">3. Website moved, MX fixed alone</th>
+      <td>
+        <code>198.51.100.20</code>
+      </td>
+      <td>
+        <code>mail.example.com</code>
+      </td>
+      <td>
+        <code>v=spf1 a -all</code>
+      </td>
+      <td>
+        <code>192.0.2.10</code>
+      </td>
+      <td>Fail</td>
+    </tr>
+    <tr>
+      <th scope="row">4. Mail records separated first</th>
+      <td>
+        <code>192.0.2.10</code>
+      </td>
+      <td>
+        <code>mail.example.com</code>
+      </td>
+      <td>
+        <code>v=spf1 a:mail.example.com -all</code>
+      </td>
+      <td>
+        <code>192.0.2.10</code>
+      </td>
+      <td>Pass</td>
+    </tr>
+    <tr>
+      <th scope="row">5. Website moved after row 4</th>
+      <td>
+        <code>198.51.100.20</code>
+      </td>
+      <td>
+        <code>mail.example.com</code>
+      </td>
+      <td>
+        <code>v=spf1 a:mail.example.com -all</code>
+      </td>
+      <td>
+        <code>192.0.2.10</code>
+      </td>
+      <td>Pass</td>
+    </tr>
+  </tbody>
+</table>
+
+Changing only the website A record in this test moved the incoming DNS destination to the new website IP and flipped the existing sender’s SPF result from pass to fail. The MX and SPF text were identical in rows 1 and 2. Both had looked up `example.com`, so their results changed when its address did.
+
+The subdomain in row 3 restores the intended incoming address, while bare `a` still points SPF at the website. If your MX already points to a separate mail server but your sender passes SPF only through the website address, hold the website change until your mail provider preserves that sender’s SPF pass independently. In rows 4 and 5, both checks follow a mail hostname whose address stays fixed. The example shows the order of work. Use your provider’s settings and confirm that they cover all your real senders.
+
+## What to ask for before you approve the switch
+
+1. Ask the website developer for the exact current and proposed DNS records, including IPv6 where used. Have the DNS administrator list the receiving hostnames and addresses under both versions. Have the mail provider list the real sending IP, envelope sender domain and expected SPF result for each service that relies on SPF, such as invoicing. Hold the edit if a receiving address is unintended, a service that needs an SPF pass would return a different result, or either result is still unverified.
+2. If either check depends on the website address, have the mail provider detach the lookup while the old website address is still in use. If cancelling the old hosting plan would end the mail service, arrange to retain or replace the service before the switch. After publishing any preparatory mail change, give cached records time to expire based on their previous lifetimes. Check the revised answers from outside your network and repeat the mail checks before changing the website address. Save the old website DNS values and keep the old site available for a rollback if needed. [How DNS cache lifetimes work](https://developers.cloudflare.com/dns/manage-dns-records/reference/ttl/)
+3. Before and after the website switch, have a staff member use an outside mailbox to send a message to a business inbox and receive a reply. Exercise any other sending services affected by the change. Where SPF is part of the expected result, have the mail provider check the receiving service’s headers for the actual SPF verdict and envelope domain. If a test fails after the switch, record the timestamp and message ID when available. Keep both services running and have the DNS administrator and mail provider decide whether restoring the saved website values will recover the mail path. If your site sends enquiries or notifications, test those separately. [How to read a message’s headers in Gmail](https://support.google.com/mail/answer/29436?hl=en), [Techsouq’s transactional email launch checks](/blog/transactional-email-checklist/)
+
+## Sources and further reading
+
+Sources checked on 27 November 2026. We tested the fictional records that day on macOS with Python 3.14.6 and dnslib 0.9.26, using DiG 9.10.6 to read the MX and its target’s A record, and pyspf 2.0.14 with dnspython 2.8.0 to check SPF. The measurements cover local DNS answers and SPF results only. Delivery and caching need separate tests.
+
+- [RFC 5321, SMTP destination lookup](https://www.rfc-editor.org/rfc/rfc5321.html#section-5.1)
+- [RFC 7208, SPF mechanisms and target names](https://www.rfc-editor.org/rfc/rfc7208.html#section-5)
+- [Cloudflare’s email DNS setup documentation](https://developers.cloudflare.com/dns/manage-dns-records/how-to/email-records/)
